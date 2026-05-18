@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Foto — Photobooth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:     #d63f6b;
+      --pink-l:   #fce8ee;
+      --pink-s:   #ffb3c6;
+      --pink-d:   #b02d55;
+      --bg:       #fbe9f0;
+      --bg2:      #f9e6f5;
+      --text:     #6b4e6b;
+      --white:    #ffffff;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, var(--bg), var(--bg2));
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid rgba(255,179,198,0.4);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .topbar h1 { font-size: 1.2rem; color: var(--text); }
+
+    .info-pill {
+      font-size: 0.82rem; font-weight: 700;
+      background: var(--white); color: var(--text);
+      padding: 5px 14px; border-radius: 60px;
+      box-shadow: 0 4px 0 var(--pink-s);
+      border: 2px solid #ffe0f0;
+    }
+
+    .info-pill span { color: var(--pink); }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── INSTRUKSI ── */
+    .instruksi {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      border: 2px solid rgba(255,179,198,0.4);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .instruksi .icon { font-size: 1.5rem; flex-shrink: 0; }
+
+    /* ── FOTO GRID ── */
+    .foto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .foto-item {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 3px solid var(--white);
+      box-shadow: 0 6px 16px rgba(255,140,170,0.2);
+      transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
+      aspect-ratio: 4/3;
+      background: #111;
+    }
+
+    .foto-item:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--pink-s);
+      box-shadow: 0 12px 24px rgba(214,63,107,0.25);
+    }
+
+    /* State terpilih */
+    .foto-item.selected {
+      border-color: var(--pink);
+      box-shadow: 0 8px 24px rgba(214,63,107,0.35);
+    }
+
+    .foto-item img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      pointer-events: none;
+    }
+
+    /* Overlay pink saat hover */
+    .foto-overlay {
+      position: absolute; inset: 0;
+      background: rgba(214,63,107,0.18);
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+
+    .foto-item.selected .foto-overlay { opacity: 1; }
+    .foto-item:hover .foto-overlay    { opacity: 0.5; }
+
+    /* Badge nomor urut */
+    .foto-badge {
+      position: absolute; top: 7px; left: 7px;
+      background: var(--pink); color: white;
+      border-radius: 50%; width: 26px; height: 26px;
+      font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(214,63,107,0.4);
+      transition: transform 0.2s;
+    }
+
+    .foto-badge.hidden { display: none; }
+    .foto-item.selected .foto-badge { transform: scale(1.1); }
+
+    /* Tanda centang besar saat hover */
+    .foto-check {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+    }
+
+    .foto-item.selected .foto-check { opacity: 1; }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      position: sticky;
+      bottom: 0;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-top: 2px solid rgba(255,179,198,0.4);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 50;
+    }
+
+    .selected-count {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .selected-count em { color: var(--pink); font-style: normal; }
+
+    .bottom-actions { display: flex; gap: 10px; }
+
+    .btn-back {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem; font-weight: 700;
+      padding: 10px 20px; border-radius: 14px;
+      cursor: pointer;
+      background: var(--white); color: var(--pink-d);
+      border: 2px solid var(--pink-s);
+      box-shadow: 0 4px 0 var(--pink-s);
+      transition: all 0.1s;
+    }
+
+    .btn-back:hover  { transform: translateY(-2px); }
+    .btn-back:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--pink-s); }
+
+    .btn-lanjut {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      padding: 12px 28px; border-radius: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--pink), var(--pink-d));
+      color: white; border: none;
+      box-shadow: 0 6px 18px rgba(214,63,107,0.3);
+      transition: all 0.15s;
+    }
+
+    .btn-lanjut:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(214,63,107,0.4); }
+    .btn-lanjut:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: #c5a8b8;
+    }
+
+    .empty-state .ic { font-size: 3.5rem; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state p   { font-size: 0.9rem; }
+
+    /* Preview thumbnail di bar bawah */
+    .selected-thumbs {
+      display: flex; gap: 6px; flex-wrap: nowrap;
+      overflow-x: auto; max-width: 300px;
+    }
+
+    .sel-thumb {
+      width: 36px; height: 36px;
+      border-radius: 8px; overflow: hidden;
+      border: 2px solid var(--pink);
+      flex-shrink: 0;
+    }
+
+    .sel-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .foto-item { animation: popIn 0.3s ease both; }
+  </style>
+</head>
+<body>
+
+<!-- Guard: cek login -->
+<script>
+  (function() {
+    if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
+      window.location.href = "index.html"; return;
+    }
+    const u = JSON.parse(localStorage.getItem("currentUser"));
+    // Kalau belum ada foto sama sekali, kembali ke foto.html
+    if (!u?.foto || u.foto.length === 0) {
+      window.location.href = "foto.html"; return;
+    }
+  })();
+</script>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <h1>🖼️ Pilih Foto Terbaik</h1>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <div class="info-pill" id="pillTotal">Semua: <span id="totalFoto">0</span> foto</div>
+    <div class="info-pill" id="pillSelected">Dipilih: <span id="countSelected">0</span></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Instruksi -->
+  <div class="instruksi">
+    <div class="icon">💡</div>
+    <div>
+      Pilih foto yang ingin kamu pakai untuk layout dan frame.
+      Kamu bisa pilih hingga <strong id="maxPilihText">12</strong> foto.
+      Klik foto untuk memilih / batal pilih.
+    </div>
+  </div>
+
+  <!-- Grid foto -->
+  <div class="foto-grid" id="fotoGrid">
+    <div class="empty-state">
+      <div class="ic">📷</div>
+      <p>Memuat foto...</p>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="selected-count">
+      Dipilih: <em id="countBottom">0</em> / <em id="maxBottom">12</em>
+    </div>
+    <!-- Thumbnail preview foto yang dipilih -->
+    <div class="selected-thumbs" id="selectedThumbs"></div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="btn-back" onclick="window.location.href='foto.html'">← Foto Lagi</button>
+    <button class="btn-lanjut" id="btnLanjut" onclick="lanjutKeFrame()" disabled>
+      Pilih Frame &amp; Layout →
+    </button>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────
+  //  STATE
+  // ─────────────────────────────────────────
+  let user     = JSON.parse(localStorage.getItem("currentUser"));
+  const MAX    = Math.min(user.paket?.foto_limit >= 999 ? 12 : (user.paket?.foto_limit ?? 12), 12);
+  let selected = []; // array index yang dipilih (berurutan)
+
+  // Sinkronkan MAX ke UI
+  document.getElementById("maxPilihText").textContent = MAX;
+  document.getElementById("maxBottom").textContent    = MAX;
+
+  // ─────────────────────────────────────────
+  //  RENDER GRID
+  // ─────────────────────────────────────────
+  function renderGrid() {
+    const grid = document.getElementById("fotoGrid");
+
+    if (!user.foto || user.foto.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="ic">📷</div>
+          <p>Belum ada foto. Kembali dan ambil foto dulu.</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById("totalFoto").textContent = user.foto.length;
+    grid.innerHTML = "";
+
+    user.foto.forEach((src, idx) => {
+      const item = document.createElement("div");
+      item.className = "foto-item";
+      item.style.animationDelay = `${idx * 0.04}s`;
+      item.innerHTML = `
+        <img src="${src}" alt="Foto ${idx + 1}" loading="lazy">
+        <div class="foto-overlay"></div>
+        <div class="foto-check">✓</div>
+        <div class="foto-badge hidden" id="badge-${idx}"></div>
+      `;
+      item.addEventListener("click", () => toggleSelect(idx, item));
+      grid.appendChild(item);
+    });
+  }
+
+  // ─────────────────────────────────────────
+  //  TOGGLE PILIH
+  // ─────────────────────────────────────────
+  function toggleSelect(idx, el) {
+    const pos = selected.indexOf(idx);
+
+    if (pos !== -1) {
+      // Batal pilih
+      selected.splice(pos, 1);
+      el.classList.remove("selected");
+    } else {
+      if (selected.length >= MAX) {
+        showBlink(`Maksimal ${MAX} foto!`);
+        return;
+      }
+      selected.push(idx);
+      el.classList.add("selected");
+    }
+
+    // Update semua badge nomor urut
+    rebuildBadges();
+    updateBar();
+  }
+
+  function rebuildBadges() {
+    // Reset semua badge dulu
+    document.querySelectorAll(".foto-badge").forEach(b => {
+      b.textContent = ""; b.classList.add("hidden");
+    });
+    // Isi ulang sesuai urutan pilih
+    selected.forEach((idx, urutan) => {
+      const badge = document.getElementById(`badge-${idx}`);
+      if (badge) {
+        badge.textContent = urutan + 1;
+        badge.classList.remove("hidden");
+      }
+    });
+  }
+
+  // ─────────────────────────────────────────
+  //  UPDATE BOTTOM BAR
+  // ─────────────────────────────────────────
+  function updateBar() {
+    const cnt = selected.length;
+    document.getElementById("countSelected").textContent = cnt;
+    document.getElementById("countBottom").textContent   = cnt;
+    document.getElementById("btnLanjut").disabled        = cnt === 0;
+
+    // Render thumbnail preview
+    const thumbs = document.getElementById("selectedThumbs");
+    thumbs.innerHTML = selected.map(idx => `
+      <div class="sel-thumb">
+        <img src="${user.foto[idx]}" alt="">
+      </div>
+    `).join("");
+  }
+
+  // ─────────────────────────────────────────
+  //  LANJUT KE PILIH FRAME
+  // ─────────────────────────────────────────
+  function lanjutKeFrame() {
+    if (selected.length === 0) { showBlink("Pilih minimal 1 foto!"); return; }
+
+    // Simpan selectedFoto ke localStorage user (berurutan sesuai pilihan)
+    user.selectedFoto = selected.map(idx => user.foto[idx]);
+    localStorage.setItem("currentUser", JSON.stringify(user));
+
+    window.location.href = "pilih-frame.html";
+  }
+
+  // ─────────────────────────────────────────
+  //  FLASH MESSAGE (tanpa alert)
+  // ─────────────────────────────────────────
+  function showBlink(msg) {
+    const el = document.getElementById("pillSelected");
+    const orig = el.innerHTML;
+    el.style.background = "#fce8ee";
+    el.style.color = "#b02d55";
+    el.textContent = "⚠️ " + msg;
+    setTimeout(() => {
+      el.style.background = "";
+      el.style.color = "";
+      el.innerHTML = orig;
+      updateBar();
+    }, 2000);
+  }
+
+  // ─────────────────────────────────────────
+  //  INIT
+  // ─────────────────────────────────────────
+  user.selectedFoto = []; // reset dari sesi sebelumnya
+  localStorage.setItem("currentUser", JSON.stringify(user));
+  renderGrid();
+  updateBar();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pilih Layout</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<script>
+if(!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")){
+  window.location.href = "index.html";
+}
+</script>
+
+<div class="layout-container">
+  <h1>Pilih Layout Frame 🎀</h1>
+
+  <div class="layout-grid">
+
+    <div class="layout-card" onclick="selectLayout('layout1')">
+      <div class="mock-frame frame1"></div>
+      <p>Classic</p>
+    </div>
+
+    <div class="layout-card" onclick="selectLayout('layout2')">
+      <div class="mock-frame frame2"></div>
+      <p>Vertical Strip</p>
+    </div>
+
+    <div class="layout-card" onclick="selectLayout('layout3')">
+      <div class="mock-frame frame3"></div>
+      <p>Square Cute</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem("currentUser"));
+
+if(!user.pembayaran || !user.pembayaran.status){
+  window.location.href = "pembayaran.html";
+}
+
+function selectLayout(layoutName){
+  user.layout = layoutName;
+  localStorage.setItem("currentUser", JSON.stringify(user));
+  window.location.href = "foto.html";
+}
+</script>
+
+</body>
+</html>

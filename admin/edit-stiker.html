@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Stiker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+</head>
+<body>
+
+<script>
+  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+  if (!admin) window.location.href = "../index.html";
+</script>
+
+<div class="admin-container">
+  <h1>Upload Stiker ✨</h1>
+  <div class="admin-topbar">
+    <span id="cabangLabel"></span>
+    <button onclick="window.location.href='dashboard.html'" class="secondary">← Dashboard</button>
+  </div>
+
+  <div class="setting-card">
+    <h2>Upload Stiker Baru</h2>
+    <p style="font-size:13px;color:#888;">Format PNG dengan background transparan.</p>
+    <input type="file" id="stikerUpload" accept="image/png,image/webp">
+    <input type="text" id="stikerName" placeholder="Nama stiker (misal: Bintang)" style="margin-top:8px;">
+    <button onclick="uploadStiker()" id="btnUpload" style="margin-top:8px;">⬆️ Upload Stiker</button>
+    <p id="msgStiker"></p>
+  </div>
+
+  <div class="setting-card">
+    <h2>Stiker Tersedia</h2>
+    <div class="stiker-grid" id="stikerList"><p>Loading...</p></div>
+  </div>
+</div>
+
+<style>
+  .stiker-grid       { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+  .stiker-card       { border: 2px solid #eee; border-radius: 12px; overflow: hidden; background: white; }
+  .stiker-card img   { width: 100%; aspect-ratio: 1; object-fit: contain; display: block; background: repeating-conic-gradient(#eee 0% 25%, white 0% 50%) 0 0 / 16px 16px; }
+  .stiker-card-info  { padding: 6px 8px; }
+  .stiker-card-info strong { font-size: 12px; display: block; }
+  .stiker-card-info .tag-nonaktif { font-size: 10px; color: #ff4444; }
+  .stiker-card-actions { display: flex; gap: 6px; padding: 0 8px 8px; }
+  .stiker-card-actions button { flex: 1; font-size: 11px; padding: 5px; border-radius: 6px; border: none; cursor: pointer; font-family: Poppins; }
+  .btn-toggle-aktif  { background: #e8f5e9; color: #2e7d32; }
+  .btn-hapus         { background: #ffebee; color: #c62828; }
+  input[type=file]   { width: 100%; padding: 10px; border: 2px dashed #e91e8c; border-radius: 8px; cursor: pointer; font-family: Poppins; }
+  input[type=text]   { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: Poppins; box-sizing: border-box; }
+</style>
+
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
+  const branchId = admin.branch_id;
+  const adminId  = admin.id;
+
+  document.getElementById("cabangLabel").innerText =
+    `Cabang: ${admin.branch_name ?? admin.username}`;
+
+  // ── Load stiker ───────────────────────────────────────────────────────
+  async function loadStiker() {
+    const list = document.getElementById("stikerList");
+
+    const { data, error } = await supabase
+      .from("stickers")
+      .select("*")
+      .eq("branch_id", branchId)
+      .order("created_at", { ascending: false });
+
+    if (error) { list.innerHTML = `<p>Gagal load: ${error.message}</p>`; return; }
+    if (!data || data.length === 0) {
+      list.innerHTML = "<p>Belum ada stiker. Upload stiker pertamamu!</p>";
+      return;
+    }
+
+    list.innerHTML = "";
+    data.forEach(stiker => {
+      const card = document.createElement("div");
+      card.className = "stiker-card";
+      card.innerHTML = `
+        <img src="${stiker.url}" alt="${stiker.name}">
+        <div class="stiker-card-info">
+          <strong>${stiker.name}</strong>
+          ${!stiker.is_active ? '<span class="tag-nonaktif">Nonaktif</span>' : ''}
+        </div>
+        <div class="stiker-card-actions">
+          <button class="btn-toggle-aktif" onclick="toggleAktif('${stiker.id}', ${stiker.is_active})">
+            ${stiker.is_active ? "🙈 Off" : "✅ On"}
+          </button>
+          <button class="btn-hapus" onclick="hapusStiker('${stiker.id}', '${stiker.storage_path}')">🗑️</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  // ── Upload stiker ─────────────────────────────────────────────────────
+  window.uploadStiker = async function() {
+    const fileInput = document.getElementById("stikerUpload");
+    const nameInput = document.getElementById("stikerName");
+    const msg       = document.getElementById("msgStiker");
+    const btn       = document.getElementById("btnUpload");
+
+    const file = fileInput.files[0];
+    const name = nameInput.value.trim();
+
+    if (!file) { msg.textContent = "❌ Pilih file dulu!"; return; }
+    if (!name) { msg.textContent = "❌ Nama stiker wajib diisi!"; return; }
+
+    btn.disabled    = true;
+    msg.textContent = "⏳ Mengupload...";
+
+    const ext         = file.name.split(".").pop();
+    const storagePath = `${branchId}/stickers/${Date.now()}.${ext}`;
+
+    // Upload ke Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from("stickers")
+      .upload(storagePath, file, { upsert: false });
+
+    if (uploadError) {
+      msg.textContent = "❌ Upload gagal: " + uploadError.message;
+      btn.disabled = false;
+      return;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from("stickers")
+      .getPublicUrl(storagePath);
+
+    const publicUrl = urlData.publicUrl;
+
+    // Simpan ke tabel stickers
+    const { error: dbError } = await supabase
+      .from("stickers")
+      .insert([{
+        branch_id:    branchId,
+        created_by:   adminId,
+        name:         name,
+        storage_path: storagePath,
+        url:          publicUrl,
+        is_active:    true
+      }]);
+
+    if (dbError) {
+      msg.textContent = "❌ Gagal simpan ke database: " + dbError.message;
+      btn.disabled = false;
+      return;
+    }
+
+    msg.textContent = "✅ Stiker berhasil diupload!";
+    fileInput.value = "";
+    nameInput.value = "";
+    btn.disabled    = false;
+    loadStiker();
+  };
+
+  // ── Toggle aktif ──────────────────────────────────────────────────────
+  window.toggleAktif = async function(id, currentStatus) {
+    const { error } = await supabase
+      .from("stickers")
+      .update({ is_active: !currentStatus })
+      .eq("id", id);
+
+    if (error) { alert("Gagal update: " + error.message); return; }
+    loadStiker();
+  };
+
+  // ── Hapus stiker ──────────────────────────────────────────────────────
+  window.hapusStiker = async function(id, storagePath) {
+    if (!confirm("Yakin hapus stiker ini?")) return;
+
+    await supabase.storage.from("stickers").remove([storagePath]);
+
+    const { error } = await supabase.from("stickers").delete().eq("id", id);
+    if (error) { alert("Gagal hapus: " + error.message); return; }
+
+    loadStiker();
+  };
+
+  loadStiker();
+</script>
+
+</body>
+</html>

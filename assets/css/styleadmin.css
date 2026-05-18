@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffd6ec, #d6f0ff);
+  }
+  
+  /* LOGIN PAGE */
+  .login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+  }
+  
+  .login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+  }
+  
+  h1 {
+    margin-bottom: 25px;
+    color: #ff4fa3;
+  }
+  
+  input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border-radius: 16px;
+    border: 2px solid #f1c6e7;
+    outline: none;
+    transition: 0.3s;
+  }
+  
+  input:focus {
+    border-color: #ff6ec7;
+    box-shadow: 0 0 0 3px rgba(255,110,199,0.2);
+  }
+  
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ff6ec7, #ffb6f9);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(255,110,199,0.3);
+  }
+  
+  button:hover {
+    transform: translateY(-3px);
+  }
+  
+  .container {
+    max-width: 420px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(20px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+
+
+/* =======================
+   ADMIN PAGE
+======================= */
+
+.admin-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    text-align: center;
+  }
+  
+  .admin-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    margin: 20px 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+  
+  .user-row {
+    background: #ffe6f5;
+    padding: 10px;
+    border-radius: 12px;
+    margin: 5px 0;
+  }
+  
+  .admin-actions {
+    margin-top: 20px;
+  }
+  
+
+
+
+
+  /* =======================
+   Edit-Frame
+======================= */
+
+.frame-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.frame-item {
+  background: white;
+  padding: 10px;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.frame-item img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.frame-btn.custom {
+  background-size: cover;
+  background-position: center;
+}

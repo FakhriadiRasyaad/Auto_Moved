@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modern Landing</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Background blobs -->
+  <div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="#top">Kellon<span>.</span></a>
+
+      <nav class="menu" id="menu">
+        <a href="#features">Features</a>
+        <a href="#work">Work</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="btn ghost" id="themeBtn" aria-label="Toggle theme">Theme</button>
+        <button class="btn primary" id="ctaBtn">Get Started</button>
+        <button class="burger" id="burger" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main id="top" class="hero">
+    <div class="hero__inner">
+      <div class="hero__left">
+        <div class="pill reveal">⚡ Fast • Clean • Responsive</div>
+        <h1 class="reveal">
+          Website modern dengan <span class="grad">animasi halus</span> dan layout elegan.
+        </h1>
+        <p class="reveal">
+          Ini starter yang cocok buat style landing page “keren” (glassmorphism + gradient + scroll reveal).
+          Tinggal ganti konten dan warna sesuai video referensi kamu.
+        </p>
+
+        <div class="hero__cta reveal">
+          <a class="btn primary" href="#pricing">Lihat Paket</a>
+          <a class="btn ghost" href="#work">Lihat Demo</a>
+        </div>
+
+        <div class="hero__stats reveal">
+          <div class="stat">
+            <div class="stat__num">120ms</div>
+            <div class="stat__label">Interaction</div>
+          </div>
+          <div class="stat">
+            <div class="stat__num">A+</div>
+            <div class="stat__label">Performance</div>
+          </div>
+          <div class="stat">
+            <div class="stat__num">100%</div>
+            <div class="stat__label">Responsive</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__right reveal">
+        <div class="card glass">
+          <div class="card__top">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+            <div class="card__title">Live Preview</div>
+          </div>
+          <div class="card__body">
+            <div class="meter">
+              <span>Design</span>
+              <div class="bar"><i style="width:92%"></i></div>
+            </div>
+            <div class="meter">
+              <span>Speed</span>
+              <div class="bar"><i style="width:88%"></i></div>
+            </div>
+            <div class="meter">
+              <span>SEO</span>
+              <div class="bar"><i style="width:84%"></i></div>
+            </div>
+
+            <div class="mini-grid">
+              <div class="mini glass"></div>
+              <div class="mini glass"></div>
+              <div class="mini glass"></div>
+              <div class="mini glass"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating glass small">
+          <div class="tag">✨ Smooth scroll</div>
+          <div class="tag">🧊 Glass UI</div>
+          <div class="tag">🎬 Reveal</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scrollHint">Scroll ↓</div>
+  </main>
+
+  <!-- Sections -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2 class="reveal">Features</h2>
+      <p class="muted reveal">Komponen yang biasanya ada di website referensi style modern.</p>
+
+      <div class="grid3">
+        <article class="feature glass reveal">
+          <h3>Glassmorphism</h3>
+          <p>Panel transparan dengan blur, cocok untuk tampilan premium.</p>
+        </article>
+        <article class="feature glass reveal">
+          <h3>Scroll Reveal</h3>
+          <p>Elemen muncul halus saat discroll (tanpa library).</p>
+        </article>
+        <article class="feature glass reveal">
+          <h3>Mobile First</h3>
+          <p>Navbar burger + layout responsif.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="work" class="section">
+    <div class="container">
+      <h2 class="reveal">Work</h2>
+      <div class="grid2">
+        <div class="workCard glass reveal"></div>
+        <div class="workCard glass reveal"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="section">
+    <div class="container">
+      <h2 class="reveal">Pricing</h2>
+      <div class="grid3">
+        <div class="price glass reveal">
+          <h3>Basic</h3>
+          <div class="price__num">Rp 199k</div>
+          <ul>
+            <li>1 landing page</li>
+            <li>Responsive</li>
+            <li>Basic animation</li>
+          </ul>
+          <button class="btn primary w100">Pilih</button>
+        </div>
+        <div class="price glass highlight reveal">
+          <h3>Pro</h3>
+          <div class="price__num">Rp 499k</div>
+          <ul>
+            <li>Multi section</li>
+            <li>Better animation</li>
+            <li>SEO basics</li>
+          </ul>
+          <button class="btn primary w100">Pilih</button>
+        </div>
+        <div class="price glass reveal">
+          <h3>Ultra</h3>
+          <div class="price__num">Rp 999k</div>
+          <ul>
+            <li>Custom design</li>
+            <li>Advanced motion</li>
+            <li>Deploy</li>
+          </ul>
+          <button class="btn primary w100">Pilih</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="section">
+    <div class="container">
+      <h2 class="reveal">FAQ</h2>
+      <details class="faq glass reveal">
+        <summary>Ini pakai library?</summary>
+        <p>Nggak. Ini HTML/CSS/JS biasa. Kalau mau lebih “mirip video”, biasanya pakai GSAP/Framer Motion.</p>
+      </details>
+      <details class="faq glass reveal">
+        <summary>Bisa dijadikan React/Next.js?</summary>
+        <p>Bisa banget. Kirim preferensi stack kamu, aku konversi.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div>© <span id="year"></span> Modern Landing</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

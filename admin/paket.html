@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kelola Paket</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+</head>
+<body>
+
+<script>
+  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+  if (!admin) window.location.href = "../index.html";
+</script>
+
+<div class="admin-container">
+  <h1>Kelola Paket Foto 💰</h1>
+  <div class="admin-topbar">
+    <span id="cabangLabel"></span>
+    <button onclick="window.location.href='dashboard.html'" class="secondary">← Dashboard</button>
+  </div>
+  <button onclick="tambahPaket()" class="btn-add">+ Tambah Paket</button>
+  <div id="paketList"><p>Loading...</p></div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <h2 id="modalTitle">Tambah Paket</h2>
+    <input type="hidden"  id="paketId">
+    <input type="text"    id="formNama"       placeholder="Nama Paket (misal: Basic)" required>
+    <input type="number"  id="formHarga"      placeholder="Harga (Rp)" required>
+    <input type="number"  id="formFotoLimit"  placeholder="Limit Foto (999 = Unlimited)" required>
+    <input type="number"  id="formFrameLimit" placeholder="Limit Frame (999 = All)" required>
+    <label><input type="checkbox" id="formStikerGratis"> Stiker Gratis</label>
+    <label><input type="checkbox" id="formHighlight"> 🔥 Best Seller / Highlight</label>
+    <label><input type="checkbox" id="formActive" checked> Aktif (tampil ke guest)</label>
+    <div class="modal-actions">
+      <button onclick="simpanPaket()">Simpan</button>
+      <button onclick="tutupModal()" class="secondary">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
+  const branchId = admin.branch_id;
+
+  document.getElementById("cabangLabel").innerText =
+    `Cabang: ${admin.branch_name ?? admin.username}`;
+
+  async function loadPakets() {
+    const list = document.getElementById("paketList");
+
+    const { data, error } = await supabase
+      .from("packages")
+      .select("*")
+      .eq("branch_id", branchId)
+      .order("harga", { ascending: true });
+
+    if (error) { list.innerHTML = `<p>Gagal load: ${error.message}</p>`; return; }
+
+    if (!data || data.length === 0) {
+      list.innerHTML = "<p>Belum ada paket. Klik + untuk menambah.</p>";
+      return;
+    }
+
+    list.innerHTML = data.map(p => `
+      <div class="paket-row ${!p.is_active ? "inactive" : ""}">
+        <div class="paket-info">
+          <strong>${p.nama}</strong>
+          ${p.is_highlight ? "🔥" : ""}
+          ${!p.is_active ? '<span class="tag-nonaktif">Nonaktif</span>' : ""}
+          <span class="paket-harga">Rp ${p.harga.toLocaleString("id-ID")}</span>
+          <small>
+            ${p.foto_limit  >= 999 ? "Unlimited" : p.foto_limit}  Foto &nbsp;·&nbsp;
+            ${p.frame_limit >= 999 ? "All"       : p.frame_limit} Frame &nbsp;·&nbsp;
+            ${p.stiker_gratis ? "✅ Stiker Gratis" : "❌ No Stiker"}
+          </small>
+        </div>
+        <div class="paket-actions">
+          <button onclick="editPaket('${p.id}')">Edit</button>
+          <button onclick="hapusPaket('${p.id}')" class="danger">Hapus</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  window.tambahPaket = function() {
+    document.getElementById("modalTitle").innerText      = "Tambah Paket";
+    document.getElementById("paketId").value             = "";
+    document.getElementById("formNama").value            = "";
+    document.getElementById("formHarga").value           = "";
+    document.getElementById("formFotoLimit").value       = "3";
+    document.getElementById("formFrameLimit").value      = "1";
+    document.getElementById("formStikerGratis").checked  = false;
+    document.getElementById("formHighlight").checked     = false;
+    document.getElementById("formActive").checked        = true;
+    document.getElementById("modal").classList.remove("hidden");
+  };
+
+  window.editPaket = async function(id) {
+    const { data, error } = await supabase
+      .from("packages").select("*").eq("id", id).single();
+
+    if (error || !data) { alert("Gagal load data paket!"); return; }
+
+    document.getElementById("modalTitle").innerText      = "Edit Paket";
+    document.getElementById("paketId").value             = data.id;
+    document.getElementById("formNama").value            = data.nama;
+    document.getElementById("formHarga").value           = data.harga;
+    document.getElementById("formFotoLimit").value       = data.foto_limit;
+    document.getElementById("formFrameLimit").value      = data.frame_limit;
+    document.getElementById("formStikerGratis").checked  = data.stiker_gratis;
+    document.getElementById("formHighlight").checked     = data.is_highlight;
+    document.getElementById("formActive").checked        = data.is_active;
+    document.getElementById("modal").classList.remove("hidden");
+  };
+
+  window.simpanPaket = async function() {
+    const id            = document.getElementById("paketId").value;
+    const nama          = document.getElementById("formNama").value.trim();
+    const harga         = parseInt(document.getElementById("formHarga").value);
+    const foto_limit    = parseInt(document.getElementById("formFotoLimit").value);
+    const frame_limit   = parseInt(document.getElementById("formFrameLimit").value);
+    const stiker_gratis = document.getElementById("formStikerGratis").checked;
+    const is_highlight  = document.getElementById("formHighlight").checked;
+    const is_active     = document.getElementById("formActive").checked;
+
+    if (!nama || !harga) { alert("Nama dan harga wajib diisi!"); return; }
+
+    const payload = {
+      nama, harga, foto_limit, frame_limit,
+      stiker_gratis, is_highlight, is_active,
+      branch_id: branchId
+    };
+
+    const { error } = id
+      ? await supabase.from("packages").update(payload).eq("id", id)
+      : await supabase.from("packages").insert([payload]);
+
+    if (error) { alert("Gagal simpan: " + error.message); return; }
+
+    tutupModal();
+    loadPakets();
+  };
+
+  window.hapusPaket = async function(id) {
+    if (!confirm("Yakin hapus paket ini?")) return;
+    const { error } = await supabase.from("packages").delete().eq("id", id);
+    if (error) { alert("Gagal hapus: " + error.message); return; }
+    loadPakets();
+  };
+
+  window.tutupModal = function() {
+    document.getElementById("modal").classList.add("hidden");
+  };
+
+  loadPakets();
+</script>
+
+</body>
+</html>

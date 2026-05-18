@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Cetak Foto — Photobooth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <!-- Library QR Code -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <style>
+    /* ── Panel QR Code ── */
+    .qr-section {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #fff0f5, #fce8ee);
+      border: 2px solid rgba(214,63,107,0.2);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .qr-section h3 {
+      font-size: 0.95rem;
+      color: #8b5a7a;
+      margin-bottom: 4px;
+    }
+
+    .qr-section p.sub {
+      font-size: 0.75rem;
+      color: #b08a9a;
+      margin-bottom: 14px;
+    }
+
+    .qr-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    #qrCanvas {
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(214,63,107,0.15);
+      border: 3px solid white;
+    }
+
+    .qr-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: #b08a9a;
+      font-size: 0.82rem;
+      padding: 20px 0;
+    }
+
+    .qr-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(214,63,107,0.2);
+      border-top-color: #d63f6b;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .qr-link {
+      font-size: 0.72rem;
+      color: #d63f6b;
+      word-break: break-all;
+      margin-top: 8px;
+      display: block;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .qr-link:hover { text-decoration: underline; }
+
+    /* Status upload Google Drive */
+    .drive-status {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .drive-status.uploading { background: #fff3cd; color: #856404; }
+    .drive-status.done      { background: #d1f5e0; color: #155724; }
+    .drive-status.error     { background: #f8d7da; color: #721c24; }
+
+    /* Print styles */
+    @media print {
+      body > *:not(#printArea) { display: none !important; }
+      #printArea {
+        display: block !important;
+        position: fixed; inset: 0;
+        background: white;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cetak-container">
+  <h1>Siap Cetak 🖨️</h1>
+  <div class="cetak-wrapper">
+
+    <!-- Preview Foto -->
+    <div class="cetak-preview-side">
+      <h2>Preview Hasil</h2>
+      <div class="cetak-canvas-box">
+        <p class="no-preview" id="noPreview">⏳ Memuat preview...</p>
+        <img id="previewImg" alt="Preview" style="display:none;">
+      </div>
+      <p id="infoLayout" style="font-size:11px;color:#888;margin-top:8px;text-align:center;"></p>
+
+      <!-- ─── QR CODE SECTION ─── -->
+      <div class="qr-section">
+        <h3>📱 Download via QR Code</h3>
+        <p class="sub">Scan pakai HP untuk download fotomu langsung dari Google Drive</p>
+
+        <div class="qr-wrap" id="qrWrap">
+          <div class="qr-loading" id="qrLoading">
+            <div class="qr-spinner"></div>
+            <span id="qrLoadingMsg">Mengunggah ke Google Drive...</span>
+          </div>
+          <canvas id="qrCanvas" style="display:none;"></canvas>
+        </div>
+
+        <div id="driveStatus" class="drive-status uploading" style="display:none;"></div>
+        <a id="qrLink" class="qr-link" href="#" target="_blank" style="display:none;">
+          🔗 Buka link foto
+        </a>
+      </div>
+    </div>
+
+    <!-- Info & Aksi -->
+    <div class="cetak-info-side">
+      <div class="cetak-card">
+        <h2>Info Sesi</h2>
+        <div class="info-row"><span>Nama</span>   <strong id="infoNama">-</strong></div>
+        <div class="info-row"><span>Layout</span> <strong id="infoLayoutName">-</strong></div>
+        <div class="info-row"><span>Filter</span> <strong id="infoFilter">-</strong></div>
+        <div class="info-row"><span>Frame</span>  <strong id="infoFrame">-</strong></div>
+        <div class="info-row"><span>Stiker</span> <strong id="infoStiker">-</strong></div>
+      </div>
+
+      <div class="cetak-card">
+        <h2>Jumlah Cetak</h2>
+        <div class="qty-control">
+          <button onclick="changeQty(-1)">−</button>
+          <span id="qtyDisplay">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+        <p style="font-size:11px;color:#888;margin-top:8px;text-align:center;">Maks 3x cetak per sesi</p>
+      </div>
+
+      <div class="cetak-actions">
+        <button id="btnCetak"    onclick="doCetak()"    class="btn-cetak"  disabled>🖨️ Cetak Sekarang</button>
+        <button id="btnDownload" onclick="doDownload()" class="btn-outline" disabled>⬇️ Download</button>
+        <button onclick="window.location.href='pilih-frame.html'" class="btn-grey">← Edit Ulang</button>
+        <button onclick="selesaiSesi()" class="btn-green">✅ Selesai</button>
+      </div>
+      <p id="msgCetak"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Print area -->
+<div id="printArea" style="display:none;"></div>
+
+<script type="module">
+  import { supabase } from "./assets/js/supabase.js";
+
+  // ──────────────────────────────────────────────
+  //  AMBIL DATA SESI
+  // ──────────────────────────────────────────────
+  let cetakData = null;
+  try {
+    const raw = sessionStorage.getItem("cetakData");
+    const gd  = sessionStorage.getItem("guestData");
+    if (!raw || !gd) { window.location.href = "guest-login.html"; }
+    cetakData = JSON.parse(raw);
+  } catch(e) { window.location.href = "guest-login.html"; }
+
+  let finalUrl  = cetakData.finalUrl;
+  let blobUrl   = null;
+  let driveLink = null; // link Google Drive setelah upload
+  let qty       = 1;
+
+  // ──────────────────────────────────────────────
+  //  ISI INFO SESI
+  // ──────────────────────────────────────────────
+  function fillInfoSesi() {
+    document.getElementById("infoNama").textContent       = cetakData.guestNama    ?? "-";
+    document.getElementById("infoLayoutName").textContent = cetakData.layout?.nama  ?? "-";
+    document.getElementById("infoFilter").textContent     =
+      (!cetakData.filter || cetakData.filter === "none") ? "Original" : "Aktif";
+    document.getElementById("infoFrame").textContent      = cetakData.frame?.name   ?? "Tanpa Frame";
+    document.getElementById("infoStiker").textContent     =
+      (cetakData.stiker?.length > 0) ? `${cetakData.stiker.length} stiker` : "Tidak ada";
+    document.getElementById("infoLayout").textContent     =
+      `${cetakData.layout?.orientasi ?? ""} · ${cetakData.layout?.rows ?? "-"}×${cetakData.layout?.cols ?? "-"}`;
+  }
+
+  // ──────────────────────────────────────────────
+  //  REFRESH SIGNED URL (jika expired)
+  // ──────────────────────────────────────────────
+  async function refreshSignedUrl() {
+    try {
+      const { data, error } = await supabase.storage
+        .from("photos").createSignedUrl(cetakData.editPath, 3600);
+      if (error || !data?.signedUrl) throw new Error(error?.message ?? "Gagal buat signed URL");
+      finalUrl           = data.signedUrl;
+      cetakData.finalUrl = finalUrl;
+      sessionStorage.setItem("cetakData", JSON.stringify(cetakData));
+      return true;
+    } catch(e) {
+      setPreviewError("❌ Gagal akses foto: " + e.message);
+      return false;
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  LOAD PREVIEW
+  // ──────────────────────────────────────────────
+  async function loadPreview() {
+    setPreviewMsg("⏳ Memuat preview...");
+    try {
+      let res = await fetch(finalUrl);
+      if (!res.ok) {
+        const ok = await refreshSignedUrl();
+        if (!ok) return;
+        res = await fetch(finalUrl);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+      }
+      const blob = await res.blob();
+      blobUrl = URL.createObjectURL(blob);
+
+      const img = document.getElementById("previewImg");
+      img.onload = () => {
+        document.getElementById("noPreview").style.display = "none";
+        img.style.display = "block";
+      };
+      img.src = blobUrl;
+
+      document.getElementById("btnCetak").disabled    = false;
+      document.getElementById("btnDownload").disabled = false;
+
+      // Setelah preview berhasil load, langsung upload ke Google Drive
+      uploadToDrive(blob);
+    } catch(e) {
+      setPreviewError("❌ Gagal load gambar: " + e.message);
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  UPLOAD KE GOOGLE DRIVE & GENERATE QR CODE
+  //
+  //  Catatan implementasi:
+  //  Karena ini adalah frontend-only project (tanpa Node.js backend),
+  //  upload ke Google Drive dilakukan via backend serverless atau
+  //  endpoint yang sudah disiapkan admin.
+  //
+  //  Jika backend Node.js tersedia di http://localhost:3000, uncomment
+  //  bagian "WITH BACKEND". Jika tidak, pakai mode "DIRECT LINK" dari
+  //  Supabase storage sebagai fallback QR.
+  // ──────────────────────────────────────────────
+  async function uploadToDrive(blob) {
+    const driveStatus = document.getElementById("driveStatus");
+    const qrLoading   = document.getElementById("qrLoading");
+    const qrLoadMsg   = document.getElementById("qrLoadingMsg");
+
+    driveStatus.style.display = "inline-block";
+    driveStatus.className     = "drive-status uploading";
+    driveStatus.textContent   = "⬆️ Mengunggah ke Google Drive...";
+
+    // ─────────────────────────────────────────────
+    //  COBA UPLOAD KE BACKEND NODE.JS (jika ada)
+    // ─────────────────────────────────────────────
+    let uploadedLink = null;
+
+    try {
+      // Coba cek apakah backend Node.js aktif
+      const pingRes = await fetch("http://localhost:3000/api/ping", { signal: AbortSignal.timeout(2000) });
+
+      if (pingRes.ok) {
+        // Backend aktif → kirim base64 foto
+        qrLoadMsg.textContent = "Mengunggah ke Google Drive via server...";
+
+        // Konversi blob ke base64
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(",")[1]);
+          reader.readAsDataURL(blob);
+        });
+
+        const guestData  = JSON.parse(sessionStorage.getItem("guestData"));
+        const uploadResp = await fetch("http://localhost:3000/api/upload-photo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageBase64: base64,
+            sessionId:   guestData?.guest?.id ?? "unknown",
+            guestNama:   cetakData.guestNama ?? "guest"
+          })
+        });
+
+        if (uploadResp.ok) {
+          const result = await uploadResp.json();
+          uploadedLink = result.driveLink ?? result.webViewLink ?? null;
+        }
+      }
+    } catch(err) {
+      // Backend tidak aktif — fallback ke Supabase public URL
+      console.info("Backend Node.js tidak aktif, pakai Supabase link sebagai fallback.");
+    }
+
+    // ─────────────────────────────────────────────
+    //  FALLBACK: Pakai Supabase public URL / signed URL
+    // ─────────────────────────────────────────────
+    if (!uploadedLink) {
+      try {
+        // Upload foto ke Supabase storage bucket "finals"
+        const guestData = JSON.parse(sessionStorage.getItem("guestData"));
+        const guestId   = guestData?.guest?.id ?? "guest";
+        const tgl       = new Date().toISOString().split("T")[0];
+        const filePath  = `finals/${guestId}_${tgl}_${Date.now()}.jpg`;
+
+        qrLoadMsg.textContent = "Menyimpan foto final...";
+
+        const { error: upErr } = await supabase.storage
+          .from("photos")
+          .upload(filePath, blob, { contentType: "image/jpeg", upsert: true });
+
+        if (!upErr) {
+          // Buat signed URL 7 hari
+          const { data: urlData } = await supabase.storage
+            .from("photos")
+            .createSignedUrl(filePath, 7 * 24 * 3600);
+
+          uploadedLink = urlData?.signedUrl ?? null;
+        }
+      } catch(fbErr) {
+        console.error("Fallback upload error:", fbErr);
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    //  GENERATE QR CODE dari link
+    // ─────────────────────────────────────────────
+    qrLoading.style.display = "none";
+
+    if (uploadedLink) {
+      driveLink = uploadedLink;
+      driveStatus.className  = "drive-status done";
+      driveStatus.textContent= "✅ Foto tersimpan! Scan QR untuk download.";
+
+      // Tampilkan QR canvas
+      const qrCanvas = document.getElementById("qrCanvas");
+      qrCanvas.style.display = "block";
+
+      try {
+        await QRCode.toCanvas(qrCanvas, uploadedLink, {
+          width:  200,
+          margin: 2,
+          color: {
+            dark:  "#2c1810",
+            light: "#ffffff"
+          }
+        });
+      } catch(qrErr) {
+        console.error("QR code error:", qrErr);
+      }
+
+      // Tampilkan link teks
+      const qrLink = document.getElementById("qrLink");
+      qrLink.href           = uploadedLink;
+      qrLink.style.display  = "block";
+      qrLink.textContent    = "🔗 " + uploadedLink.substring(0, 60) + "...";
+
+    } else {
+      // Tidak bisa upload sama sekali
+      driveStatus.className  = "drive-status error";
+      driveStatus.textContent= "⚠️ QR tidak tersedia. Gunakan tombol Download.";
+      document.getElementById("qrLoading").innerHTML =
+        "<p style='color:#b08a9a;font-size:0.78rem'>Tidak bisa membuat QR Code. Pakai tombol Download.</p>";
+      document.getElementById("qrLoading").style.display = "flex";
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  QTY CONTROL
+  // ──────────────────────────────────────────────
+  window.changeQty = function(delta) {
+    qty = Math.max(1, Math.min(3, qty + delta));
+    document.getElementById("qtyDisplay").textContent = qty;
+  };
+
+  // ──────────────────────────────────────────────
+  //  CETAK
+  // ──────────────────────────────────────────────
+  window.doCetak = function() {
+    if (!blobUrl) { showMsg("❌ Gambar belum siap.", "red"); return; }
+    showMsg("⏳ Menyiapkan cetak...", "#666");
+
+    const printArea = document.getElementById("printArea");
+    let pages = "";
+    for (let i = 0; i < qty; i++) {
+      pages += `<div style="page-break-after:${i < qty-1 ? 'always':'avoid'};
+        width:100vw;height:100vh;display:flex;align-items:center;
+        justify-content:center;background:white;">
+        <img src="${blobUrl}" style="max-width:100%;max-height:100vh;object-fit:contain;">
+      </div>`;
+    }
+    printArea.innerHTML      = pages;
+    printArea.style.display  = "flex";
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        printArea.style.display = "none";
+        printArea.innerHTML = "";
+        showMsg(`✅ ${qty}x halaman dikirim ke printer!`, "green");
+      }, 500);
+    }, 200);
+  };
+
+  // ──────────────────────────────────────────────
+  //  DOWNLOAD LANGSUNG
+  // ──────────────────────────────────────────────
+  window.doDownload = function() {
+    if (!blobUrl) { showMsg("❌ Gambar belum siap.", "red"); return; }
+    const nama = (cetakData.guestNama ?? "foto").replace(/[^a-zA-Z0-9]/g, "_");
+    const tgl  = new Date().toISOString().slice(0, 10);
+    const link = document.createElement("a");
+    link.href     = blobUrl;
+    link.download = `photobooth_${nama}_${tgl}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showMsg("✅ Foto berhasil didownload!", "green");
+  };
+
+  // ──────────────────────────────────────────────
+  //  SELESAI SESI
+  // ──────────────────────────────────────────────
+  window.selesaiSesi = function() {
+    if (!confirm("Sesi selesai? Kamu akan kembali ke halaman login.")) return;
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    sessionStorage.removeItem("cetakData");
+    sessionStorage.removeItem("guestData");
+    sessionStorage.removeItem("selectedBranch");
+    window.location.href = "guest-login.html";
+  };
+
+  // ──────────────────────────────────────────────
+  //  HELPERS
+  // ──────────────────────────────────────────────
+  function setPreviewMsg(text) {
+    const el = document.getElementById("noPreview");
+    el.textContent = text; el.style.display = "block";
+    document.getElementById("previewImg").style.display = "none";
+  }
+  function setPreviewError(text) {
+    setPreviewMsg(text);
+    document.getElementById("qrLoading").innerHTML =
+      "<p style='color:#b08a9a;font-size:0.78rem'>QR tidak tersedia karena foto gagal dimuat.</p>";
+  }
+  function showMsg(text, color) {
+    const el = document.getElementById("msgCetak");
+    el.textContent = text; el.style.color = color;
+  }
+
+  // ──────────────────────────────────────────────
+  //  START
+  // ──────────────────────────────────────────────
+  fillInfoSesi();
+  if (!finalUrl && cetakData.editPath) {
+    refreshSignedUrl().then(ok => { if (ok) loadPreview(); });
+  } else if (finalUrl) {
+    loadPreview();
+  } else {
+    setPreviewError("❌ Data foto tidak ditemukan. Kembali ke edit.");
+  }
+</script>
+</body>
+</html>

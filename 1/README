@@ -1,0 +1,103 @@
+Alurnya gini 
+User 
+- Login page > Halaman Tutorial > Halaman Pilih Paket > Halaman Pembayaran > Halaman Pilih Layout > Halaman Foto > Halaman Kumpulan foto dan pemilihan foto > Halaman Edit foto Effect > Halaman Ubah frame & Stiker >  Halaman Cetak
+Admin Dashboard
+- Halaman Edit frame
+- Halaman Edit stiker 
+- Halaman Ubah pembayaran (Payment Gateway)
+- Halaman folder (auto kirim folder A ke B)
+- Halaman Pembayaran Dll
+Superadmin Dashboard
+- Halaman buat akun admin
+- Halaman Statistik akun Admin (Pilih opsi akun admin siapa yang mau ditampilkan)
+
+
+
+Jadi nanti ada user yang semua user informasinya di masing-masing admin, jadi masing-masing admin punya user berbeda, dan user ini ga perlu akun jadi dia guest aja ga perlu daftar akun tapi di admin nanti ada informasi nama dan nomor telfonnya gitu, tapi fokus untuk FE terlebih dahulu
+
+
+
+
+Login (isi nama + no hp + pilih cabang)
+→ Tutorial
+→ Pilih Paket
+→ Pembayaran
+→ Pilih Layout
+→ Foto
+→ Pilih Foto
+→ Edit Effect
+→ Ubah Frame & Stiker
+→ Cetak
+
+
+
+Admin
+- id
+- nama_cabang
+- payment_gateway
+- frames[]
+- stickers[]
+
+User
+- id
+- nama
+- no_hp
+- admin_id
+- paket
+- foto[]
+- selected_foto[]
+- pembayaran_status
+
+
+
+🔵 ADMIN
+
+Login pakai akun admin
+
+Setelah login → masuk ke halaman "Input User"
+
+Semua user yang dibuat otomatis milik admin itu
+
+🟢 USER (Guest)
+
+Tidak punya akun
+
+Data diinput oleh admin
+
+
+
+
+Loginnya pakai akun admin, nanti ke user.html harus masukin nama dan emailnanti kesimpan di akun admin, 1 admin bisa banyak user, dari user baru ke tutorial. untuk folder admin dan super admin nanti
+
+project/
+│
+├── index.html (login)
+├── user.html
+├── tutorial.html
+├── paket.html
+├── pembayaran.html
+├── layout.html
+├── foto.html
+├── pilih-foto.html
+├── edit-effect.html
+├── frame-stiker.html
+├── cetak.html
+│
+├── admin/
+│   ├── dashboard.html
+│   ├── edit-frame.html
+│   ├── edit-stiker.html
+│   ├── payment.html
+│   ├── folder.html
+│   └── pembayaran.html
+│
+├── superadmin/
+│   ├── dashboard.html
+│   ├── buat-admin.html
+│   └── statistik.html
+│
+├── assets/
+│   ├── css/style.css
+│   ├── js/auth.js
+│   ├── js/userFlow.js
+│   └── images/

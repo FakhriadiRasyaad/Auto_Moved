@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Buat Admin Baru</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/stylesupers.css">
+  
+</head>
+<body>
+
+<script>
+  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+  if (!admin) window.location.href = "../index.html";
+  if (admin.role !== "superadmin") window.location.href = "dashboard.html";
+</script>
+
+<!-- ── Header ── -->
+<div class="page-header">
+  <button class="btn-back" onclick="goBack()">← Dashboard</button>
+  <h1>➕ Buat Admin Baru</h1>
+</div>
+
+<!-- ── Body ── -->
+<div class="page-body">
+
+  <!-- Alert -->
+  <div class="alert" id="alertBox">
+    <span id="alertIcon">⚠️</span>
+    <span id="alertMsg"></span>
+  </div>
+
+  <!-- RLS Alert khusus untuk branches -->
+  <div id="rlsAlert" style="display:none;background:#fef3c7;border:1.5px solid #fbbf24;border-radius:12px;padding:16px;margin-bottom:16px;">
+    <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;">⚠️ Perlu izin RLS untuk buat cabang baru</div>
+    <div style="font-size:12px;color:#78350f;margin-bottom:10px;">Jalankan SQL ini sekali di <strong>Supabase → SQL Editor</strong>:</div>
+    <div style="background:#1e1e1e;color:#4ade80;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;line-height:1.6;overflow-x:auto;white-space:pre;">CREATE POLICY "allow_auth_insert_branches"
+ON branches FOR INSERT
+TO authenticated
+WITH CHECK (true);
+
+CREATE POLICY "allow_auth_select_branches"
+ON branches FOR SELECT
+TO authenticated
+USING (true);</div>
+    <div style="font-size:11px;color:#92400e;margin-top:8px;">Setelah menjalankan SQL, coba lagi buat cabang.</div>
+    <button onclick="document.getElementById('rlsAlert').style.display='none'"
+      style="margin-top:10px;background:#92400e;color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
+      Mengerti, tutup
+    </button>
+  </div>
+
+  <!-- Success Banner -->
+  <div class="success-banner" id="successBanner">
+    <div class="sb-icon">🎉</div>
+    <h3>Admin Berhasil Dibuat!</h3>
+    <p>Akun sudah aktif dan bisa langsung login.</p>
+    <div class="sb-info" id="successInfo"></div>
+    <p style="font-size:11px;color:#006644;margin-bottom:10px;">
+      ⚠️ Simpan password ini sekarang — tidak bisa dilihat lagi.
+    </p>
+    <button class="btn-another" onclick="resetForm()">+ Buat Admin Lagi</button>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card" id="formCard">
+
+    <!-- Identitas Admin -->
+    <h2>👤 Identitas Admin</h2>
+
+    <div class="field">
+      <label>Nama Tampilan <span class="req">*</span></label>
+      <input type="text" id="displayName" placeholder="cth: Admin Jakarta Pusat">
+    </div>
+
+    <div class="field">
+      <label>Email <span class="req">*</span></label>
+      <input type="email" id="email" placeholder="cth: jakarta@photobooth.com">
+    </div>
+
+    <div class="field">
+      <label>Password <span class="req">*</span></label>
+      <input type="password" id="password" placeholder="Minimal 8 karakter">
+      <div class="hint">Minimal 8 karakter. Akan diberikan ke admin cabang.</div>
+    </div>
+
+    <div class="field">
+      <label>Konfirmasi Password <span class="req">*</span></label>
+      <input type="password" id="passwordConfirm" placeholder="Ulangi password">
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Role -->
+    <h2>🔑 Role</h2>
+    <div class="field">
+      <div class="role-grid">
+        <label class="role-option">
+          <input type="radio" name="role" value="admin" checked>
+          <div class="role-icon">🏪</div>
+          <div class="role-label">Admin</div>
+          <div class="role-desc">Kelola 1 cabang</div>
+        </label>
+        <label class="role-option">
+          <input type="radio" name="role" value="superadmin">
+          <div class="role-icon">👑</div>
+          <div class="role-label">Superadmin</div>
+          <div class="role-desc">Akses semua cabang</div>
+        </label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Cabang -->
+    <h2>🏢 Cabang</h2>
+
+    <div class="field">
+      <label>Pilih Cabang <span class="req">*</span></label>
+      <div class="branch-row">
+        <select id="branchSelect">
+          <option value="">⏳ Loading cabang...</option>
+        </select>
+        <button class="btn-new-branch" onclick="toggleNewBranch()">+ Cabang Baru</button>
+      </div>
+    </div>
+
+    <!-- Panel buat cabang baru -->
+    <div class="new-branch-panel" id="newBranchPanel">
+      <div class="panel-title">🏗️ Buat Cabang Baru</div>
+      <div class="panel-row">
+        <div class="panel-field">
+          <label>Nama Cabang</label>
+          <input type="text" id="branchName" placeholder="cth: Jakarta Pusat">
+        </div>
+        <div class="panel-field">
+          <label>Kode Cabang</label>
+          <input type="text" id="branchCode" placeholder="cth: JKT-01" maxlength="20"
+            oninput="this.value=this.value.toUpperCase()">
+        </div>
+      </div>
+      <button class="btn-create-branch" id="btnCreateBranch" onclick="createBranch()">
+        🏢 Simpan Cabang Baru
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Submit -->
+    <button class="btn-submit" id="btnSubmit" onclick="createAdmin()">
+      ✅ Buat Akun Admin
+    </button>
+
+  </div><!-- /form-card -->
+</div><!-- /page-body -->
+
+<!-- Non-module untuk onclick -->
+<script>
+  let showNewBranch = false;
+
+  function toggleNewBranch() {
+    showNewBranch = !showNewBranch;
+    document.getElementById("newBranchPanel").classList.toggle("show", showNewBranch);
+  }
+
+  function goBack() { window.location.href = "dashboard.html"; }
+
+  function showAlert(msg, type = "error") {
+    const box  = document.getElementById("alertBox");
+    const icon = document.getElementById("alertIcon");
+    const text = document.getElementById("alertMsg");
+    icon.textContent = type === "error" ? "❌" : "✅";
+    text.textContent = msg;
+    box.className = `alert show ${type}`;
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (type === "success") setTimeout(() => box.classList.remove("show"), 4000);
+  }
+
+  function hideAlert() {
+    document.getElementById("alertBox").classList.remove("show");
+  }
+
+  function resetForm() {
+    document.getElementById("successBanner").classList.remove("show");
+    document.getElementById("formCard").style.display = "block";
+    document.getElementById("displayName").value  = "";
+    document.getElementById("email").value         = "";
+    document.getElementById("password").value      = "";
+    document.getElementById("passwordConfirm").value = "";
+    document.querySelector('input[name=role][value=admin]').checked = true;
+    hideAlert();
+  }
+
+  function setLoading(loading) {
+    const btn = document.getElementById("btnSubmit");
+    btn.disabled = loading;
+    btn.innerHTML = loading
+      ? '<span class="spinner"></span> Membuat akun...'
+      : '✅ Buat Akun Admin';
+  }
+
+  function showRateLimitBanner() {
+    setLoading(false);
+    const existing = document.getElementById("rateLimitBanner");
+    if (existing) existing.remove();
+
+    const div = document.createElement("div");
+    div.id = "rateLimitBanner";
+    div.style.cssText = "background:#fef3c7;border:1.5px solid #fbbf24;border-radius:12px;padding:16px;margin-bottom:16px;";
+    div.innerHTML = `
+      <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:8px;">⏱️ Email Rate Limit — Terlalu banyak email dikirim</div>
+      <div style="font-size:12px;color:#78350f;margin-bottom:12px;">
+        Supabase membatasi pengiriman email konfirmasi. Solusinya: <strong>matikan email confirmation</strong>.
+      </div>
+      <div style="background:#1e1e1e;color:#facc15;border-radius:8px;padding:12px;font-size:12px;font-family:monospace;line-height:1.8;">
+        Supabase Dashboard<br>
+        → Authentication<br>
+        → Providers<br>
+        → Email<br>
+        → <strong style="color:#4ade80">Confirm email → OFF</strong>
+      </div>
+      <div style="font-size:12px;color:#78350f;margin-top:10px;">
+        Setelah dimatikan, tidak ada email konfirmasi yang dikirim — akun langsung aktif saat dibuat.
+        <br>Coba buat akun lagi setelah setting diubah.
+      </div>
+      <button onclick="document.getElementById('rateLimitBanner').remove()"
+        style="margin-top:10px;background:#92400e;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
+        Mengerti
+      </button>`;
+
+    const body = document.querySelector(".page-body");
+    body.insertBefore(div, body.firstChild);
+    div.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function showProfileErrorBanner(userId, role, branchId, displayName, errMsg) {
+    // Show a dedicated banner with SQL copy button
+    const existing = document.getElementById("profileErrBanner");
+    if (existing) existing.remove();
+
+    const sql = `INSERT INTO profiles (user_id, role, branch_id, display_name) VALUES ('${userId}', '${role}', '${branchId}', '${displayName}');`;
+
+    const div = document.createElement("div");
+    div.id = "profileErrBanner";
+    div.style.cssText = "background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:16px;";
+    div.innerHTML = `
+      <div style="font-size:13px;font-weight:800;color:#991b1b;margin-bottom:6px;">⚠️ Akun dibuat, tapi profil gagal disimpan</div>
+      <div style="font-size:12px;color:#7f1d1d;margin-bottom:10px;">Error: <code>${errMsg}</code><br><br>
+      Akun email sudah aktif. Jalankan SQL ini di <strong>Supabase → SQL Editor</strong> untuk melengkapi:</div>
+      <div id="sqlBox" style="background:#1e1e1e;color:#4ade80;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;line-height:1.6;word-break:break-all;">${sql}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button onclick="navigator.clipboard.writeText(\`${sql.replace(/`/g,'\`')}\`).then(()=>{this.textContent='✅ Tersalin!';setTimeout(()=>{this.textContent='📋 Copy SQL'},2000)})"
+          style="background:#991b1b;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
+          📋 Copy SQL
+        </button>
+        <button onclick="document.getElementById('profileErrBanner').remove()"
+          style="background:#f5f5f5;color:#333;border:1px solid #ddd;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
+          Tutup
+        </button>
+      </div>`;
+
+    const body = document.querySelector(".page-body");
+    body.insertBefore(div, body.firstChild);
+    div.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function showAlertRLS() {
+    document.getElementById("rlsAlert").style.display = "block";
+    document.getElementById("rlsAlert").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function setBranchLoading(loading) {
+    const btn = document.getElementById("btnCreateBranch");
+    btn.disabled = loading;
+    btn.innerHTML = loading
+      ? '<span class="spinner"></span> Menyimpan...'
+      : '🏢 Simpan Cabang Baru';
+  }
+</script>
+
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  // ── Load branches ────────────────────────────────────────────────
+  async function loadBranches(selectId = null) {
+    const sel = document.getElementById("branchSelect");
+    const { data, error } = await supabase
+      .from("branches")
+      .select("id, name, code")
+      .order("name", { ascending: true });
+
+    if (error || !data) {
+      sel.innerHTML = '<option value="">Gagal load cabang</option>';
+      return;
+    }
+
+    sel.innerHTML = '<option value="">-- Pilih Cabang --</option>' +
+      data.map(b =>
+        `<option value="${b.id}" ${b.id === selectId ? "selected" : ""}>
+          ${b.name} (${b.code})
+        </option>`
+      ).join("");
+  }
+
+  loadBranches();
+
+  // ── Buat cabang baru ─────────────────────────────────────────────
+  window.createBranch = async function() {
+    const name = document.getElementById("branchName").value.trim();
+    const code = document.getElementById("branchCode").value.trim();
+
+    if (!name || !code) {
+      showAlert("Nama dan kode cabang wajib diisi!", "error");
+      return;
+    }
+
+    setBranchLoading(true);
+    hideAlert();
+
+    const { data, error } = await supabase
+      .from("branches")
+      .insert([{ name, code }])
+      .select()
+      .single();
+
+    setBranchLoading(false);
+
+    if (error) {
+      let msg = "Gagal buat cabang: " + error.message;
+      if (error.message.includes("row-level security")) {
+        msg = "Gagal: RLS block insert ke tabel branches. Jalankan SQL ini di Supabase dulu:\n" +
+              "CREATE POLICY \"superadmin_insert_branches\" ON branches FOR INSERT TO authenticated WITH CHECK (true);\n" +
+              "CREATE POLICY \"superadmin_select_branches\" ON branches FOR SELECT TO authenticated USING (true);";
+        // Show in alert nicely
+        showAlertRLS();
+        setBranchLoading(false);
+        return;
+      }
+      showAlert(msg, "error");
+      return;
+    }
+
+    // Reset panel & reload branches, auto-select yang baru
+    document.getElementById("branchName").value = "";
+    document.getElementById("branchCode").value = "";
+    document.getElementById("newBranchPanel").classList.remove("show");
+    showNewBranch = false;
+
+    await loadBranches(data.id);
+    showAlert(`✅ Cabang "${name}" berhasil dibuat dan dipilih!`, "success");
+  };
+
+  // ── Buat admin ───────────────────────────────────────────────────
+  window.createAdmin = async function() {
+    hideAlert();
+
+    const displayName    = document.getElementById("displayName").value.trim();
+    const email          = document.getElementById("email").value.trim().toLowerCase();
+    const password       = document.getElementById("password").value;
+    const passwordConfirm= document.getElementById("passwordConfirm").value;
+    const role           = document.querySelector('input[name=role]:checked').value;
+    const branchId       = document.getElementById("branchSelect").value;
+
+    // ── Validasi ──────────────────────────────────────────────────
+    if (!displayName) {
+      showAlert("Nama tampilan wajib diisi!", "error");
+      document.getElementById("displayName").focus();
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showAlert("Format email tidak valid!", "error");
+      document.getElementById("email").focus();
+      return;
+    }
+    if (password.length < 8) {
+      showAlert("Password minimal 8 karakter!", "error");
+      document.getElementById("password").focus();
+      return;
+    }
+    if (password !== passwordConfirm) {
+      showAlert("Konfirmasi password tidak cocok!", "error");
+      document.getElementById("passwordConfirm").focus();
+      return;
+    }
+    if (!branchId) {
+      showAlert("Pilih cabang untuk admin ini!", "error");
+      document.getElementById("branchSelect").focus();
+      return;
+    }
+
+    setLoading(true);
+
+    // ── Step 1: Daftar user ke Supabase Auth ──────────────────────
+    // Pakai signUp biasa — pastikan "Confirm email" sudah di-OFF
+    // di Supabase → Authentication → Providers → Email
+    const { data: authData, error: authError } =
+      await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: displayName,
+            role: role
+          }
+        }
+      });
+
+    if (authError) {
+      setLoading(false);
+      let msg = "Gagal buat akun: " + authError.message;
+      if (authError.message.toLowerCase().includes("rate limit") ||
+          authError.message.toLowerCase().includes("email rate")) {
+        msg = "";
+        showRateLimitBanner();
+        return;
+      }
+      if (authError.message.toLowerCase().includes("already registered") ||
+          authError.message.toLowerCase().includes("already been registered")) {
+        msg = "Email ini sudah terdaftar. Gunakan email lain.";
+      }
+      showAlert(msg, "error");
+      return;
+    }
+
+    if (!authData.user) {
+      setLoading(false);
+      showAlert("Gagal mendapatkan data user setelah registrasi.", "error");
+      return;
+    }
+
+    const userId = authData.user.id;
+
+    // ── Step 2: Get branch name untuk display ─────────────────────
+    const { data: branchData } = await supabase
+      .from("branches")
+      .select("name, code")
+      .eq("id", branchId)
+      .single();
+
+    // ── Step 3: Insert ke tabel profiles (cek dulu apakah sudah ada) ─
+    // Cek apakah trigger otomatis sudah insert profile
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    let profileError = null;
+
+    if (existingProfile) {
+      // Sudah ada (dibuat oleh trigger) — update saja
+      const { error: updateErr } = await supabase
+        .from("profiles")
+        .update({
+          role:         role,
+          branch_id:    branchId,
+          display_name: displayName
+        })
+        .eq("user_id", userId);
+      profileError = updateErr;
+    } else {
+      // Belum ada — insert baru
+      const { error: insertErr } = await supabase
+        .from("profiles")
+        .insert({
+          user_id:      userId,
+          role:         role,
+          branch_id:    branchId,
+          display_name: displayName
+        });
+      profileError = insertErr;
+    }
+
+    if (profileError) {
+      setLoading(false);
+      showProfileErrorBanner(userId, role, branchId, displayName, profileError.message);
+      return;
+    }
+
+    setLoading(false);
+
+    // ── Step 4: Tampilkan success banner ──────────────────────────
+    const branchName = branchData
+      ? `${branchData.name} (${branchData.code})`
+      : branchId;
+
+    document.getElementById("formCard").style.display = "none";
+    document.getElementById("successInfo").innerHTML = `
+      <div class="info-row"><span class="k">Nama</span><span class="v">${displayName}</span></div>
+      <div class="info-row"><span class="k">Email</span><span class="v">${email}</span></div>
+      <div class="info-row"><span class="k">Password</span><span class="v">${password}</span></div>
+      <div class="info-row"><span class="k">Role</span><span class="v">${role === "superadmin" ? "👑 Superadmin" : "🏪 Admin"}</span></div>
+      <div class="info-row"><span class="k">Cabang</span><span class="v">${branchName}</span></div>
+    `;
+    document.getElementById("successBanner").classList.add("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+</script>
+
+</body>
+</html>

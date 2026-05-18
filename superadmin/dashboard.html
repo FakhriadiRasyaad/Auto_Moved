@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Superadmin Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/stylesupers.css">
+</head>
+<body>
+
+<div class="admin-container">
+  <h1>Superadmin Dashboard 👑</h1>
+
+  <div id="adminList"></div>
+
+  <button onclick="goCreate()">Buat Admin</button>
+  <button onclick="goStat()">Lihat Statistik</button>
+</div>
+
+<script>
+let admins = JSON.parse(localStorage.getItem("adminAccounts")) || [];
+const container = document.getElementById("adminList");
+
+admins.forEach(admin => {
+  container.innerHTML += `
+    <div class="user-row">
+      <strong>${admin.username}</strong>
+      <button onclick="deleteAdmin(${admin.id})">Hapus</button>
+    </div>
+  `;
+});
+
+function deleteAdmin(id){
+  admins = admins.filter(a => a.id !== id);
+  localStorage.setItem("adminAccounts", JSON.stringify(admins));
+  location.reload();
+}
+
+function goCreate(){
+  window.location.href = "buat-admin.html";
+}
+
+function goStat(){
+  window.location.href = "statistik.html";
+}
+</script>
+
+</body>
+</html>

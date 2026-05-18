@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pilih Paket</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<script>
+  if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
+    window.location.href = "index.html";
+  }
+</script>
+
+<div class="paket-container">
+  <h1>Pilih Paket Foto 💕</h1>
+  <div class="paket-grid" id="paketGrid">
+    <p>Loading paket...</p>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase } from "./assets/js/supabase.js";
+
+  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
+  const branchId = admin.branch_id;
+  const grid     = document.getElementById("paketGrid");
+
+  const { data: pakets, error } = await supabase
+    .from("packages")
+    .select("*")
+    .eq("branch_id", branchId)
+    .eq("is_active", true)
+    .order("harga", { ascending: true });
+
+  if (error || !pakets || pakets.length === 0) {
+    grid.innerHTML = "<p>Paket tidak tersedia. Hubungi admin.</p>";
+  } else {
+    grid.innerHTML = "";
+
+    pakets.forEach(paket => {
+      const card = document.createElement("div");
+      card.className = "paket-card" + (paket.is_highlight ? " highlight" : "");
+      card.onclick   = () => selectPaket(paket);
+
+      card.innerHTML = `
+        ${paket.is_highlight ? '<div class="badge">🔥 Best Seller</div>' : ""}
+        <h2>${paket.nama}</h2>
+        <p>${paket.foto_limit  >= 999 ? "Unlimited" : paket.foto_limit}  Foto</p>
+        <p>${paket.frame_limit >= 999 ? "All"       : paket.frame_limit} Frame</p>
+        ${paket.stiker_gratis ? "<p>Stiker Gratis</p>" : ""}
+        <div class="price">Rp ${paket.harga.toLocaleString("id-ID")}</div>
+      `;
+
+      grid.appendChild(card);
+    });
+  }
+
+  function selectPaket(paket) {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+
+    user.paket = {
+      id:            paket.id,
+      nama:          paket.nama,
+      harga:         paket.harga,
+      foto_limit:    paket.foto_limit,
+      frame_limit:   paket.frame_limit,
+      stiker_gratis: paket.stiker_gratis
+    };
+
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    window.location.href = "pembayaran.html";
+  }
+</script>
+
+</body>
+</html>

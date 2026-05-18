@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Setting Folder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+</head>
+<body>
+
+<script>
+  if (!localStorage.getItem("currentAdmin")) window.location.href = "../index.html";
+</script>
+
+<!-- Progress overlay -->
+<div id="progressOverlay">
+  <div class="progress-box">
+    <h3 id="progTitle">⏳ Menyiapkan ZIP...</h3>
+    <p id="progDesc">Mengambil foto dari server</p>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <p class="pstatus" id="pstatus">0%</p>
+  </div>
+</div>
+
+<!-- Modal preview -->
+<div id="imgModal" onclick="closeModal()">
+  <button class="close-btn">✕</button>
+  <img id="modalImg" src="" alt="Preview">
+</div>
+
+<div class="page-wrap">
+  <h1>📁 Setting Folder</h1>
+  <p class="subtitle">Atur folder tujuan dan kelola foto tersimpan</p>
+
+  <!-- Folder Tujuan -->
+  <div class="card">
+    <p class="card-title">🗂️ Folder Tujuan (Download 2)</p>
+    <p class="card-desc">
+      Download 2 akan menyimpan ZIP langsung ke folder ini di PC kamu. Klik <b>Pilih Folder</b> lalu izinkan akses. Hanya Chrome/Edge yang support fitur ini.
+    </p>
+
+    <div class="folder-status" id="folderStatus">
+      <span class="folder-status-icon">📁</span>
+      <div class="folder-status-text">
+        <div class="folder-status-name empty" id="folderName">Belum dipilih</div>
+        <div class="folder-status-hint" id="folderHint">Pilih folder untuk Download 2</div>
+      </div>
+    </div>
+
+    <div class="folder-btns">
+      <button class="btn-pick" onclick="pickFolder()" id="btnPick">
+        📂 Pilih Folder
+      </button>
+      <button class="btn-clear" id="btnClear" onclick="clearFolder()" style="display:none;">
+        ✕ Hapus
+      </button>
+    </div>
+
+    <div class="browser-note" id="browserNote">
+      ⚠️ Browser kamu tidak mendukung pemilihan folder langsung (butuh Chrome/Edge). 
+      Download 2 akan tetap berfungsi tapi file masuk ke folder <b>Downloads</b> seperti Download 1.
+    </div>
+  </div>
+
+  <!-- Foto Tersimpan -->
+  <div class="card">
+    <p class="card-title">📸 Foto Tersimpan</p>
+    <p class="card-desc">
+      Setiap sesi tersimpan dalam folder <b>NamaGuest / Tanggal / edit</b> (hasil edit) dan <b>noedit</b> (foto asli terpilih).
+      Download sebagai satu ZIP per sesi. Download 2 sesuai yang anda cantumkan.
+    </p>
+
+    <button class="btn-load" onclick="loadSessions()">🔄 Muat Sesi Foto</button>
+    <div id="sessionList"><p class="empty-state">Klik tombol di atas untuk memuat.</p></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-back" onclick="window.location.href='dashboard.html'">← Kembali</button>
+    <button class="btn-save" onclick="saveSettings()">💾 Simpan</button>
+  </div>
+  <p id="msgSave"></p>
+</div>
+
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  const admin      = JSON.parse(localStorage.getItem("currentAdmin"));
+  const branchId   = admin.branch_id;
+  const storageKey = "folder_admin_" + admin.id;
+  let setting      = JSON.parse(localStorage.getItem(storageKey) || "{}");
+  let folderHandle = null; // FileSystemDirectoryHandle
+
+  const supportsFS = "showDirectoryPicker" in window;
+  if (!supportsFS) document.getElementById("browserNote").classList.add("show");
+
+  // ── Load handle dari IndexedDB ────────────────────────────────────────
+  async function openIDB() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open("photobooth_fs", 1);
+      r.onupgradeneeded = e => e.target.result.createObjectStore("handles");
+      r.onsuccess = e => res(e.target.result);
+      r.onerror   = e => rej(e);
+    });
+  }
+  async function saveHandle(h) {
+    try {
+      const db = await openIDB();
+      db.transaction("handles","readwrite").objectStore("handles").put(h, `folder_${admin.id}`);
+    } catch(e) {}
+  }
+  async function loadHandle() {
+    try {
+      const db  = await openIDB();
+      const req = db.transaction("handles","readonly").objectStore("handles").get(`folder_${admin.id}`);
+      return new Promise(res => { req.onsuccess = e => res(e.target.result||null); req.onerror = ()=>res(null); });
+    } catch(e) { return null; }
+  }
+  async function deleteHandle() {
+    try {
+      const db = await openIDB();
+      db.transaction("handles","readwrite").objectStore("handles").delete(`folder_${admin.id}`);
+    } catch(e) {}
+  }
+
+  // Load saved handle on start
+  loadHandle().then(h => { if (h) { folderHandle = h; showFolderActive(h.name); } });
+
+  // ── Pick folder ───────────────────────────────────────────────────────
+  window.pickFolder = async function() {
+    if (!supportsFS) {
+      showMsg("⚠️ Browser tidak support. Pakai Chrome/Edge untuk fitur ini.", "#e65100"); return;
+    }
+    try {
+      const handle = await window.showDirectoryPicker({ mode: "readwrite" });
+      folderHandle = handle;
+      await saveHandle(handle);
+      setting.folderName = handle.name;
+      showFolderActive(handle.name);
+      showMsg("✅ Folder dipilih: " + handle.name, "green");
+    } catch(e) {
+      if (e.name !== "AbortError") showMsg("❌ " + e.message, "red");
+    }
+  };
+
+  window.clearFolder = function() {
+    folderHandle = null;
+    deleteHandle();
+    delete setting.folderName;
+    document.getElementById("folderName").textContent = "Belum dipilih";
+    document.getElementById("folderName").classList.add("empty");
+    document.getElementById("folderHint").textContent = "Pilih folder untuk Download 2";
+    document.getElementById("folderStatus").classList.remove("active");
+    document.getElementById("btnClear").style.display = "none";
+  };
+
+  function showFolderActive(name) {
+    document.getElementById("folderName").textContent = "📂 " + name;
+    document.getElementById("folderName").classList.remove("empty");
+    document.getElementById("folderHint").textContent = "Folder aktif — Download 2 akan menyimpan ke sini";
+    document.getElementById("folderStatus").classList.add("active");
+    document.getElementById("btnClear").style.display = "inline-flex";
+  }
+
+  // ── Load sesi dari Supabase ───────────────────────────────────────────
+  window.loadSessions = async function() {
+    const list = document.getElementById("sessionList");
+    list.innerHTML = `<p class="empty-state">⏳ Memuat sesi...</p>`;
+
+    const { data: folders, error } = await supabase.storage
+      .from("photos").list(branchId, { limit: 100, sortBy: { column: "name", order: "desc" } });
+
+    if (error) { list.innerHTML = `<p class="empty-state" style="color:red;">❌ ${error.message}</p>`; return; }
+    if (!folders?.length) { list.innerHTML = `<p class="empty-state">Belum ada sesi tersimpan.</p>`; return; }
+
+    list.innerHTML = "";
+
+    for (const folder of folders) {
+      if (folder.metadata) continue; // skip file
+
+      // Parse nama sesi: NamaGuest_YYYY-MM-DDTHH-MM-SS
+      const raw   = folder.name;
+      const parts = raw.match(/^(.+?)_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})$/);
+      const guest = parts ? parts[1].replace(/_/g, " ") : raw.replace(/_/g, " ");
+      const dtRaw = parts ? parts[2] : "";
+      const dt    = dtRaw ? dtRaw.replace("T"," ").replace(/-/g,":").replace(" ","T").slice(0,16).replace("T"," ") : "-";
+
+      const card = document.createElement("div");
+      card.className = "session-card";
+      card.innerHTML = `
+        <div class="session-header" onclick="toggleSession(this, '${raw}')">
+          <div class="session-avatar">👤</div>
+          <div class="session-meta">
+            <div class="session-guest">${guest}</div>
+            <div class="session-info">📅 ${dt}</div>
+          </div>
+          <div class="session-actions">
+            <button class="btn-dl btn-dl1" id="dl1_${raw}"
+              onclick="event.stopPropagation(); downloadZip('${raw}', '${guest}', 1)">
+              ⬇️ Download 1
+            </button>
+            <button class="btn-dl btn-dl2 ${folderHandle ? '' : 'needs-folder'}" id="dl2_${raw}"
+              onclick="event.stopPropagation(); downloadZip('${raw}', '${guest}', 2)">
+              📥 Download 2
+            </button>
+          </div>
+          <span class="session-toggle">▼</span>
+        </div>
+        <div class="session-preview" data-folder="${raw}"></div>
+      `;
+      list.appendChild(card);
+    }
+  };
+
+  // Toggle preview
+  window.toggleSession = async function(header, folderName) {
+    const preview  = header.nextElementSibling;
+    const toggle   = header.querySelector(".session-toggle");
+    const isOpen   = preview.classList.contains("open");
+
+    document.querySelectorAll(".session-preview.open").forEach(d => d.classList.remove("open"));
+    document.querySelectorAll(".session-toggle.open").forEach(t => t.classList.remove("open"));
+    if (isOpen) return;
+
+    preview.classList.add("open");
+    toggle.classList.add("open");
+
+    if (preview.innerHTML.trim() !== "") return; // already loaded
+    await loadSessionPreview(preview, folderName);
+  };
+
+  // Helper: list semua file dalam subfolder secara rekursif (1 level)
+  async function listAllFiles(sessionPath) {
+    // List root session folder dulu — cari subfolder edit/ dan noedit/
+    const { data: rootItems } = await supabase.storage.from("photos")
+      .list(sessionPath, { limit: 20 });
+
+    const results = { edit: [], noedit: [] };
+    if (!rootItems) return results;
+
+    for (const item of rootItems) {
+      if (item.metadata) {
+        // File langsung di root (format lama: hasil.jpg, foto_01.jpg)
+        if (item.name === "hasil.jpg") results.edit.push({ name: item.name, path: sessionPath + "/" + item.name });
+        else results.noedit.push({ name: item.name, path: sessionPath + "/" + item.name });
+      } else {
+        // Subfolder — list isinya
+        const subPath = sessionPath + "/" + item.name;
+        const { data: subItems } = await supabase.storage.from("photos")
+          .list(subPath, { limit: 50 });
+        if (subItems) {
+          for (const sf of subItems.filter(f => f.metadata)) {
+            const target = item.name === "edit" ? results.edit : results.noedit;
+            target.push({ name: sf.name, path: subPath + "/" + sf.name });
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  async function loadSessionPreview(previewEl, folderName) {
+    previewEl.innerHTML = `<p style="font-size:11px;color:#aaa;">⏳ Memuat preview...</p>`;
+    const sessionPath = `${branchId}/${folderName}`;
+
+    const files = await listAllFiles(sessionPath);
+    let html = "";
+
+    if (files.edit.length) {
+      html += `<p class="preview-label">✨ Edit (${files.edit.length} foto)</p><div class="preview-grid">`;
+      for (const f of files.edit) {
+        const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
+        if (s?.signedUrl) html += `
+          <div class="preview-item">
+            <img src="${s.signedUrl}" onclick="openModal('${s.signedUrl}')" title="${f.name}">
+            <span class="tag">edit</span>
+          </div>`;
+      }
+      html += `</div>`;
+    }
+
+    if (files.noedit.length) {
+      html += `<p class="preview-label">📷 Foto Asli (${files.noedit.length} foto)</p><div class="preview-grid">`;
+      for (const f of files.noedit) {
+        const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
+        if (s?.signedUrl) html += `
+          <div class="preview-item">
+            <img src="${s.signedUrl}" onclick="openModal('${s.signedUrl}')" title="${f.name}">
+            <span class="tag">noedit</span>
+          </div>`;
+      }
+      html += `</div>`;
+    }
+
+    previewEl.innerHTML = html || `<p style="font-size:11px;color:#aaa;padding:12px 0;">
+      Tidak ada file. Coba sesi ulang dari pilih-frame.html.</p>`;
+  }
+
+  // ── Download ZIP ──────────────────────────────────────────────────────
+  // Struktur ZIP: NamaGuest/Tanggal/edit/hasil.jpg
+  //               NamaGuest/Tanggal/noedit/foto_01.jpg ...
+
+  window.downloadZip = async function(folderRaw, guestDisplay, mode) {
+    // Mode 2 perlu folderHandle
+    if (mode === 2 && !folderHandle) {
+      if (!supportsFS) {
+        // Fallback: download ke Downloads seperti mode 1
+        showMsg("⚠️ Browser tidak support folder picker, download ke Downloads.", "#e65100");
+        mode = 1;
+      } else {
+        showMsg("⚠️ Pilih folder tujuan dulu!", "#e65100");
+        document.getElementById("btnPick").scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+    }
+
+    // Pastikan permission masih aktif
+    if (mode === 2 && folderHandle) {
+      try {
+        const perm = await folderHandle.requestPermission({ mode: "readwrite" });
+        if (perm !== "granted") { showMsg("❌ Izin folder ditolak.", "red"); return; }
+      } catch(e) { showMsg("❌ " + e.message, "red"); return; }
+    }
+
+    // Parse nama & tanggal dari folderRaw
+    const parts     = folderRaw.match(/^(.+?)_(\d{4}-\d{2}-\d{2})T(\d{2}-\d{2}-\d{2})$/);
+    const guestName = parts ? parts[1] : folderRaw;
+    const tglPart   = parts ? parts[2] : new Date().toISOString().slice(0,10);
+
+    // Nama path dalam ZIP
+    const zipEditPath   = `${guestName}/${tglPart}/edit/`;
+    const zipNoeditPath = `${guestName}/${tglPart}/noedit/`;
+
+    const btn1 = document.getElementById(`dl1_${folderRaw}`);
+    const btn2 = document.getElementById(`dl2_${folderRaw}`);
+    if (btn1) { btn1.disabled = true; btn1.textContent = "⏳"; }
+    if (btn2) { btn2.disabled = true; btn2.textContent = "⏳"; }
+
+    showProgress("Menyiapkan ZIP...", 0);
+
+    try {
+      const sessionPath = `${branchId}/${folderRaw}`;
+      const zip  = new JSZip();
+      setProgress(0, 1, "Memeriksa sesi...");
+
+      // Gunakan listAllFiles yang sama dengan preview — support semua struktur path
+      const allFiles = await listAllFiles(sessionPath);
+      const combined = [
+        ...allFiles.edit  .map(f => ({ ...f, sub: "edit"   })),
+        ...allFiles.noedit.map(f => ({ ...f, sub: "noedit" })),
+      ];
+
+      if (combined.length === 0) throw new Error("Tidak ada file ditemukan di sesi ini.");
+
+      const newTotal = combined.length;
+      setProgress(0, newTotal, "Mengambil foto...");
+      let done2 = 0;
+
+      for (const item of combined) {
+        const { data: s } = await supabase.storage.from("photos").createSignedUrl(item.path, 120);
+        if (!s?.signedUrl) { done2++; setProgress(done2, newTotal); continue; }
+
+        const res  = await fetch(s.signedUrl);
+        const blob = await res.blob();
+        const buf  = await blob.arrayBuffer();
+
+        const zipPath = item.sub === "edit" ? zipEditPath + item.name : zipNoeditPath + item.name;
+        zip.file(zipPath, buf);
+
+        done2++;
+        setProgress(done2, newTotal, `Mengambil ${done2}/${newTotal} file...`);
+      }
+
+      setProgress(newTotal, newTotal, "Membuat ZIP...");
+      document.getElementById("progDesc").textContent = "Membuat file ZIP...";
+
+      const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+      const zipName = `${guestName}_${tglPart}.zip`;
+
+      if (mode === 2 && folderHandle) {
+        // Simpan langsung ke folder yang dipilih
+        const fileHandle = await folderHandle.getFileHandle(zipName, { create: true });
+        const writable   = await fileHandle.createWritable();
+        await writable.write(zipBlob);
+        await writable.close();
+        showMsg(`✅ ZIP disimpan ke folder: ${zipName}`, "green");
+      } else {
+        // Download ke Downloads
+        const url  = URL.createObjectURL(zipBlob);
+        const link = document.createElement("a");
+        link.href  = url; link.download = zipName;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        showMsg(`✅ ZIP didownload: ${zipName}`, "green");
+      }
+
+      hideProgress();
+
+    } catch(e) {
+      hideProgress();
+      showMsg("❌ Gagal: " + e.message, "red");
+    } finally {
+      if (btn1) { btn1.disabled = false; btn1.textContent = "⬇️ Download 1"; }
+      if (btn2) { btn2.disabled = false; btn2.textContent = folderHandle ? "📥 Download 2" : "📥 Download 2"; }
+    }
+  };
+
+  // ── Progress UI ───────────────────────────────────────────────────────
+  function showProgress(title, pct) {
+    document.getElementById("progTitle").textContent = title;
+    document.getElementById("progressOverlay").classList.add("show");
+    document.getElementById("pfill").style.width = pct + "%";
+  }
+  function setProgress(done, total, desc) {
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    document.getElementById("pfill").style.width = pct + "%";
+    document.getElementById("pstatus").textContent = `${pct}% (${done}/${total})`;
+    if (desc) document.getElementById("progDesc").textContent = desc;
+  }
+  function hideProgress() {
+    document.getElementById("progressOverlay").classList.remove("show");
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────
+  window.openModal = function(url) {
+    document.getElementById("modalImg").src = url;
+    document.getElementById("imgModal").classList.add("show");
+  };
+  window.closeModal = function() {
+    document.getElementById("imgModal").classList.remove("show");
+  };
+
+  // ── Save settings ─────────────────────────────────────────────────────
+  window.saveSettings = function() {
+    localStorage.setItem(storageKey, JSON.stringify(setting));
+    showMsg("✅ Setting disimpan!", "green");
+    setTimeout(() => showMsg("", ""), 3000);
+  };
+
+  function showMsg(text, color) {
+    const el = document.getElementById("msgSave");
+    el.textContent = text; el.style.color = color;
+  }
+</script>
+
+</body>
+</html>

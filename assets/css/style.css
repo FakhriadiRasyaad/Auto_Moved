@@ -1,0 +1,604 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffd6ec, #d6f0ff);
+  }
+  
+  /* LOGIN PAGE */
+  .login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+  }
+  
+  .login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+  }
+  
+  h1 {
+    margin-bottom: 25px;
+    color: #ff4fa3;
+  }
+  
+  input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border-radius: 16px;
+    border: 2px solid #f1c6e7;
+    outline: none;
+    transition: 0.3s;
+  }
+  
+  input:focus {
+    border-color: #ff6ec7;
+    box-shadow: 0 0 0 3px rgba(255,110,199,0.2);
+  }
+  
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ff6ec7, #ffb6f9);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(255,110,199,0.3);
+  }
+  
+  button:hover {
+    transform: translateY(-3px);
+  }
+  
+  .container {
+    max-width: 420px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(20px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+  /* =======================
+   PAKET PAGE
+======================= */
+
+.paket-container {
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+    padding: 40px;
+  }
+  
+  .paket-container h1 {
+    margin-bottom: 40px;
+    font-size: 32px;
+    color: #ff4fa3;
+  }
+  
+  .paket-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  
+  .paket-card {
+    background: white;
+    padding: 30px;
+    width: 260px;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+  }
+  
+  .paket-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 50px rgba(0,0,0,0.12);
+  }
+  
+  .paket-card h2 {
+    color: #ff4fa3;
+    margin-bottom: 10px;
+  }
+  
+  .paket-card p {
+    color: #666;
+    margin-bottom: 5px;
+  }
+  
+  .price {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #ff6ec7;
+  }
+  
+  /* Highlight Card */
+  .highlight {
+    border: 3px solid #ff6ec7;
+  }
+  
+  .badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: #ff6ec7;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+
+  /* =======================
+   PAYMENT PAGE
+======================= */
+
+.payment-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .payment-card {
+    background: white;
+    padding: 30px;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  }
+  
+  .payment-card h2 {
+    margin-bottom: 10px;
+    color: #ff4fa3;
+  }
+  
+  .payment-card h3 {
+    margin: 20px 0 15px;
+    color: #ff4fa3;
+  }
+  
+  .payment-methods {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .method {
+    padding: 15px 20px;
+    border-radius: 18px;
+    background: #ffe6f5;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 600;
+  }
+  
+  .method:hover {
+    background: #ffc9ec;
+  }
+  
+  .method.active {
+    background: #ff6ec7;
+    color: white;
+  }
+  
+
+
+  /* =======================
+   LAYOUT PAGE
+======================= */
+
+.layout-container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .layout-container h1 {
+    margin-bottom: 40px;
+    font-size: 32px;
+    color: #ff4fa3;
+  }
+  
+  .layout-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  
+  .layout-card {
+    background: white;
+    padding: 20px;
+    width: 220px;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .layout-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 50px rgba(0,0,0,0.12);
+  }
+  
+  .layout-card p {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #ff4fa3;
+  }
+  
+  /* Mock Frame Preview */
+  
+  .mock-frame {
+    width: 100%;
+    height: 250px;
+    border-radius: 20px;
+    background: #ffe6f5;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Frame 1 */
+  .frame1::before {
+    content: "";
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border: 8px solid #ff6ec7;
+    top: 10%;
+    left: 10%;
+    border-radius: 20px;
+  }
+  
+  /* Frame 2 */
+  .frame2::before {
+    content: "";
+    position: absolute;
+    width: 60%;
+    height: 90%;
+    border: 8px solid #8ec5fc;
+    top: 5%;
+    left: 20%;
+    border-radius: 20px;
+  }
+  
+  /* Frame 3 */
+  .frame3::before {
+    content: "";
+    position: absolute;
+    width: 70%;
+    height: 70%;
+    border: 8px dashed #ff4fa3;
+    top: 15%;
+    left: 15%;
+    border-radius: 50%;
+  }
+  
+
+  /* =======================
+   FOTO PAGE
+======================= */
+
+.foto-container {
+    text-align: center;
+    padding: 40px;
+    width: 100%;
+    max-width: 900px;
+  }
+  
+  .camera-box {
+    position: relative;
+    margin: 20px auto;
+    width: 500px;
+    height: 380px;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  #countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 5px 20px rgba(0,0,0,0.5);
+  }
+  
+  .preview-grid {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .preview-grid img {
+    width: 120px;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+
+
+
+  /* =======================
+   PILIH FOTO PAGE
+======================= */
+
+.pilih-container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .foto-grid {
+    margin: 30px 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .foto-item {
+    width: 150px;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+  }
+  
+  .foto-item img {
+    width: 100%;
+    display: block;
+  }
+  
+  .foto-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .foto-item.selected {
+    border: 4px solid #ff6ec7;
+    box-shadow: 0 10px 25px rgba(255,110,199,0.4);
+  }
+  
+
+  /* =======================
+   EDIT EFFECT PAGE
+======================= */
+
+.edit-container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .edit-preview {
+    margin: 20px auto;
+    width: 400px;
+    height: 400px;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  
+  .edit-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .slider-group {
+    margin: 20px 0;
+  }
+  
+  .slider-group label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+    color: #ff4fa3;
+  }
+  
+  .slider-group input {
+    width: 100%;
+  }
+  
+  .thumb-grid {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .thumb-grid img {
+    width: 80px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .thumb-grid img:hover {
+    transform: scale(1.1);
+  }
+  
+
+  /* =======================
+   FRAME PAGE
+======================= */
+
+.frame-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .frame-preview {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 20px auto;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  
+  .frame-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .frame-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: 28px;
+  }
+  
+  .frame-overlay.pink {
+    border: 20px solid #ff6ec7;
+  }
+  
+  .frame-overlay.blue {
+    border: 20px solid #8ec5fc;
+  }
+  
+  .frame-overlay.gold {
+    border: 20px solid gold;
+  }
+  
+  .frame-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+  }
+  
+  .frame-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    cursor: pointer;
+    border: 3px solid white;
+    transition: 0.3s;
+  }
+  
+  .frame-btn:hover {
+    transform: scale(1.1);
+  }
+  
+  .frame-btn.pink { background: #ff6ec7; }
+  .frame-btn.blue { background: #8ec5fc; }
+  .frame-btn.gold { background: gold; }
+  .frame-btn.none {
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+
+  /* =======================
+   CETAK PAGE
+======================= */
+
+.cetak-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .print-preview {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 20px auto;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  
+  .print-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .info-box {
+    margin: 20px auto;
+    padding: 15px;
+    background: white;
+    border-radius: 18px;
+    width: 300px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+  
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+  
+    .print-preview, .print-preview * {
+      visibility: visible;
+    }
+  
+    .print-preview {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  #stripCanvas {
+    margin: 20px auto;
+    display: block;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  

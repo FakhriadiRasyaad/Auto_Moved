@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foto Kamu — Photobooth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f7f3ed;--card:#fff;--pink:#d63f6b;--pink2:#b02d55;--rose:#fce8ee;--brown:#2c1810;--muted:#8c7268;--border:#e8ddd6;--green:#22896b;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;}
+    .header{background:white;border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(44,24,16,.05);}
+    .h-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--pink),var(--pink2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+    .h-info{flex:1;min-width:0;}
+    .h-name{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--brown);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .h-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+    .btn-back{background:var(--bg);color:var(--brown);border:1px solid var(--border);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+    .btn-back:hover{background:var(--border);}
+    .body{max-width:720px;margin:0 auto;padding:20px 16px 48px;}
+    .photo-card{background:white;border-radius:20px;border:1px solid var(--border);overflow:hidden;box-shadow:0 4px 20px rgba(44,24,16,.07);}
+    .pc-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .pc-title{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:var(--brown);}
+    .pc-count{font-size:11px;color:var(--muted);}
+    .actions{padding:12px 18px;display:flex;gap:8px;flex-wrap:wrap;background:#fdf9f5;border-bottom:1px solid var(--border);}
+    .act-btn{display:flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:10px 16px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+    .act-pink{background:linear-gradient(135deg,var(--pink),var(--pink2));color:white;box-shadow:0 4px 12px rgba(214,63,107,.25);}
+    .act-pink:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(214,63,107,.35);}
+    .act-green{background:var(--green);color:white;box-shadow:0 4px 12px rgba(34,137,107,.2);}
+    .act-green:hover{transform:translateY(-1px);}
+    .act-outline{background:white;color:var(--brown);border:1.5px solid var(--border);}
+    .act-outline:hover{border-color:var(--pink);color:var(--pink);}
+    .act-blue{background:linear-gradient(135deg,#4a90e2,#357abd);color:white;box-shadow:0 4px 12px rgba(74,144,226,.25);}
+    .act-blue:hover{transform:translateY(-1px);}
+    /* Tombol edit & cetak — warna ungu agar beda */
+    .act-purple{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;box-shadow:0 4px 12px rgba(124,58,237,.25);}
+    .act-purple:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(124,58,237,.35);}
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:14px;}
+    .photo-item{position:relative;border-radius:11px;overflow:hidden;cursor:pointer;aspect-ratio:3/4;background:var(--bg);border:2px solid transparent;transition:all .22s cubic-bezier(.4,0,.2,1);animation:pIn .35s ease both;}
+    .photo-item:hover{border-color:var(--pink);transform:translateY(-3px) scale(1.02);}
+    .photo-item:hover .ov{opacity:1;}
+    @keyframes pIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+    .photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
+    .ov{position:absolute;inset:0;background:rgba(214,63,107,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .18s;font-size:26px;}
+    .pnum{position:absolute;bottom:7px;left:7px;background:rgba(44,24,16,.6);color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;display:flex;align-items:center;gap:2px;}
+    .pdl{position:absolute;top:7px;right:7px;background:white;border:none;border-radius:6px;width:26px;height:26px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .18s;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+    .photo-item:hover .pdl{opacity:1;}
+    .folder-section{margin-bottom:24px;}
+    .folder-header{padding:12px 16px;background:#fdf9f5;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid var(--border);}
+    .folder-header:hover{background:var(--rose);}
+    .folder-header .folder-name{font-weight:600;color:var(--brown);}
+    .folder-header .folder-date{font-size:12px;color:var(--muted);}
+    /* Tombol edit per folder */
+    .folder-edit-btn{margin-left:auto;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;flex-shrink:0;}
+    .folder-edit-btn:hover{transform:translateY(-1px);opacity:.9;}
+    .folder-toggle{font-size:11px;color:var(--muted);}
+    .folder-content{overflow:hidden;transition:max-height 0.3s ease;padding-left:8px;border-left:2px solid var(--border);margin-bottom:16px;}
+    .folder-content:not(.open){max-height:0;padding:0;margin:0;border-left:none;}
+    .empty{padding:44px;text-align:center;color:var(--muted);}
+    .empty .eico{font-size:44px;margin-bottom:10px;}
+    .loading-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:14px;}
+    .skel{border-radius:11px;aspect-ratio:3/4;background:linear-gradient(90deg,#f0ebe5 25%,#e4dbd4 50%,#f0ebe5 75%);background-size:200% 100%;animation:shim 1.4s infinite;}
+    @keyframes shim{to{background-position:-200% 0}}
+    .lb{position:fixed;inset:0;z-index:1000;background:rgba(20,10,5,.92);display:none;align-items:center;justify-content:center;padding:20px;}
+    .lb.open{display:flex;}
+    .lb-inner{position:relative;max-width:480px;width:100%;animation:lbIn .22s ease;}
+    @keyframes lbIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+    .lb-img{width:100%;border-radius:14px;display:block;box-shadow:0 24px 80px rgba(0,0,0,.55);}
+    .lb-x{position:absolute;top:-13px;right:-13px;width:34px;height:34px;border-radius:50%;background:white;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+    .lb-x:hover{background:var(--rose);}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.13);color:white;border:1px solid rgba(255,255,255,.22);border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:background .18s;}
+    .lb-nav:hover{background:rgba(255,255,255,.25);}
+    .lb-prev{left:-54px;}.lb-next{right:-54px;}
+    .lb-acts{display:flex;gap:8px;margin-top:12px;justify-content:center;}
+    .lb-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 15px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .18s;}
+    .lb-btn:hover{background:rgba(255,255,255,.22);}
+    .lb-btn.pp{background:var(--pink);border-color:var(--pink);}
+    .lb-btn.pp:hover{background:var(--pink2);}
+    .print-area{display:none;}
+    @media print{
+      body *{visibility:hidden!important;}
+      .print-area,.print-area *{visibility:visible!important;}
+      .print-area{position:fixed!important;inset:0!important;display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:center!important;padding:8mm!important;background:white!important;gap:6mm!important;}
+      .print-area img{max-height:85vh!important;max-width:100%!important;object-fit:contain!important;border-radius:6px!important;}
+      .print-caption{width:100%!important;text-align:center!important;font-family:sans-serif!important;font-size:10pt!important;color:#888!important;margin-top:4mm!important;}
+      @page{margin:0;size:A4 portrait;}
+    }
+  </style>
+</head>
+<body>
+<div class="print-area" id="printArea"></div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb" onclick="lbBgClick(event)">
+  <div class="lb-inner">
+    <button class="lb-x" onclick="lbClose()">✕</button>
+    <button class="lb-nav lb-prev" onclick="lbNav(-1)">‹</button>
+    <button class="lb-nav lb-next" onclick="lbNav(1)">›</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <div class="lb-acts">
+      <button class="lb-btn pp" onclick="printOne()">🖨 Print Foto Ini</button>
+      <button class="lb-btn" onclick="dlOne()">⬇ Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="h-icon">📸</div>
+  <div class="h-info">
+    <div class="h-name" id="hName">Galeri Foto</div>
+    <div class="h-sub"  id="hSub">—</div>
+  </div>
+  <button class="btn-back" onclick="goBack()">← Keluar</button>
+</div>
+
+<!-- Body -->
+<div class="body">
+  <div class="photo-card">
+    <div class="pc-header">
+      <div class="pc-title">✨ Semua Foto Kamu</div>
+      <div class="pc-count" id="pcCount">—</div>
+    </div>
+    <div class="actions" id="actBar" style="display:none">
+      <button class="act-btn act-pink"   onclick="printAll()">🖨 Print Semua</button>
+      <button class="act-btn act-green"  onclick="dlAll()">⬇ Download Semua</button>
+    </div>
+    <div id="photoArea">
+      <div class="loading-grid">
+        <div class="skel"></div><div class="skel"></div>
+        <div class="skel"></div><div class="skel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var branch = null, guest = null;
+  var allPhotos = [], allUrls = [], lbIdx = 0;
+
+  var raw = sessionStorage.getItem("guestData");
+  var br  = sessionStorage.getItem("selectedBranch");
+  if (!raw) { window.location.href = "guest-login.html"; }
+  var pd = JSON.parse(raw);
+  guest  = pd.guest;
+  branch = br ? JSON.parse(br) : null;
+
+  document.getElementById("hName").textContent = "Hai, " + guest.nama + "!";
+  document.getElementById("hSub").textContent  = "Cabang: " + (branch ? branch.name : "—");
+
+  window.goBack = function() {
+    sessionStorage.removeItem("guestData");
+    window.location.href = "guest-login.html";
+  };
+
+  window.lbOpen = function(i) {
+    lbIdx = i;
+    document.getElementById("lbImg").src = allUrls[i] || "";
+    document.getElementById("lb").classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+  window.lbClose = function() {
+    document.getElementById("lb").classList.remove("open");
+    document.body.style.overflow = "";
+  };
+  window.lbBgClick = function(e) { if(e.target.id==="lb") lbClose(); };
+  window.lbNav = function(d) {
+    lbIdx = (lbIdx + d + allPhotos.length) % allPhotos.length;
+    document.getElementById("lbImg").src = allUrls[lbIdx] || "";
+  };
+  document.addEventListener("keydown", function(e) {
+    if (!document.getElementById("lb").classList.contains("open")) return;
+    if (e.key==="ArrowLeft") lbNav(-1);
+    if (e.key==="ArrowRight") lbNav(1);
+    if (e.key==="Escape") lbClose();
+  });
+
+  function printOne() {
+    var pa = document.getElementById("printArea");
+    pa.innerHTML = '<img src="' + allUrls[lbIdx] + '"><div class="print-caption">Foto ' + (lbIdx+1) + ' — Photobooth</div>';
+    pa.style.display = "flex";
+    window.print();
+    setTimeout(function() { pa.style.display="none"; lbClose(); }, 800);
+  }
+  function printAll() {
+    var pa = document.getElementById("printArea");
+    pa.innerHTML = allUrls.map(u=>'<img src="'+u+'">').join("") + '<div class="print-caption">' + allUrls.length + ' foto — Photobooth</div>';
+    pa.style.display = "flex";
+    window.print();
+    setTimeout(function() { pa.style.display="none"; }, 800);
+  }
+  function dlOne() {
+    fetch(allUrls[lbIdx]).then(r=>r.blob()).then(b=>{
+      var a=document.createElement("a"); a.href=URL.createObjectURL(b);
+      a.download="foto_"+(lbIdx+1)+".jpg"; a.click();
+    });
+  }
+  function dlAll() {
+    var i=0;
+    (function next(){
+      if(i>=allUrls.length)return;
+      fetch(allUrls[i]).then(r=>r.blob()).then(b=>{
+        var a=document.createElement("a"); a.href=URL.createObjectURL(b);
+        a.download="foto_"+(i+1)+".jpg"; a.click();
+        i++; setTimeout(next,500);
+      });
+    })();
+  }
+  window.downloadOne = function(i) {
+    fetch(allUrls[i]).then(r=>r.blob()).then(b=>{
+      var a=document.createElement("a"); a.href=URL.createObjectURL(b);
+      a.download="foto_"+(i+1)+".jpg"; a.click();
+    });
+  };
+  window.toggleFolder = function(header) {
+    const content = header.nextElementSibling;
+    content.classList.toggle('open');
+    const toggle = header.querySelector('.folder-toggle');
+    if(toggle) toggle.textContent = content.classList.contains('open') ? '▼' : '▶';
+  };
+
+  // ── KUNCI FIX: set sessionFolderPath dari folder yang dipilih guest ──
+  // lalu redirect ke pilih-frame.html
+  window.editFolder = function(folderPath, guestNama, branchId) {
+    sessionStorage.setItem("sessionFolderPath", folderPath);
+    sessionStorage.setItem("sessionGuestNama",  guestNama);
+    sessionStorage.setItem("sessionBranchId",   String(branchId));
+    sessionStorage.removeItem("cetakData");
+    window.location.href = "pilih-frame.html";
+  };
+</script>
+
+<script type="module">
+  import { supabase } from "./assets/js/supabase.js";
+
+  const guest  = window.guest;
+  const branch = window.branch;
+
+  const VALID_SUBFOLDERS = ['asli', 'edit', 'noedit'];
+  const SUBFOLDER_ICON   = { asli:'📷', edit:'✨', noedit:'🖼️' };
+
+  async function loadAllGuestPhotos() {
+    document.getElementById("photoArea").innerHTML = '<div class="loading-grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>';
+    document.getElementById("actBar").style.display  = "none";
+    document.getElementById("pcCount").textContent = "memuat...";
+
+    try {
+      if (!branch?.id) throw new Error("Data cabang tidak ditemukan.");
+
+      // 1. List semua folder di branch
+      const { data: folders, error: listErr } = await supabase.storage
+        .from("photos")
+        .list(branch.id, { limit:100, sortBy:{ column:"name", order:"desc" } });
+
+      if (listErr) throw listErr;
+      if (!folders?.length) throw new Error("Tidak ada folder ditemukan.");
+
+      // 2. Filter folder milik guest ini
+      const prefix       = guest.nama + '_';
+      const guestFolders = folders.filter(f => f.name.startsWith(prefix) && !f.metadata);
+
+      if (!guestFolders.length) {
+        document.getElementById("photoArea").innerHTML = '<div class="empty"><div class="eico">🎞️</div><div>Belum ada foto.</div></div>';
+        document.getElementById("pcCount").textContent = "0 foto";
+        return;
+      }
+
+      // 3. Kumpulkan semua file dari subfolder
+      let allFiles = [];
+      // Simpan metadata folder untuk tombol edit
+      let folderMeta = {}; // folderName -> sessionPath
+
+      for (const folder of guestFolders) {
+        const sessionPath = `${branch.id}/${folder.name}`;
+        folderMeta[folder.name] = sessionPath;
+
+        const { data: subItems } = await supabase.storage
+          .from("photos").list(sessionPath, { limit:20 });
+        if (!subItems) continue;
+
+        for (const item of subItems) {
+          if (!item.metadata) {
+            if (!VALID_SUBFOLDERS.includes(item.name)) continue;
+            const { data: files } = await supabase.storage
+              .from("photos").list(`${sessionPath}/${item.name}`, { limit:100 });
+            if (files) {
+              files.forEach(f => {
+                if (f.metadata) allFiles.push({
+                  folderName: folder.name, sessionPath,
+                  kind: item.name,
+                  path: `${sessionPath}/${item.name}/${f.name}`,
+                  name: f.name
+                });
+              });
+            }
+          } else {
+            const kind = item.name === "hasil.jpg" ? 'edit' : 'asli';
+            allFiles.push({ folderName: folder.name, sessionPath, kind, path:`${sessionPath}/${item.name}`, name:item.name });
+          }
+        }
+      }
+
+      if (!allFiles.length) {
+        document.getElementById("photoArea").innerHTML = '<div class="empty"><div class="eico">🎞️</div><div>Tidak ada file foto.</div></div>';
+        document.getElementById("pcCount").textContent = "0 foto";
+        return;
+      }
+
+      // Urutkan
+      const subOrder = { asli:0, edit:1, noedit:2 };
+      allFiles.sort((a,b) =>
+        a.folderName.localeCompare(b.folderName) ||
+        (subOrder[a.kind]??9) - (subOrder[b.kind]??9) ||
+        a.name.localeCompare(b.name)
+      );
+
+      // Buat signed URLs
+      const paths = allFiles.map(f => f.path);
+      let signedUrls = [];
+      try {
+        const { data: signed, error: signErr } = await supabase.storage
+          .from("photos").createSignedUrls(paths, 3600);
+        if (signErr) throw signErr;
+        signedUrls = signed.map(s => s.signedUrl);
+      } catch(e) {
+        signedUrls = paths.map(p => supabase.storage.from("photos").getPublicUrl(p).data.publicUrl);
+      }
+
+      window.allPhotos = allFiles;
+      window.allUrls   = signedUrls;
+
+      // 4. Render dengan pengelompokan per folder + tombol Edit & Cetak per folder
+      let html = '', currentFolder = '';
+
+      for (let i = 0; i < allFiles.length; i++) {
+        const file = allFiles[i];
+
+        if (file.folderName !== currentFolder) {
+          if (currentFolder !== '') html += '</div></div></div>';
+
+          currentFolder = file.folderName;
+          const sfp = file.sessionPath; // path folder sesi ini
+
+          // Parse tanggal dari nama folder
+          const partsShort = currentFolder.match(/^(.+?)_(\d{4}-\d{2}-\d{2})$/);
+          const partsLong  = currentFolder.match(/^(.+?)_(\d{4}-\d{2}-\d{2})T(\d{2}-\d{2}-\d{2})$/);
+          let displayName = currentFolder, tanggal = '';
+          if (partsLong)  { displayName=partsLong[1];  tanggal=`${partsLong[2]} ${partsLong[3].replace(/-/g,':')}`; }
+          else if (partsShort){ displayName=partsShort[1]; tanggal=partsShort[2]; }
+
+          // Escape untuk onclick
+          const sfpEsc  = sfp.replace(/'/g,"\\'");
+          const namaEsc = guest.nama.replace(/'/g,"\\'");
+
+          html += `<div class="folder-section">`;
+          html += `<div class="folder-header" onclick="toggleFolder(this)">`;
+          html += `<span class="folder-name">📁 ${displayName}</span>`;
+          html += `<span class="folder-date">${tanggal}</span>`;
+          // Tombol Edit & Cetak per folder — set sessionFolderPath lalu ke pilih-frame
+          html += `<button class="folder-edit-btn" onclick="event.stopPropagation();editFolder('${sfpEsc}','${namaEsc}','${branch.id}')">🖼️ Edit &amp; Cetak</button>`;
+          html += `<span class="folder-toggle">▼</span>`;
+          html += `</div>`;
+          html += `<div class="folder-content open">`;
+          html += `<div class="photo-grid">`;
+        }
+
+        const icon = SUBFOLDER_ICON[file.kind] || '📷';
+        html += `
+          <div class="photo-item" onclick="lbOpen(${i})">
+            <img src="${signedUrls[i]}" alt="" onerror="this.style.opacity='.3'">
+            <div class="ov">🔍</div>
+            <div class="pnum">${icon} ${file.kind}</div>
+            <button class="pdl" onclick="event.stopPropagation();downloadOne(${i})">⬇</button>
+          </div>`;
+      }
+
+      if (currentFolder !== '') html += '</div></div></div>';
+
+      document.getElementById("photoArea").innerHTML = html;
+      document.getElementById("pcCount").textContent = allFiles.length + " foto";
+      document.getElementById("actBar").style.display = "flex";
+
+    } catch(e) {
+      console.error(e);
+      document.getElementById("photoArea").innerHTML = '<div class="empty">Gagal memuat foto. ' + e.message + '</div>';
+    }
+  }
+
+  loadAllGuestPhotos();
+</script>
+</body>
+</html>

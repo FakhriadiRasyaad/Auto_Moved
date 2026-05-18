@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pembayaran</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+
+<script>
+  if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
+    window.location.href = "index.html";
+  }
+</script>
+
+<div class="bayar-container">
+  <h1>Pembayaran 💳</h1>
+  <div id="metodePembayaran"><p>Loading...</p></div>
+
+  <!-- QRIS Manual -->
+  <div id="qrisSection" class="hidden">
+    <h2>Scan QRIS</h2>
+    <p id="nominalDisplay"></p>
+    <div id="qrContainer"></div>
+    <div id="countdown" class="countdown"></div>
+    <p id="msgQris">Menunggu konfirmasi pembayaran dari admin...</p>
+  </div>
+
+  <!-- Cash -->
+  <div id="cashSection" class="hidden">
+    <h2>Bayar Cash 💵</h2>
+    <p>Nominal: <strong id="nominalCash"></strong></p>
+    <p>Berikan uang ke admin dan tunggu konfirmasi.</p>
+    <p id="msgCash">Menunggu konfirmasi dari admin...</p>
+  </div>
+
+  <!-- Gateway -->
+  <div id="gatewaySection" class="hidden">
+    <h2>Pembayaran Online 💳</h2>
+    <p id="nominalGateway"></p>
+    <div id="gatewayContainer"></div>
+    <p id="msgGateway">Selesaikan pembayaran di popup yang muncul...</p>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase } from "./assets/js/supabase.js";
+
+  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
+  const user     = JSON.parse(localStorage.getItem("currentUser"));
+  const branchId = admin.branch_id;
+  const harga    = user.paket.harga;
+
+  let sessionId      = null;
+  let pollingTimer   = null;
+  let countdownTimer = null;
+  let gatewayConfig  = { mode: "manual" };
+
+  document.getElementById("nominalDisplay").textContent  = "Nominal: Rp " + harga.toLocaleString("id-ID");
+  document.getElementById("nominalCash").textContent     = "Rp " + harga.toLocaleString("id-ID");
+  document.getElementById("nominalGateway").textContent  = "Nominal: Rp " + harga.toLocaleString("id-ID");
+
+  // ── Load setting ──────────────────────────────────────────────────────
+  const { data: setting, error } = await supabase
+    .from("payment_settings")
+    .select("*")
+    .eq("branch_id", branchId)
+    .single();
+
+  if (error || !setting) {
+    document.getElementById("metodePembayaran").innerHTML =
+      "<p>Setting pembayaran tidak ditemukan. Hubungi admin.</p>";
+  } else {
+    // Parse gateway config dengan aman
+    try {
+      if (setting.gateway_config) {
+        gatewayConfig = typeof setting.gateway_config === "string"
+          ? JSON.parse(setting.gateway_config)
+          : setting.gateway_config;
+      }
+    } catch(e) {
+      gatewayConfig = { mode: "manual" };
+    }
+
+    window.qrisPayload = setting.qris_payload;
+    renderMetode(setting);
+  }
+
+  // ── Render metode ─────────────────────────────────────────────────────
+  function renderMetode(setting) {
+    const div  = document.getElementById("metodePembayaran");
+    const mode = gatewayConfig?.mode ?? "manual";
+    let html   = "<h2>Pilih Metode Bayar</h2><div class='metode-grid'>";
+
+    if (setting.enable_qris) {
+      if (mode === "midtrans") {
+        html += `<button onclick="pakeGateway('midtrans')" class="metode-btn">📱 QRIS (Midtrans)</button>`;
+      } else if (mode === "xendit") {
+        html += `<button onclick="pakeGateway('xendit')" class="metode-btn">📱 QRIS (Xendit)</button>`;
+      } else {
+        // mode manual
+        html += `<button onclick="pakeQRIS()" class="metode-btn">📱 QRIS</button>`;
+      }
+    }
+
+    if (setting.enable_cash) {
+      html += `<button onclick="pakeCash()" class="metode-btn">💵 Cash</button>`;
+    }
+
+    if (!setting.enable_qris && !setting.enable_cash) {
+      html = "<p>Tidak ada metode pembayaran aktif. Hubungi admin.</p>";
+    }
+
+    html += "</div>";
+    div.innerHTML = html;
+  }
+
+  // ── Buat session ──────────────────────────────────────────────────────
+  async function buatSession(metode) {
+    const { data, error } = await supabase
+      .from("sessions")
+      .insert([{
+        branch_id:  branchId,
+        guest_id:   user.id,
+        paket:      user.paket.nama,
+        harga:      harga,
+        pembayaran: metode,
+        status:     "waiting"
+      }])
+      .select()
+      .single();
+
+    if (error || !data) {
+      alert("Gagal membuat sesi: " + (error?.message ?? ""));
+      return null;
+    }
+
+    user.session_id = data.id;
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    return data.id;
+  }
+
+  // ── Polling ───────────────────────────────────────────────────────────
+  function startPolling(sId) {
+    pollingTimer = setInterval(async () => {
+      const { data } = await supabase
+        .from("sessions")
+        .select("status")
+        .eq("id", sId)
+        .single();
+
+      if (data?.status === "paid") {
+        clearInterval(pollingTimer);
+        clearInterval(countdownTimer);
+        lanjutSetelahBayar();
+      }
+    }, 3000);
+  }
+
+  // ── QRIS Manual ───────────────────────────────────────────────────────
+  window.pakeQRIS = async function() {
+    document.getElementById("metodePembayaran").classList.add("hidden");
+    document.getElementById("qrisSection").classList.remove("hidden");
+
+    sessionId = await buatSession("qris");
+    if (!sessionId) return;
+
+    try {
+      const dynamic = makeQrisDynamic(window.qrisPayload, harga);
+      const canvas  = document.createElement("canvas");
+      await QRCode.toCanvas(canvas, dynamic, { width: 260, margin: 2 });
+      const box = document.getElementById("qrContainer");
+      box.innerHTML = "";
+      box.appendChild(canvas);
+      startPolling(sessionId);
+      startCountdown(5 * 60);
+    } catch(e) {
+      document.getElementById("msgQris").textContent = "Gagal generate QRIS: " + e.message;
+    }
+  };
+
+  // ── Gateway ───────────────────────────────────────────────────────────
+  window.pakeGateway = async function(provider) {
+    document.getElementById("metodePembayaran").classList.add("hidden");
+    document.getElementById("gatewaySection").classList.remove("hidden");
+
+    sessionId = await buatSession(provider);
+    if (!sessionId) return;
+
+    if (provider === "midtrans") await initMidtrans();
+    else if (provider === "xendit") await initXendit();
+
+    startPolling(sessionId);
+  };
+
+  async function initMidtrans() {
+    const msg = document.getElementById("msgGateway");
+    const env = gatewayConfig.env ?? "sandbox";
+
+    const script = document.createElement("script");
+    script.src = env === "production"
+      ? "https://app.midtrans.com/snap/snap.js"
+      : "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute("data-client-key", gatewayConfig.client_key);
+    document.head.appendChild(script);
+
+    script.onload = async () => {
+      const { data: txData, error: txError } = await supabase.functions.invoke("create-midtrans-token", {
+        body: {
+          session_id: sessionId,
+          amount:     harga,
+          customer:   { name: user.nama, phone: user.nohp, email: user.email ?? "guest@photobooth.com" }
+        }
+      });
+
+      if (txError || !txData?.token) {
+        msg.textContent = "❌ Gagal koneksi Midtrans. Hubungi admin.";
+        return;
+      }
+
+      window.snap.pay(txData.token, {
+        onSuccess: () => lanjutSetelahBayar(),
+        onPending: () => { msg.textContent = "⏳ Pembayaran pending..."; },
+        onError:   () => { msg.textContent = "❌ Pembayaran gagal. Coba lagi."; },
+        onClose:   () => { msg.textContent = "⚠️ Popup ditutup. Hubungi admin jika sudah bayar."; }
+      });
+    };
+  }
+
+  async function initXendit() {
+    const msg = document.getElementById("msgGateway");
+
+    const { data: invoiceData, error: invoiceError } = await supabase.functions.invoke("create-xendit-invoice", {
+      body: {
+        session_id:     sessionId,
+        amount:         harga,
+        customer_name:  user.nama,
+        customer_phone: user.nohp,
+        email:          user.email ?? "guest@photobooth.com",
+        description:    `Photobooth - ${user.paket.nama}`
+      }
+    });
+
+    if (invoiceError || !invoiceData?.invoice_url) {
+      msg.textContent = "❌ Gagal membuat invoice Xendit. Hubungi admin.";
+      return;
+    }
+
+    document.getElementById("gatewayContainer").innerHTML = `
+      <a href="${invoiceData.invoice_url}" target="_blank" class="metode-btn" style="display:inline-block;margin-top:16px;">
+        💳 Klik untuk Bayar via Xendit
+      </a>
+      <p style="margin-top:8px;font-size:13px;">Setelah bayar, halaman akan otomatis lanjut.</p>
+    `;
+  }
+
+  // ── Cash ──────────────────────────────────────────────────────────────
+  window.pakeCash = async function() {
+    document.getElementById("metodePembayaran").classList.add("hidden");
+    document.getElementById("cashSection").classList.remove("hidden");
+    sessionId = await buatSession("cash");
+    if (!sessionId) return;
+    startPolling(sessionId);
+  };
+
+  // ── Countdown ─────────────────────────────────────────────────────────
+  function startCountdown(seconds) {
+    const el = document.getElementById("countdown");
+    let sisa  = seconds;
+
+    countdownTimer = setInterval(() => {
+      sisa--;
+      const m = String(Math.floor(sisa / 60)).padStart(2, "0");
+      const s = String(sisa % 60).padStart(2, "0");
+      el.textContent = `QR berlaku: ${m}:${s}`;
+
+      if (sisa <= 0) {
+        clearInterval(countdownTimer);
+        clearInterval(pollingTimer);
+        document.getElementById("qrContainer").innerHTML =
+          "<p>⏰ QR kadaluarsa. Kembali ke halaman paket...</p>";
+        el.textContent = "";
+        setTimeout(() => window.location.href = "paket.html", 2000);
+      }
+    }, 1000);
+  }
+
+  // ── Setelah bayar ─────────────────────────────────────────────────────
+  function lanjutSetelahBayar() {
+    user.sudahBayar = true;
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    window.location.href = "foto.html";
+  }
+
+  // ── QRIS Dynamic Generator ────────────────────────────────────────────
+  function makeQrisDynamic(qrisString, amountNumber) {
+    const amount = String(Math.trunc(amountNumber));
+    const items  = parseTLV(qrisString).filter(x => x.tag !== "63");
+    setOrInsert(items, "01", "12", { afterTag: "00" });
+    setOrInsert(items, "54", amount);
+    const noCrc = buildTLV(items);
+    const crc   = crc16ccitt(noCrc + "6304");
+    return noCrc + "63" + "04" + crc;
+  }
+
+  function parseTLV(str) {
+    const out = []; let i = 0;
+    while (i < str.length) {
+      const tag = str.slice(i, i + 2);
+      const len = Number(str.slice(i + 2, i + 4));
+      const val = str.slice(i + 4, i + 4 + len);
+      if (Number.isNaN(len) || val.length !== len) throw new Error("TLV tidak valid di posisi " + i);
+      out.push({ tag, value: val });
+      i += 4 + len;
+    }
+    return out;
+  }
+
+  function buildTLV(items) {
+    return items.map(({ tag, value }) =>
+      `${tag}${value.length.toString().padStart(2, "0")}${value}`
+    ).join("");
+  }
+
+  function crc16ccitt(str) {
+    let crc = 0xffff;
+    for (let i = 0; i < str.length; i++) {
+      crc ^= str.charCodeAt(i) << 8;
+      for (let j = 0; j < 8; j++) {
+        crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+        crc &= 0xffff;
+      }
+    }
+    return crc.toString(16).toUpperCase().padStart(4, "0");
+  }
+
+  function setOrInsert(items, tag, value, opt = {}) {
+    const idx = items.findIndex(x => x.tag === tag);
+    if (idx >= 0) { items[idx].value = value; return; }
+    if (opt.afterTag) {
+      const afterIdx = items.findIndex(x => x.tag === opt.afterTag);
+      if (afterIdx >= 0) { items.splice(afterIdx + 1, 0, { tag, value }); return; }
+    }
+    items.push({ tag, value });
+  }
+</script>
+
+</body>
+</html>

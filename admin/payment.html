@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Setting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+</head>
+<body>
+
+<script>
+  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+  if (!admin) window.location.href = "../index.html";
+</script>
+
+<div class="admin-container">
+  <h1>Payment Setting 💳</h1>
+  <div class="admin-topbar">
+    <span id="cabangLabel"></span>
+    <button onclick="window.location.href='dashboard.html'" class="secondary">← Dashboard</button>
+  </div>
+
+  <div class="setting-card">
+    <h2>Metode Pembayaran</h2>
+    <label><input type="checkbox" id="enableQris"> Aktifkan QRIS</label><br><br>
+    <label><input type="checkbox" id="enableCash"> Aktifkan Cash</label>
+  </div>
+
+  <div class="setting-card">
+    <h2>Mode QRIS</h2>
+    <p>Pilih cara QRIS bekerja:</p>
+
+    <div class="mode-tabs">
+      <button class="tab-btn active" id="tabManual"    onclick="switchMode('manual')">📋 QRIS String</button>
+      <button class="tab-btn"        id="tabMidtrans"  onclick="switchMode('midtrans')">⚡ Midtrans</button>
+      <button class="tab-btn"        id="tabXendit"    onclick="switchMode('xendit')">⚡ Xendit</button>
+    </div>
+
+    <div id="modeManual" class="mode-panel">
+      <h3>QRIS String Statis</h3>
+      <p>Paste QRIS string dari merchant. Sistem generate QR dinamis sesuai nominal. Konfirmasi manual oleh admin.</p>
+      <textarea id="qrisInput" rows="6" placeholder="Paste QRIS string di sini..."></textarea>
+      <div class="info-box">ℹ️ Buka aplikasi bank → menu QRIS → Salin string → paste di sini.</div>
+    </div>
+
+    <div id="modeMidtrans" class="mode-panel hidden">
+      <h3>Midtrans Payment Gateway</h3>
+      <p>Pembayaran otomatis terdeteksi tanpa konfirmasi admin.</p>
+      <input type="text" id="midtransServerKey" placeholder="Server Key (SB-Mid-server-xxx)">
+      <input type="text" id="midtransClientKey" placeholder="Client Key (SB-Mid-client-xxx)">
+      <div class="radio-group">
+        <label><input type="radio" name="midtransEnv" value="sandbox" checked> Sandbox</label>
+        <label><input type="radio" name="midtransEnv" value="production"> Production</label>
+      </div>
+      <div class="info-box">ℹ️ Daftar di <a href="https://midtrans.com" target="_blank">midtrans.com</a> → Settings → Access Keys</div>
+    </div>
+
+    <div id="modeXendit" class="mode-panel hidden">
+      <h3>Xendit Payment Gateway</h3>
+      <p>Pembayaran otomatis terdeteksi tanpa konfirmasi admin.</p>
+      <input type="text" id="xenditApiKey"        placeholder="API Key (xnd_development_xxx)">
+      <input type="text" id="xenditCallbackToken" placeholder="Callback Token">
+      <div class="radio-group">
+        <label><input type="radio" name="xenditEnv" value="development" checked> Development</label>
+        <label><input type="radio" name="xenditEnv" value="production"> Production</label>
+      </div>
+      <div class="info-box">ℹ️ Daftar di <a href="https://xendit.co" target="_blank">xendit.co</a> → Settings → API Keys</div>
+    </div>
+  </div>
+
+  <div class="setting-card">
+    <button onclick="simpanSetting()" class="btn-save">💾 Simpan Setting</button>
+    <p id="msgSetting"></p>
+  </div>
+</div>
+
+<!-- Script NON-module dulu untuk switchMode agar onclick HTML bisa akses -->
+<script>
+  let currentMode = "manual";
+
+  function switchMode(mode) {
+    currentMode = mode;
+    ["manual", "midtrans", "xendit"].forEach(m => {
+      const panel = document.getElementById("mode" + m.charAt(0).toUpperCase() + m.slice(1));
+      const tab   = document.getElementById("tab"  + m.charAt(0).toUpperCase() + m.slice(1));
+      if (panel) panel.classList.toggle("hidden", m !== mode);
+      if (tab)   tab.classList.toggle("active",   m === mode);
+    });
+  }
+</script>
+
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
+  const branchId = admin.branch_id;
+
+  document.getElementById("cabangLabel").innerText =
+    `Cabang: ${admin.branch_name ?? admin.username}`;
+
+  // ── Load setting ──────────────────────────────────────────────────────
+  const { data } = await supabase
+    .from("payment_settings")
+    .select("*")
+    .eq("branch_id", branchId)
+    .single();
+
+  if (data) {
+    document.getElementById("enableQris").checked = data.enable_qris  ?? false;
+    document.getElementById("enableCash").checked = data.enable_cash  ?? false;
+    document.getElementById("qrisInput").value    = data.qris_payload ?? "";
+
+    if (data.gateway_config) {
+      try {
+        const cfg = typeof data.gateway_config === "string"
+          ? JSON.parse(data.gateway_config)
+          : data.gateway_config;
+
+        switchMode(cfg.mode ?? "manual");
+
+        if (cfg.mode === "midtrans") {
+          document.getElementById("midtransServerKey").value = cfg.server_key ?? "";
+          document.getElementById("midtransClientKey").value = cfg.client_key ?? "";
+          document.querySelectorAll('input[name="midtransEnv"]').forEach(r => {
+            r.checked = r.value === (cfg.env ?? "sandbox");
+          });
+        }
+
+        if (cfg.mode === "xendit") {
+          document.getElementById("xenditApiKey").value        = cfg.api_key        ?? "";
+          document.getElementById("xenditCallbackToken").value = cfg.callback_token ?? "";
+          document.querySelectorAll('input[name="xenditEnv"]').forEach(r => {
+            r.checked = r.value === (cfg.env ?? "development");
+          });
+        }
+      } catch(e) {
+        switchMode("manual");
+      }
+    }
+  }
+
+  // ── Simpan ────────────────────────────────────────────────────────────
+  window.simpanSetting = async function() {
+    const enable_qris = document.getElementById("enableQris").checked;
+    const enable_cash = document.getElementById("enableCash").checked;
+    const msg         = document.getElementById("msgSetting");
+    msg.textContent   = "";
+
+    let qris_payload   = null;
+    let gateway_config = null;
+
+    if (currentMode === "manual") {
+      qris_payload   = document.getElementById("qrisInput").value.trim();
+      gateway_config = JSON.stringify({ mode: "manual" });
+      if (enable_qris && !qris_payload) {
+        msg.textContent = "❌ QRIS string wajib diisi!"; return;
+      }
+
+    } else if (currentMode === "midtrans") {
+      const server_key = document.getElementById("midtransServerKey").value.trim();
+      const client_key = document.getElementById("midtransClientKey").value.trim();
+      const env        = document.querySelector('input[name="midtransEnv"]:checked').value;
+      if (!server_key || !client_key) {
+        msg.textContent = "❌ Server Key dan Client Key wajib diisi!"; return;
+      }
+      gateway_config = JSON.stringify({ mode: "midtrans", server_key, client_key, env });
+
+    } else if (currentMode === "xendit") {
+      const api_key        = document.getElementById("xenditApiKey").value.trim();
+      const callback_token = document.getElementById("xenditCallbackToken").value.trim();
+      const env            = document.querySelector('input[name="xenditEnv"]:checked').value;
+      if (!api_key) {
+        msg.textContent = "❌ API Key wajib diisi!"; return;
+      }
+      gateway_config = JSON.stringify({ mode: "xendit", api_key, callback_token, env });
+    }
+
+    const { error } = await supabase
+      .from("payment_settings")
+      .upsert({
+        branch_id: branchId,
+        enable_qris,
+        enable_cash,
+        qris_payload,
+        gateway_config
+      }, { onConflict: "branch_id" });
+
+    msg.textContent = error
+      ? "❌ Gagal simpan: " + error.message
+      : "✅ Setting berhasil disimpan!";
+  };
+</script>
+
+</body>
+</html>

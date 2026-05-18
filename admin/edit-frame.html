@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Frame</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+</head>
+<body>
+
+<script>
+  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+  if (!admin) window.location.href = "../index.html";
+</script>
+
+<div class="admin-container">
+  <h1>Upload Frame 🎀</h1>
+  <div class="admin-topbar">
+    <span id="cabangLabel"></span>
+    <button onclick="window.location.href='dashboard.html'" class="secondary">← Dashboard</button>
+  </div>
+
+  <div class="setting-card">
+    <h2>Upload Frame Baru</h2>
+    <p style="font-size:13px;color:#888;">Format PNG, transparan background disarankan. Frame akan overlay di atas foto.</p>
+    <input type="file" id="frameUpload" accept="image/png,image/webp">
+    <input type="text" id="frameName" placeholder="Nama frame (misal: Bunga Pink)" style="margin-top:8px;">
+    <button onclick="uploadFrame()" id="btnUpload" style="margin-top:8px;">⬆️ Upload Frame</button>
+    <p id="msgFrame"></p>
+  </div>
+
+  <div class="setting-card">
+    <h2>Frame Tersedia</h2>
+    <div class="frame-grid" id="frameList"><p>Loading...</p></div>
+  </div>
+</div>
+
+
+
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
+  const branchId = admin.branch_id;
+  const adminId  = admin.id;
+
+  document.getElementById("cabangLabel").innerText =
+    `Cabang: ${admin.branch_name ?? admin.username}`;
+
+  // ── Load frames ───────────────────────────────────────────────────────
+  async function loadFrames() {
+    const list = document.getElementById("frameList");
+
+    const { data, error } = await supabase
+      .from("frames")
+      .select("*")
+      .eq("branch_id", branchId)
+      .order("created_at", { ascending: false });
+
+    if (error) { list.innerHTML = `<p>Gagal load: ${error.message}</p>`; return; }
+    if (!data || data.length === 0) {
+      list.innerHTML = "<p>Belum ada frame. Upload frame pertamamu!</p>";
+      return;
+    }
+
+    list.innerHTML = "";
+    data.forEach(frame => {
+      const card = document.createElement("div");
+      card.className = "frame-card";
+      card.innerHTML = `
+        <img src="${frame.url}" alt="${frame.name}">
+        <div class="frame-card-info">
+          <strong>${frame.name}</strong>
+          ${!frame.is_active ? '<span class="tag-nonaktif">Nonaktif</span>' : ''}
+        </div>
+        <div class="frame-card-actions">
+          <button class="btn-toggle-aktif" onclick="toggleAktif('${frame.id}', ${frame.is_active})">
+            ${frame.is_active ? "🙈 Nonaktifkan" : "✅ Aktifkan"}
+          </button>
+          <button class="btn-hapus" onclick="hapusFrame('${frame.id}', '${frame.storage_path}')">🗑️ Hapus</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  // ── Upload frame ──────────────────────────────────────────────────────
+  window.uploadFrame = async function() {
+    const fileInput = document.getElementById("frameUpload");
+    const nameInput = document.getElementById("frameName");
+    const msg       = document.getElementById("msgFrame");
+    const btn       = document.getElementById("btnUpload");
+
+    const file = fileInput.files[0];
+    const name = nameInput.value.trim();
+
+    if (!file) { msg.textContent = "❌ Pilih file dulu!"; return; }
+    if (!name) { msg.textContent = "❌ Nama frame wajib diisi!"; return; }
+
+    btn.disabled    = true;
+    msg.textContent = "⏳ Mengupload...";
+
+    const ext          = file.name.split(".").pop();
+    const storagePath  = `${branchId}/frames/${Date.now()}.${ext}`;
+
+    // Upload ke Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from("frames")
+      .upload(storagePath, file, { upsert: false });
+
+    if (uploadError) {
+      msg.textContent = "❌ Upload gagal: " + uploadError.message;
+      btn.disabled = false;
+      return;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from("frames")
+      .getPublicUrl(storagePath);
+
+    const publicUrl = urlData.publicUrl;
+
+    // Simpan ke tabel frames
+    const { error: dbError } = await supabase
+      .from("frames")
+      .insert([{
+        branch_id:    branchId,
+        created_by:   adminId,
+        name:         name,
+        storage_path: storagePath,
+        url:          publicUrl,
+        is_active:    true
+      }]);
+
+    if (dbError) {
+      msg.textContent = "❌ Gagal simpan ke database: " + dbError.message;
+      btn.disabled = false;
+      return;
+    }
+
+    msg.textContent      = "✅ Frame berhasil diupload!";
+    fileInput.value      = "";
+    nameInput.value      = "";
+    btn.disabled         = false;
+    loadFrames();
+  };
+
+  // ── Toggle aktif ──────────────────────────────────────────────────────
+  window.toggleAktif = async function(id, currentStatus) {
+    const { error } = await supabase
+      .from("frames")
+      .update({ is_active: !currentStatus })
+      .eq("id", id);
+
+    if (error) { alert("Gagal update: " + error.message); return; }
+    loadFrames();
+  };
+
+  // ── Hapus frame ───────────────────────────────────────────────────────
+  window.hapusFrame = async function(id, storagePath) {
+    if (!confirm("Yakin hapus frame ini?")) return;
+
+    // Hapus dari storage
+    await supabase.storage.from("frames").remove([storagePath]);
+
+    // Hapus dari database
+    const { error } = await supabase.from("frames").delete().eq("id", id);
+    if (error) { alert("Gagal hapus: " + error.message); return; }
+
+    loadFrames();
+  };
+
+  loadFrames();
+</script>
+
+</body>
+</html>

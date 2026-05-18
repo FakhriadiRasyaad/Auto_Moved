@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Effect</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<script>
+  if(!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")){
+    window.location.href = "index.html";
+  }
+</script>
+
+<div class="edit-container">
+  <h1>Edit Foto 🎨</h1>
+
+  <div class="edit-preview">
+    <img id="mainImage">
+  </div>
+
+  <div class="slider-group">
+    <label>Brightness</label>
+    <input type="range" id="brightness" min="50" max="150" value="100">
+
+    <label>Contrast</label>
+    <input type="range" id="contrast" min="50" max="150" value="100">
+
+    <label>Grayscale</label>
+    <input type="range" id="grayscale" min="0" max="100" value="0">
+
+    <label>Sepia</label>
+    <input type="range" id="sepia" min="0" max="100" value="0">
+  </div>
+
+  <div class="thumb-grid" id="thumbGrid"></div>
+
+  <button onclick="lanjut()">Lanjut Frame</button>
+</div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("currentUser"));
+
+console.log("=== DEBUG edit-effect ===");
+console.log("user:", user);
+console.log("selectedFoto:", user ? user.selectedFoto : "user null");
+
+if(!user || !user.selectedFoto || user.selectedFoto.length === 0){
+  console.log("REDIRECT ke pilih-foto.html karena selectedFoto kosong");
+  window.location.href = "pilih-foto.html";
+}
+
+const mainImage = document.getElementById("mainImage");
+const thumbGrid = document.getElementById("thumbGrid");
+
+let currentIndex = 0;
+
+function renderThumbs(){
+  thumbGrid.innerHTML = "";
+  user.selectedFoto.forEach((foto, index) => {
+    const img = document.createElement("img");
+    img.src = foto;
+    img.style.cursor = "pointer";
+    img.onclick = () => loadImage(index);
+    thumbGrid.appendChild(img);
+  });
+}
+
+function loadImage(index){
+  currentIndex = index;
+  mainImage.src = user.selectedFoto[index];
+  resetSliders();
+}
+
+renderThumbs();
+loadImage(0);
+
+const sliders = ["brightness","contrast","grayscale","sepia"];
+sliders.forEach(id => {
+  document.getElementById(id).addEventListener("input", applyFilter);
+});
+
+function applyFilter(){
+  const brightness = document.getElementById("brightness").value;
+  const contrast = document.getElementById("contrast").value;
+  const grayscale = document.getElementById("grayscale").value;
+  const sepia = document.getElementById("sepia").value;
+
+  mainImage.style.filter =
+    `brightness(${brightness}%) contrast(${contrast}%) grayscale(${grayscale}%) sepia(${sepia}%)`;
+}
+
+function resetSliders(){
+  document.getElementById("brightness").value = 100;
+  document.getElementById("contrast").value = 100;
+  document.getElementById("grayscale").value = 0;
+  document.getElementById("sepia").value = 0;
+  mainImage.style.filter = "none";
+}
+
+function lanjut(){
+  localStorage.setItem("currentUser", JSON.stringify(user));
+  window.location.href = "frame-stiker.html";
+}
+</script>
+
+</body>
+</html>

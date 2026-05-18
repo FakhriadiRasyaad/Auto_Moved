@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistik — Superadmin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/stylesupers.css">
+
+</head>
+<body>
+
+<script>
+  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+  if (!admin) window.location.href = "../index.html";
+  if (admin.role !== "superadmin") window.location.href = "dashboard.html";
+</script>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">📸 Photobooth</div>
+    <div class="header-sep"></div>
+    <div class="header-title">Statistik Semua Cabang</div>
+  </div>
+  <button class="btn-back" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+</div>
+
+<!-- ── Body ── -->
+<div class="body">
+
+  <!-- Loading bar -->
+  <div class="loading-bar" id="loadingBar"><div class="loading-fill"></div></div>
+
+  <!-- Summary global -->
+  <div class="summary-grid" id="summaryGrid">
+    <div class="sum-card pink">
+      <div class="sum-icon">🏢</div>
+      <div class="sum-val" id="gTotalCabang">—</div>
+      <div class="sum-label">Total Cabang</div>
+    </div>
+    <div class="sum-card cyan">
+      <div class="sum-icon">👥</div>
+      <div class="sum-val" id="gTotalGuest">—</div>
+      <div class="sum-label">Total Guest</div>
+    </div>
+    <div class="sum-card amber">
+      <div class="sum-icon">📋</div>
+      <div class="sum-val" id="gTotalSesi">—</div>
+      <div class="sum-label">Total Sesi</div>
+    </div>
+    <div class="sum-card green">
+      <div class="sum-icon">💰</div>
+      <div class="sum-val" id="gTotalRev">—</div>
+      <div class="sum-label">Total Pendapatan</div>
+    </div>
+  </div>
+
+  <!-- Filter tanggal -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="setRange('all', this)">Semua</button>
+    <button class="filter-btn" onclick="setRange('today', this)">Hari Ini</button>
+    <button class="filter-btn" onclick="setRange('week', this)">7 Hari</button>
+    <button class="filter-btn" onclick="setRange('month', this)">30 Hari</button>
+    <div class="filter-sep"></div>
+    <div class="date-range">
+      <input type="date" id="dateFrom">
+      <span>—</span>
+      <input type="date" id="dateTo">
+      <button class="btn-apply" onclick="applyCustomRange()">Terapkan</button>
+    </div>
+  </div>
+
+  <!-- Download semua -->
+  <div class="download-bar">
+    <button class="btn-dl primary" onclick="downloadAllCSV()">
+      ⬇ Download Semua CSV
+    </button>
+    <button class="btn-dl" onclick="downloadSummaryCSV()">
+      📊 Ringkasan CSV
+    </button>
+  </div>
+
+  <!-- Accordion list -->
+  <div class="section-top">
+    <div>
+      <div class="section-title">Statistik Per Cabang / Admin</div>
+      <div class="section-sub">Klik cabang untuk melihat detail lengkap</div>
+    </div>
+    <div id="totalLabel" style="font-size:12px;color:var(--text3);"></div>
+  </div>
+
+  <div class="accordion-list" id="accordionList">
+    <div class="empty">⏳ Memuat data...</div>
+  </div>
+
+</div><!-- /body -->
+
+<!-- Plain script -->
+<script>
+  // ── Accordion toggle ─────────────────────────────────────────────
+  function toggleAcc(id) {
+    const item = document.getElementById("acc_" + id);
+    const body = document.getElementById("body_" + id);
+    const isOpen = item.classList.contains("open");
+    item.classList.toggle("open", !isOpen);
+    body.classList.toggle("open", !isOpen);
+  }
+
+  // ── Date filter ──────────────────────────────────────────────────
+  let currentFrom = null;
+  let currentTo   = null;
+  let allData     = [];
+
+  function setRange(range, btn) {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const now   = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    if (range === "all") {
+      currentFrom = null; currentTo = null;
+    } else if (range === "today") {
+      currentFrom = today;
+      currentTo   = new Date(today.getTime() + 86400000);
+    } else if (range === "week") {
+      currentFrom = new Date(today.getTime() - 6 * 86400000);
+      currentTo   = new Date(today.getTime() + 86400000);
+    } else if (range === "month") {
+      currentFrom = new Date(today.getTime() - 29 * 86400000);
+      currentTo   = new Date(today.getTime() + 86400000);
+    }
+
+    renderAll();
+  }
+
+  function applyCustomRange() {
+    const from = document.getElementById("dateFrom").value;
+    const to   = document.getElementById("dateTo").value;
+    if (!from || !to) return;
+    currentFrom = new Date(from);
+    currentTo   = new Date(new Date(to).getTime() + 86400000);
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    renderAll();
+  }
+
+  // ── Format helpers ───────────────────────────────────────────────
+  function fmtRp(n) {
+    if (n >= 1000000) return "Rp " + (n/1000000).toFixed(1) + "jt";
+    if (n >= 1000)    return "Rp " + (n/1000).toFixed(0) + "rb";
+    return "Rp " + n.toLocaleString("id-ID");
+  }
+  function fmtRpFull(n) {
+    return "Rp " + (n||0).toLocaleString("id-ID");
+  }
+  function fmtDate(d) {
+    return new Date(d).toLocaleDateString("id-ID", { day:"2-digit", month:"short", year:"2-digit" });
+  }
+  function fmtTime(d) {
+    return new Date(d).toLocaleTimeString("id-ID", { hour:"2-digit", minute:"2-digit" });
+  }
+
+  // ── Filter sessions by date ──────────────────────────────────────
+  function filterSessions(sessions) {
+    if (!currentFrom && !currentTo) return sessions;
+    return sessions.filter(s => {
+      const d = new Date(s.created_at);
+      if (currentFrom && d < currentFrom) return false;
+      if (currentTo   && d > currentTo)   return false;
+      return true;
+    });
+  }
+
+  // ── Compute per-branch stats ─────────────────────────────────────
+  function computeStats(sessions) {
+    const filtered = filterSessions(sessions);
+    const paid     = filtered.filter(s => s.status === "paid" || s.status === "done");
+    const revenue  = paid.reduce((a, s) => a + (s.harga || 0), 0);
+    const waiting  = filtered.filter(s => s.status === "waiting").length;
+
+    // Package breakdown
+    const pkgMap = {};
+    paid.forEach(s => {
+      if (!pkgMap[s.paket]) pkgMap[s.paket] = { count: 0, rev: 0 };
+      pkgMap[s.paket].count++;
+      pkgMap[s.paket].rev += (s.harga || 0);
+    });
+
+    // Payment method breakdown
+    const payMap = {};
+    filtered.forEach(s => {
+      const m = s.pembayaran || "unknown";
+      if (!payMap[m]) payMap[m] = { count: 0, rev: 0 };
+      payMap[m].count++;
+      if (s.status === "paid" || s.status === "done") payMap[m].rev += (s.harga || 0);
+    });
+
+    return { filtered, paid, revenue, waiting, pkgMap, payMap };
+  }
+
+  // ── Render accordion ─────────────────────────────────────────────
+  function renderAll() {
+    if (!allData.length) return;
+
+    // Global summary
+    let gCabang = allData.length;
+    let gGuest  = 0, gSesi = 0, gRev = 0;
+
+    allData.forEach(b => {
+      const s = computeStats(b.sessions);
+      gGuest += new Set(b.sessions.map(x => x.guest_id).filter(Boolean)).size;
+      gSesi  += s.filtered.length;
+      gRev   += s.revenue;
+    });
+
+    document.getElementById("gTotalCabang").textContent = gCabang;
+    document.getElementById("gTotalGuest").textContent  = gGuest;
+    document.getElementById("gTotalSesi").textContent   = gSesi;
+    document.getElementById("gTotalRev").textContent    = fmtRp(gRev);
+    document.getElementById("totalLabel").textContent   = `${gCabang} cabang`;
+
+    // Accordion items
+    const list = document.getElementById("accordionList");
+    if (!allData.length) {
+      list.innerHTML = '<div class="empty">Tidak ada data cabang</div>';
+      return;
+    }
+
+    list.innerHTML = allData.map((b, i) => {
+      const s = computeStats(b.sessions);
+      const uniqueGuests = new Set(b.sessions.map(x => x.guest_id).filter(Boolean)).size;
+
+      const pkgRows = Object.entries(s.pkgMap)
+        .sort((a,b) => b[1].count - a[1].count);
+      const maxPkg = pkgRows[0]?.[1]?.count || 1;
+
+      const payColors = { qris:"#f02d8a", cash:"#10b981", midtrans:"#3b82f6", xendit:"#8b5cf6" };
+      const payRows = Object.entries(s.payMap);
+
+      // Recent 5 sessions
+      const recent = [...s.filtered]
+        .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 8);
+
+      const adminDisplay = b.profiles.length
+        ? b.profiles.map(p => p.display_name || p.role).join(", ")
+        : "—";
+
+      return `
+        <div class="acc-item" id="acc_${b.branch.id}" style="animation-delay:${i*0.06}s">
+          <div class="acc-header" onclick="toggleAcc('${b.branch.id}')">
+            <div class="acc-avatar">${b.branch.name.charAt(0).toUpperCase()}</div>
+            <div class="acc-info">
+              <div class="acc-name">
+                ${b.branch.name}
+                <span class="role-tag admin">${b.branch.code}</span>
+              </div>
+              <div class="acc-meta">Admin: ${adminDisplay}</div>
+            </div>
+            <div class="acc-stats">
+              <div class="acc-stat cyan">
+                <div class="val">${uniqueGuests}</div>
+                <div class="lbl">Guest</div>
+              </div>
+              <div class="acc-stat pink">
+                <div class="val">${s.filtered.length}</div>
+                <div class="lbl">Sesi</div>
+              </div>
+              <div class="acc-stat green">
+                <div class="val">${fmtRp(s.revenue)}</div>
+                <div class="lbl">Pendapatan</div>
+              </div>
+            </div>
+            <div class="acc-chevron">▼</div>
+          </div>
+
+          <div class="acc-body" id="body_${b.branch.id}">
+            <div class="acc-inner">
+
+              <!-- Stat boxes -->
+              <div class="inner-stats">
+                <div class="ist green">
+                  <div class="iv">${fmtRpFull(s.revenue)}</div>
+                  <div class="il">Pendapatan Lunas</div>
+                </div>
+                <div class="ist cyan">
+                  <div class="iv">${uniqueGuests}</div>
+                  <div class="il">Total Guest</div>
+                </div>
+                <div class="ist pink">
+                  <div class="iv">${s.paid.length}</div>
+                  <div class="il">Sesi Lunas</div>
+                </div>
+                <div class="ist amber">
+                  <div class="iv">${s.waiting}</div>
+                  <div class="il">Menunggu</div>
+                </div>
+              </div>
+
+              <!-- Package breakdown -->
+              ${pkgRows.length ? `
+              <div class="breakdown-title">📦 Paket Terlaris</div>
+              ${pkgRows.map(([nama, d]) => `
+                <div class="pkg-row">
+                  <div class="pkg-name">${nama}</div>
+                  <div class="pkg-bar-wrap"><div class="pkg-bar" style="width:${Math.round(d.count/maxPkg*100)}%"></div></div>
+                  <div class="pkg-count">${d.count}x</div>
+                  <div class="pkg-rev">${fmtRpFull(d.rev)}</div>
+                </div>
+              `).join("")}` : ""}
+
+              <!-- Payment method -->
+              ${payRows.length ? `
+              <div class="breakdown-title" style="margin-top:16px;">💳 Metode Pembayaran</div>
+              ${payRows.map(([method, d]) => `
+                <div class="pay-row">
+                  <div class="pay-dot" style="background:${payColors[method]||'#666'}"></div>
+                  <div class="pay-method">${method}</div>
+                  <div class="pay-count">${d.count} sesi</div>
+                  <div class="pay-rev">${fmtRpFull(d.rev)}</div>
+                </div>
+              `).join("")}` : ""}
+
+              <!-- Recent sessions -->
+              ${recent.length ? `
+              <div class="breakdown-title" style="margin-top:16px;">🕐 Sesi Terbaru</div>
+              <table class="sess-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Paket</th>
+                    <th>Harga</th>
+                    <th>Metode</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${recent.map(s => `
+                    <tr>
+                      <td>${fmtDate(s.created_at)} ${fmtTime(s.created_at)}</td>
+                      <td>${s.paket || "—"}</td>
+                      <td style="color:var(--green)">${fmtRpFull(s.harga)}</td>
+                      <td style="text-transform:uppercase;font-size:10px">${s.pembayaran||"—"}</td>
+                      <td><span class="status-pill ${s.status}">${s.status}</span></td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>` : ""}
+
+              <!-- Per-branch download -->
+              <button class="btn-dl-branch" onclick="downloadBranchCSV('${b.branch.id}', '${b.branch.name}')">
+                ⬇ Download CSV — ${b.branch.name}
+              </button>
+
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // ── CSV helpers ──────────────────────────────────────────────────
+  function toCSV(rows, headers) {
+    const escape = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    return [
+      headers.map(escape).join(","),
+      ...rows.map(r => headers.map(h => escape(r[h])).join(","))
+    ].join("\n");
+  }
+
+  function downloadCSV(content, filename) {
+    const bom  = "\uFEFF"; // BOM for Excel UTF-8
+    const blob = new Blob([bom + content], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadBranchCSV(branchId, branchName) {
+    const b = allData.find(x => x.branch.id === branchId);
+    if (!b) return;
+    const filtered = filterSessions(b.sessions);
+    const rows = filtered.map(s => ({
+      Tanggal:    new Date(s.created_at).toLocaleString("id-ID"),
+      Paket:      s.paket || "",
+      Harga:      s.harga || 0,
+      Pembayaran: s.pembayaran || "",
+      Status:     s.status || "",
+      Cabang:     branchName,
+    }));
+    downloadCSV(toCSV(rows, ["Tanggal","Paket","Harga","Pembayaran","Status","Cabang"]),
+      `statistik_${branchName.replace(/\s+/g,"_")}_${new Date().toISOString().slice(0,10)}.csv`);
+  }
+
+  function downloadAllCSV() {
+    const rows = [];
+    allData.forEach(b => {
+      filterSessions(b.sessions).forEach(s => {
+        rows.push({
+          Cabang:     b.branch.name,
+          Kode:       b.branch.code,
+          Tanggal:    new Date(s.created_at).toLocaleString("id-ID"),
+          Paket:      s.paket || "",
+          Harga:      s.harga || 0,
+          Pembayaran: s.pembayaran || "",
+          Status:     s.status || "",
+        });
+      });
+    });
+    if (!rows.length) { alert("Tidak ada data untuk diexport."); return; }
+    downloadCSV(toCSV(rows, ["Cabang","Kode","Tanggal","Paket","Harga","Pembayaran","Status"]),
+      `statistik_semua_${new Date().toISOString().slice(0,10)}.csv`);
+  }
+
+  function downloadSummaryCSV() {
+    const rows = allData.map(b => {
+      const s = computeStats(b.sessions);
+      const uniqueGuests = new Set(b.sessions.map(x => x.guest_id).filter(Boolean)).size;
+      return {
+        Cabang:        b.branch.name,
+        Kode:          b.branch.code,
+        Admin:         b.profiles.map(p=>p.display_name||"").join("; "),
+        "Total Sesi":  s.filtered.length,
+        "Sesi Lunas":  s.paid.length,
+        "Menunggu":    s.waiting,
+        "Total Guest": uniqueGuests,
+        "Pendapatan":  s.revenue,
+      };
+    });
+    downloadCSV(toCSV(rows, ["Cabang","Kode","Admin","Total Sesi","Sesi Lunas","Menunggu","Total Guest","Pendapatan"]),
+      `ringkasan_cabang_${new Date().toISOString().slice(0,10)}.csv`);
+  }
+</script>
+
+<!-- Module script: load data -->
+<script type="module">
+  import { supabase } from "../assets/js/supabase.js";
+
+  async function loadAll() {
+    // Load branches
+    const { data: branches, error: bErr } = await supabase
+      .from("branches")
+      .select("id, code, name")
+      .order("name");
+
+    if (bErr || !branches?.length) {
+      document.getElementById("accordionList").innerHTML =
+        '<div class="empty">Tidak ada cabang ditemukan.</div>';
+      document.getElementById("loadingBar").classList.add("done");
+      return;
+    }
+
+    // Load all sessions
+    const { data: sessions } = await supabase
+      .from("sessions")
+      .select("id, branch_id, guest_id, paket, harga, pembayaran, status, created_at")
+      .order("created_at", { ascending: false });
+
+    // Load all profiles (admins)
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, role, branch_id, display_name")
+      .in("role", ["admin", "superadmin"]);
+
+    // Assemble per-branch
+    allData = branches.map(b => ({
+      branch:   b,
+      sessions: (sessions || []).filter(s => s.branch_id === b.id),
+      profiles: (profiles || []).filter(p => p.branch_id === b.id),
+    }));
+
+    document.getElementById("loadingBar").classList.add("done");
+    renderAll();
+  }
+
+  loadAll();
+</script>
+
+</body>
+</html>
