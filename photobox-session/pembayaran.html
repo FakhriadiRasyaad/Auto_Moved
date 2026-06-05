@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <title>Pembayaran Photobooth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script type="text/javascript"
+    src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=ZqoBD2R6irG4RaLdBRBQJGrppHnfpVZTcX4Q500Ks7MMWt0JbT4FYtDXj4IxYkn3qq9pnNl3oq0HsUo3u-yt6gLl85M3Be6RLw4urGbPnt0fqab8H3YJFlnum10VSQaUca5O5kmkfg-SlPVifC0Z_KsPRtdhraL2cRY4W7ALjpr00DUquMWCnH9obCZCLq3z7SMUwE4c3f0dow77yah8VquxqC6se-K_ZeUrfGR__G64Fi5QnNOc2YTG3ZIiwUvlWWCvS9h8PzIEVdV163ARdA"
+    charset="UTF-8"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #e7e7e7 50%, #ffffff 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 960px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3vh 40px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #000;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── STEP INDICATOR ── */
+    .steps {
+      display: flex;
+      align-items: center;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 700;
+      border: 1.5px solid #000;
+      color: #000;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  background-color 0.3s ease,
+                  color 0.3s ease,
+                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .step:hover {
+      transform: translateY(-4px) scale(1.15);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes bouncePop {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.4);
+      }
+
+      100% {
+        transform: scale(1.3);
+      }
+    }
+
+    .step.active {
+      background: #000;
+      color: #fff;
+      animation: bouncePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .step-line {
+      width: 50px;
+      border-top: 1.5px dashed #000;
+    }
+
+    /* ── TITLE SECTION ── */
+    .title-section {
+      flex-shrink: 0;
+      margin-top: 0.5vh;
+    }
+
+    .title-section h1 {
+      font-size: 38px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1.1;
+    }
+
+    .title-section p {
+      font-size: 15px;
+      font-weight: 500;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    /* ── CONTAINER 2 KOLOM ── */
+    .payment-container {
+      background: #181818;
+      border-radius: 20px;
+      padding: 4vh 45px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+      width: 100%;
+      flex-grow: 1;
+      max-height: 65vh;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 30px;
+      align-items: center;
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  box-shadow 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .payment-container:hover {
+      transform: scale(1.01);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+    }
+
+    .payment-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .payment-details h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .payment-details .sub-info {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 24px;
+    }
+
+    .invoice-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #333;
+      font-size: 15px;
+    }
+
+    .invoice-item span:first-child {
+      color: #ccc;
+    }
+
+    .invoice-item span:last-child {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .invoice-item.total-row {
+      border-bottom: none;
+      padding-top: 16px;
+    }
+
+    .invoice-item.total-row span:last-child {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffcc00;
+    }
+
+    /* ── QR CODE & METHOD SELECTION SIDE ── */
+    .qr-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #222;
+      border-radius: 16px;
+      padding: 15px;
+      border: 1px solid #333;
+      height: 100%;
+      max-height: 100%;
+      overflow: hidden;
+    }
+
+    .metode-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .metode-btn {
+      width: 100%;
+      background: #333;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .metode-btn:hover {
+      background: #444;
+    }
+
+    /* DESAIN TEMPLATE QRIS STANDAR NASIONAL */
+    .qris-template-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      width: 190px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      margin-bottom: 2px;
+    }
+
+    .qris-template-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+
+    .qris-logo-main {
+      height: 15px;
+      object-fit: contain;
+    }
+
+    .gpn-logo-main {
+      height: 13px;
+      object-fit: contain;
+    }
+
+    .qr-box {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 140px;
+      height: 140px;
+    }
+
+    .qr-box canvas {
+      width: 140px !important;
+      height: 140px !important;
+      object-fit: contain;
+    }
+
+    .qris-template-footer {
+      width: 100%;
+      text-align: center;
+      margin-top: 6px;
+      border-top: 1px dashed #ddd;
+      padding-top: 4px;
+    }
+
+    .qris-template-footer p {
+      font-size: 8px !important;
+      color: #444 !important;
+      font-weight: 600 !important;
+      line-height: 1.1;
+    }
+
+    .qr-side p {
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .countdown {
+      font-size: 13px !important;
+      color: #ffcc00 !important;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ── ACTION BUTTONS ── */
+    .bottom-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      flex-shrink: 0;
+      margin-top: 1vh;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 160px;
+      height: 52px;
+      background: transparent;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  background-color 0.3s ease,
+                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-back:hover {
+      transform: translateY(-3px) scale(1.03);
+      background: rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-next {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 240px;
+      height: 52px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  background-color 0.3s ease,
+                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-next:hover {
+      transform: translateY(-4px) scale(1.03);
+      background: #222;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    /* ── FLUID SCALING (ALWAYS KEEPS 2-COLUMN DESKTOP LAYOUT) ── */
+    @media (max-width: 900px) {
+      .page-wrapper {
+        padding: 2vh 20px;
+      }
+      .logo img {
+        width: 36px;
+        height: 36px;
+      }
+      .logo-text {
+        font-size: 18px;
+      }
+      .step {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+      .step-line {
+        width: 35px;
+      }
+      .title-section h1 {
+        font-size: 30px;
+      }
+      .title-section p {
+        font-size: 13px;
+      }
+      .payment-container {
+        padding: 15px 25px;
+        gap: 20px;
+        max-height: 62vh;
+      }
+      .payment-details h2 {
+        font-size: 20px;
+      }
+      .payment-details .sub-info {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .invoice-item {
+        padding: 8px 0;
+        font-size: 13px;
+      }
+      .invoice-item.total-row span:last-child {
+        font-size: 18px;
+      }
+      .qr-side {
+        padding: 10px;
+      }
+      .qris-template-card {
+        padding: 6px 10px;
+        width: 150px;
+        margin-bottom: 2px;
+      }
+      .qr-box {
+        width: 100px;
+        height: 100px;
+      }
+      .qr-box canvas {
+        width: 100px !important;
+        height: 100px !important;
+      }
+      .qris-template-footer p {
+        font-size: 6px !important;
+      }
+      .countdown {
+        font-size: 11px !important;
+      }
+      .btn-back {
+        width: 130px;
+        height: 44px;
+        font-size: 14px;
+      }
+      .btn-next {
+        width: 200px;
+        height: 44px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page-wrapper {
+        padding: 1vh 10px;
+      }
+      .logo img {
+        width: 28px;
+        height: 28px;
+      }
+      .logo-text {
+        font-size: 15px;
+      }
+      .step {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+      }
+      .step-line {
+        width: 20px;
+      }
+      .title-section h1 {
+        font-size: 22px;
+      }
+      .title-section p {
+        font-size: 11px;
+      }
+      .payment-container {
+        padding: 10px;
+        gap: 12px;
+        border-radius: 12px;
+        max-height: 46vh;
+      }
+      .payment-details h2 {
+        font-size: 15px;
+      }
+      .payment-details .sub-info {
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+      .invoice-item {
+        padding: 4px 0;
+        font-size: 10.5px;
+      }
+      .invoice-item.total-row span:last-child {
+        font-size: 14px;
+      }
+      .qr-side {
+        padding: 6px;
+        border-radius: 10px;
+      }
+      .qris-template-card {
+        padding: 4px 6px;
+        width: 110px;
+        border-radius: 8px;
+      }
+      .qris-logo-main {
+        height: 10px;
+      }
+      .gpn-logo-main {
+        height: 8px;
+      }
+      .qr-box {
+        width: 70px;
+        height: 70px;
+      }
+      .qr-box canvas {
+        width: 70px !important;
+        height: 70px !important;
+      }
+      .qris-template-footer p {
+        font-size: 5px !important;
+      }
+      .countdown {
+        font-size: 9px !important;
+      }
+      #msgQris, #msgCash, #msgGateway {
+        font-size: 9px;
+      }
+      .btn-back {
+        width: 100px;
+        height: 36px;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+      .btn-next {
+        width: 150px;
+        height: 36px;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+    }
+
+    /* Height-based scaling for short viewport heights */
+    @media (max-height: 680px) {
+      .page-wrapper {
+        padding: 1.5vh 30px;
+      }
+      .logo img {
+        width: 32px;
+        height: 32px;
+      }
+      .logo-text {
+        font-size: 18px;
+      }
+      .step {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+      }
+      .step-line {
+        width: 35px;
+      }
+      .title-section h1 {
+        font-size: 26px;
+      }
+      .title-section p {
+        font-size: 13px;
+      }
+      .payment-container {
+        padding: 12px 24px;
+        max-height: 58vh;
+        gap: 15px;
+      }
+      .payment-details h2 {
+        font-size: 18px;
+      }
+      .payment-details .sub-info {
+        margin-bottom: 8px;
+        font-size: 11px;
+      }
+      .invoice-item {
+        padding: 6px 0;
+        font-size: 12px;
+      }
+      .invoice-item.total-row span:last-child {
+        font-size: 16px;
+      }
+      .qr-side {
+        padding: 8px;
+      }
+      .qris-template-card {
+        padding: 6px 10px;
+        width: 130px;
+        margin-bottom: 2px;
+      }
+      .qr-box {
+        width: 90px;
+        height: 90px;
+      }
+      .qr-box canvas {
+        width: 90px !important;
+        height: 90px !important;
+      }
+      .countdown {
+        font-size: 11px !important;
+        margin-top: 1px;
+      }
+      #msgQris, #msgCash, #msgGateway {
+        font-size: 10px;
+        margin-top: 1px;
+      }
+      .bottom-actions {
+        margin-top: 6px;
+      }
+      .btn-back, .btn-next {
+        height: 38px;
+        font-size: 13px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+
+<body>
+  <script>
+    if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
+      window.location.href = "../login-admin.html";
+    }
+
+    function kembali() {
+      window.location.href = 'pilih-paket.html';
+    }
+  </script>
+
+  <div class="page-wrapper">
+    <div class="header">
+      <div class="logo">
+        <img src="../img/Logo_photobooth_LTI.png" alt="Logo" />
+        <span class="logo-text">PHOTOBOOTH</span>
+      </div>
+      <div class="steps">
+        <div class="step" id="step-back" onclick="kembali()">1</div>
+        <div class="step-line"></div>
+        <div class="step active">2</div>
+        <div class="step-line"></div>
+        <div class="step">3</div>
+        <div class="step-line"></div>
+        <div class="step">4</div>
+      </div>
+    </div>
+
+    <div class="title-section">
+      <h1>Pembayaran 💳</h1>
+      <p>Selesaikan rincian pembayaran transaksi Anda</p>
+    </div>
+
+    <div class="payment-container">
+      <div class="payment-details">
+        <h2>Rincian Pesanan</h2>
+        <p class="sub-info">Silakan periksa kembali jenis paket pilihan Anda</p>
+
+        <div class="invoice-item">
+          <span>Nama Paket</span>
+          <span id="txt-paket">-</span>
+        </div>
+        <div class="invoice-item">
+          <span>Metode Transaksi</span>
+          <span id="txt-metode">Memuat...</span>
+        </div>
+        <div class="invoice-item total-row">
+          <span>Total Bayar</span>
+          <span id="txt-harga">Rp0</span>
+        </div>
+      </div>
+
+      <div class="qr-side">
+        <div id="metodePembayaran" class="hidden" style="width: 100%;">
+          <p style="color:#fff;">Loading...</p>
+        </div>
+
+        <div id="qrisSection" class="hidden" style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
+          <div class="qris-template-card">
+            <div class="qris-template-header">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.svg" class="qris-logo-main"
+                alt="QRIS" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/GPN_Logo.svg" class="gpn-logo-main"
+                alt="GPN" />
+            </div>
+            <div class="qr-box" id="qrContainer"></div>
+            <div class="qris-template-footer">
+              <p>Penyedia Jasa Pembayaran (PJP) Berizin Bank Indonesia</p>
+            </div>
+          </div>
+          <div id="countdown" class="countdown"></div>
+          <p id="msgQris" style="margin-top: 4px;">Menunggu konfirmasi pembayaran dari admin...</p>
+        </div>
+
+        <div id="cashSection" class="hidden" style="text-align: center;">
+          <h3 style="color:#ffcc00; margin-bottom:8px;">Bayar Tunai / Cash 💵</h3>
+          <p style="color:#fff; margin-bottom:6px;">Silakan berikan uang tunai kepada Kasir/Admin.</p>
+          <p id="msgCash" style="color:#aaa;">Menunggu persetujuan aktivasi sesi dari admin...</p>
+        </div>
+
+        <div id="gatewaySection" class="hidden" style="width: 100%; text-align: center;">
+          <p style="color:#fff; margin-bottom:8px; font-weight:600;">Pembayaran Online Gateway</p>
+          <div id="gatewayContainer"></div>
+          <p id="msgGateway" style="margin-top:8px; color:#aaa;">Selesaikan pembayaran pada portal yang disediakan...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="btn-back" id="btn-back" onclick="kembali()">Kembali</button>
+      <button class="btn-next" id="btn-konfirmasi">Konfirmasi Selesai</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
+
+    // 1. AMBIL DATA AWAL DARI LOCAL STORAGE (Diberi proteksi objek kosong || {})
+    const admin = JSON.parse(localStorage.getItem("currentAdmin")) || {};
+    const user = JSON.parse(localStorage.getItem("currentUser")) || {};
+
+    const savedPackageId = localStorage.getItem("selectedPackage");
+    const savedPriceText = localStorage.getItem("selectedPackagePrice") || "0";
+
+    // PENGATURAN HARGA SECARA AMAN: Cek di user.paket.harga dahulu, jika tidak ada baru gunakan selectedPackagePrice dari localStorage
+    const harga = user?.paket?.harga || parseInt(savedPriceText.replace(/[^0-9]/g, '')) || 0;
+    const namaPaket = user?.paket?.nama || localStorage.getItem("selectedPackageName") || savedPackageId || "Paket Foto";
+    const branchId = admin?.branch_id || null;
+
+    let sessionId = null;
+    let pollingTimer = null;
+    let countdownTimer = null;
+    let gatewayConfig = { mode: "manual" };
+
+    // 2. VALIDASI KEBERADAAN ALUR DATA
+    if (!savedPackageId) {
+      console.warn("Package ID tidak ditemukan di Local Storage. Kembali ke pilih paket.");
+      kembali();
+    } else {
+      initPaymentSystem();
+    }
+
+    // 3. FUNGSI LOAD KONFIGURASI SUPABASE
+    async function initPaymentSystem() {
+      // Tampilkan data paket dan harga yang diambil dari local storage ke layar UI
+      document.getElementById('txt-paket').innerText = namaPaket;
+      document.getElementById('txt-harga').innerText = "Rp " + harga.toLocaleString("id-ID");
+      document.getElementById('txt-metode').innerText = "QRIS";
+
+      if (!branchId) {
+        document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Error: Data Admin / Branch ID tidak ditemukan di Local Storage.</p>";
+        return;
+      }
+
+      const { data: setting, error } = await supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("branch_id", branchId)
+        .single();
+
+      if (error || !setting) {
+        console.error("Supabase Error:", error);
+        document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Setting QRIS tidak ditemukan di database untuk Branch ID ini.</p>";
+        return;
+      }
+
+      try {
+        if (setting.gateway_config) {
+          gatewayConfig = typeof setting.gateway_config === "string"
+            ? JSON.parse(setting.gateway_config)
+            : setting.gateway_config;
+        }
+      } catch (e) {
+        gatewayConfig = { mode: "manual" };
+      }
+
+      // Amankan qris_payload ke level window agar global dan tidak undefined
+      window.qrisPayload = setting.qris_payload || "";
+      
+      // Langsung jalankan pembayaran QRIS secara otomatis
+      pakeQRIS();
+    }
+
+    // 4. RENDER ELEMENT LIST PILIHAN TOMBOL METODE
+    function renderMetode(setting) {
+      const div = document.getElementById("metodePembayaran");
+      const mode = gatewayConfig?.mode ?? "manual";
+      let html = `<p style="color:#fff; font-weight:600; text-align:center; margin-bottom:10px;">PILIH METODE BAYAR</p><div class="metode-grid">`;
+
+      if (setting.enable_qris) {
+        if (mode === "midtrans") {
+          html += `<button id="opt-midtrans" class="metode-btn">📱 QRIS (Midtrans)</button>`;
+        } else if (mode === "xendit") {
+          html += `<button id="opt-xendit" class="metode-btn">📱 QRIS (Xendit)</button>`;
+        } else {
+          html += `<button id="opt-qris" class="metode-btn">📱 Scan QRIS</button>`;
+        }
+      }
+
+      if (setting.enable_cash) {
+        html += `<button id="opt-cash" class="metode-btn">💵 Bayar Cash</button>`;
+      }
+
+      if (!setting.enable_qris && !setting.enable_cash) {
+        html = "<p style='color:red; text-align:center;'>Tidak ada metode pembayaran aktif.</p>";
+      }
+
+      html += "</div>";
+      div.innerHTML = html;
+
+      // ATTACH EVENT LISTENER SECARA AMAN
+      if (document.getElementById("opt-midtrans")) {
+        document.getElementById("opt-midtrans").addEventListener("click", () => pakeGateway('midtrans'));
+      }
+      if (document.getElementById("opt-xendit")) {
+        document.getElementById("opt-xendit").addEventListener("click", () => pakeGateway('xendit'));
+      }
+      if (document.getElementById("opt-qris")) {
+        document.getElementById("opt-qris").addEventListener("click", () => pakeQRIS());
+      }
+      if (document.getElementById("opt-cash")) {
+        document.getElementById("opt-cash").addEventListener("click", () => pakeCash());
+      }
+    }
+
+    // 5. MEMBUAT DATA SESI TRANSAKSI BARU DI DATABASE
+    async function buatSession(metode) {
+      const { data, error } = await supabase
+        .from("sessions")
+        .insert([{
+          branch_id: branchId,
+          guest_id: user?.id || null, // AMAN: Menggunakan optional chaining jika user null
+          paket: namaPaket,
+          harga: harga,
+          pembayaran: metode,
+          status: "waiting"
+        }])
+        .select()
+        .single();
+
+      if (error || !data) {
+        alert("Gagal membuat sesi: " + (error?.message ?? ""));
+        return null;
+      }
+
+      // Update session_id ke local storage secara aman
+      const currentUserData = JSON.parse(localStorage.getItem("currentUser")) || {};
+      currentUserData.session_id = data.id;
+      localStorage.setItem("currentUser", JSON.stringify(currentUserData));
+
+      return data.id;
+    }
+
+    // 6. DETEKSI STATUS PEMBAYARAN REALTIME (POLLING BERKALA)
+    function startPolling(sId) {
+      if (pollingTimer) clearInterval(pollingTimer);
+      pollingTimer = setInterval(async () => {
+        const { data } = await supabase
+          .from("sessions")
+          .select("status")
+          .eq("id", sId)
+          .single();
+
+        if (data?.status === "paid") {
+          clearInterval(pollingTimer);
+          clearInterval(countdownTimer);
+          lanjutSetelahBayar();
+        }
+      }, 3000);
+    }
+
+    // 7. AKSI METODE: SCAN QRIS MANUAL
+    async function pakeQRIS() {
+      if (!window.qrisPayload || window.qrisPayload.trim() === "") {
+        alert("Gagal memproses: Data QRIS dasar (qris_payload) di database kosong. Hubungi admin.");
+        return;
+      }
+
+      document.getElementById("metodePembayaran").classList.add("hidden");
+      document.getElementById("qrisSection").classList.remove("hidden");
+      document.getElementById('txt-metode').innerText = "QRIS";
+
+      sessionId = await buatSession("qris");
+      if (!sessionId) return;
+
+      try {
+        const dynamic = makeQrisDynamic(window.qrisPayload, harga);
+        const canvas = document.createElement("canvas");
+        await QRCode.toCanvas(canvas, dynamic, { width: 140, margin: 1 });
+
+        const box = document.getElementById("qrContainer");
+        box.innerHTML = "";
+        box.appendChild(canvas);
+
+        startPolling(sessionId);
+        startCountdown(5 * 60);
+      } catch (e) {
+        document.getElementById("msgQris").innerHTML = `<span style="color:#ff3b30;">Gagal generate QRIS: ${e.message}</span>`;
+      }
+    }
+
+    // 8. AKSI METODE: TUNAI / CASH
+    async function pakeCash() {
+      document.getElementById("metodePembayaran").classList.add("hidden");
+      document.getElementById("cashSection").classList.remove("hidden");
+      document.getElementById('txt-metode').innerText = "Uang Tunai (Cash)";
+
+      sessionId = await buatSession("cash");
+      if (!sessionId) return;
+      startPolling(sessionId);
+    }
+
+    // 9. AKSI METODE: ONLINE GATEWAY (MIDTRANS / XENDIT)
+    async function pakeGateway(provider) {
+      document.getElementById("metodePembayaran").classList.add("hidden");
+      document.getElementById("gatewaySection").classList.remove("hidden");
+      document.getElementById('txt-metode').innerText = `QRIS (${provider.toUpperCase()})`;
+
+      sessionId = await buatSession(provider);
+      if (!sessionId) return;
+
+      const msg = document.getElementById("msgGateway");
+      if (provider === "midtrans") {
+        const env = gatewayConfig.env ?? "sandbox";
+        const script = document.createElement("script");
+        script.src = env === "production"
+          ? "https://app.midtrans.com/snap/snap.js"
+          : "https://app.sandbox.midtrans.com/snap/snap.js";
+        script.setAttribute("data-client-key", gatewayConfig.client_key || "");
+        document.head.appendChild(script);
+
+        script.onload = async () => {
+          const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+          const { data: txData, error: txError } = await supabase.functions.invoke("create-midtrans-token", {
+            body: {
+              session_id: sessionId,
+              amount: harga,
+              customer: {
+                name: localUser.nama || "Guest",
+                phone: localUser.nohp || "",
+                email: localUser.email || "guest@photobooth.com"
+              }
+            }
+          });
+
+          if (txError || !txData?.token) {
+            msg.textContent = "❌ Gagal koneksi Midtrans.";
+            return;
+          }
+
+          window.snap.pay(txData.token, {
+            onSuccess: () => lanjutSetelahBayar(),
+            onPending: () => { msg.textContent = "⏳ Menunggu penyelesaian payment..."; },
+            onError: () => { msg.textContent = "❌ Pembayaran gateway gagal."; },
+            onClose: () => { msg.textContent = "⚠️ Popup ditutup. Hubungi admin jika sudah bayar."; }
+          });
+        };
+      } else if (provider === "xendit") {
+        const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+        const { data: invoiceData, error: invoiceError } = await supabase.functions.invoke("create-xendit-invoice", {
+          body: {
+            session_id: sessionId,
+            amount: harga,
+            customer_name: localUser.nama || "Guest",
+            customer_phone: localUser.nohp || "",
+            email: localUser.email || "guest@photobooth.com",
+            description: `Photobooth - ${namaPaket}`
+          }
+        });
+
+        if (invoiceError || !invoiceData?.invoice_url) {
+          msg.textContent = "❌ Gagal membuat link Xendit.";
+          return;
+        }
+
+        document.getElementById("gatewayContainer").innerHTML = `
+        <a href="${invoiceData.invoice_url}" target="_blank" class="metode-btn" style="background:#ffcc00; color:#000; display:inline-block; margin-top:16px;">
+          KLIK UNTUK BAYAR VIA XENDIT
+        </a>
+        <p style="margin-top:8px;font-size:13px;color:#aaa;">Setelah bayar, halaman akan otomatis lanjut.</p>
+      `;
+      }
+      startPolling(sessionId);
+    }
+
+    // 10. TIMER HITUNG MUNDUR QRIS
+    function startCountdown(seconds) {
+      const el = document.getElementById("countdown");
+      let sisa = seconds;
+      if (countdownTimer) clearInterval(countdownTimer);
+
+      countdownTimer = setInterval(() => {
+        sisa--;
+        const m = String(Math.floor(sisa / 60)).padStart(2, "0");
+        const s = String(sisa % 60).padStart(2, "0");
+        el.textContent = `QR berlaku: ${m}:${s}`;
+
+        if (sisa <= 0) {
+          clearInterval(countdownTimer);
+          clearInterval(pollingTimer);
+          document.getElementById("qrContainer").innerHTML = "<p style='color:#ff3b30; font-weight:700;'>KADALUARSA</p>";
+          el.textContent = "";
+          alert("Waktu pembayaran habis. Sesi direset kembali ke halaman utama.");
+          setTimeout(() => { kembali(); }, 1500);
+        }
+      }, 1000);
+    }
+
+    // 11. REDIRECT HALAMAN KETIKA TRANSAKSI PAID
+    function lanjutSetelahBayar() {
+      const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+      localUser.sudahBayar = true;
+      localStorage.setItem("currentUser", JSON.stringify(localUser));
+      window.location.href = "sesi-foto.html";
+    }
+
+    document.getElementById('btn-konfirmasi').addEventListener('click', function () {
+      const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+      if (localUser.sudahBayar) {
+        lanjutSetelahBayar();
+      } else {
+        alert("Sistem belum memverifikasi pembayaran Anda. Pastikan proses transfer sukses atau hubungi kasir!");
+      }
+    });
+
+    // 12. LOGIC ENGINE QRIS DYNAMIC GENERATOR
+    function makeQrisDynamic(qrisString, amountNumber) {
+      const amount = String(Math.trunc(amountNumber));
+      const items = parseTLV(qrisString).filter(x => x.tag !== "63");
+      setOrInsert(items, "01", "12", { afterTag: "00" });
+      setOrInsert(items, "54", amount);
+      const noCrc = buildTLV(items);
+      const crc = crc16ccitt(noCrc + "6304");
+      return noCrc + "63" + "04" + crc;
+    }
+
+    function parseTLV(str) {
+      const out = []; let i = 0;
+      while (i < str.length) {
+        const tag = str.slice(i, i + 2);
+        const len = Number(str.slice(i + 2, i + 4));
+        const val = str.slice(i + 4, i + 4 + len);
+        if (Number.isNaN(len) || val.length !== len) throw new Error("Format TLV QRIS dasar tidak valid.");
+        out.push({ tag, value: val });
+        i += 4 + len;
+      }
+      return out;
+    }
+
+    function buildTLV(items) {
+      return items.map(({ tag, value }) =>
+        `${tag}${value.length.toString().padStart(2, "0")}${value}`
+      ).join("");
+    }
+
+    function crc16ccitt(str) {
+      let crc = 0xffff;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+          crc &= 0xffff;
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, "0");
+    }
+
+    // Amankan TLV insertion logic
+    function setOrInsert(items, tag, value, opt = {}) {
+      const idx = items.findIndex(x => x.tag === tag);
+      if (idx >= 0) { items[idx].value = value; return; }
+      if (opt.afterTag) {
+        const afterIdx = items.findIndex(x => x.tag === opt.afterTag);
+        if (afterIdx >= 0) { items.splice(afterIdx + 1, 0, { tag, value }); return; }
+      }
+      items.push({ tag, value });
+    }
+  </script>
+</body>
+
+</html>

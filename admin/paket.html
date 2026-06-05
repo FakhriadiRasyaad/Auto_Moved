@@ -4,9 +4,353 @@
   <meta charset="UTF-8">
   <title>Kelola Paket</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css?v=monochrome-v13">
+  <style>
+    body {
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      margin: 0 !important;
+      padding: 40px 20px !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+      min-height: 100vh !important;
+      background-color: #f6f8fb;
+    }
+    .admin-container::before,
+    .admin-container::after {
+      display: none !important;
+    }
+    .admin-container {
+      max-width: 960px !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 40px 24px !important;
+      box-sizing: border-box !important;
+      font-family: Poppins, sans-serif !important;
+    }
+    @media (max-width: 576px) {
+      .admin-container {
+        padding: 30px 16px !important;
+      }
+    }
+    .admin-container h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #18181b;
+      margin-bottom: 8px;
+    }
+    .admin-topbar {
+      margin-bottom: 24px;
+    }
+    #cabangLabel {
+      font-size: 0.85rem;
+      color: #71717a;
+      background: #e4e4e7;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .btn-add {
+      background: #0f172a !important;
+      border: 1px solid #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      font-family: Poppins, sans-serif !important;
+      padding: 12px 20px !important;
+      border-radius: 10px !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem !important;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      margin-bottom: 28px;
+    }
+    .btn-add:hover {
+      background: #1e293b !important;
+      border-color: #1e293b !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+    }
+    
+    /* ── PACKAGE CARDS GRID ── */
+    #paketList {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+    .paket-row {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      background: #ffffff;
+      border: 1px solid #e4e4e7;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      margin-bottom: 0 !important;
+    }
+    .paket-row:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+    .paket-row.inactive {
+      opacity: 0.65;
+      background: #f8fafc;
+    }
+    .paket-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+      flex: 1;
+      text-align: left;
+    }
+    .paket-info strong {
+      font-size: 1.15rem;
+      color: #18181b;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .tag-nonaktif {
+      background: #fecaca !important;
+      color: #dc2626 !important;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: 6px;
+      display: inline-block;
+    }
+    .paket-harga {
+      font-size: 1.25rem !important;
+      color: #18181b !important;
+      font-weight: 700 !important;
+      margin-top: 4px;
+      display: block;
+    }
+    .paket-info small {
+      font-size: 0.8rem;
+      color: #71717a;
+      line-height: 1.5;
+      margin-top: 8px;
+      display: block;
+    }
+    .paket-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      width: 100%;
+    }
+    .paket-actions button {
+      flex: 1;
+      padding: 10px !important;
+      font-weight: 700 !important;
+      border-radius: 8px !important;
+      font-family: Poppins, sans-serif !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.82rem !important;
+      box-sizing: border-box;
+    }
+    .paket-actions button:not(.danger) {
+      background: #18181b !important;
+      color: #ffffff !important;
+      border: 1px solid #18181b !important;
+    }
+    .paket-actions button:not(.danger):hover {
+      background: #27272a !important;
+      border-color: #27272a !important;
+    }
+    .paket-actions button.danger {
+      background: #fff5f5 !important;
+      color: #e11d48 !important;
+      border: 1px solid #ffe4e6 !important;
+    }
+    .paket-actions button.danger:hover {
+      background: #e11d48 !important;
+      color: #ffffff !important;
+      border-color: #e11d48 !important;
+      box-shadow: 0 4px 10px rgba(225, 29, 72, 0.15);
+    }
+    
+    /* ── MODAL FORM REDESIGN ── */
+    .modal-content {
+      max-width: 580px !important;
+      border-radius: 20px !important;
+      padding: 30px !important;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.15) !important;
+      font-family: Poppins, sans-serif !important;
+      box-sizing: border-box;
+    }
+    #modalTitle {
+      font-size: 1.35rem !important;
+      font-weight: 700 !important;
+      color: #18181b !important;
+      margin-bottom: 24px !important;
+      border-bottom: 1.5px solid #e4e4e7 !important;
+      padding-bottom: 12px !important;
+      text-align: left !important;
+      text-shadow: none !important;
+    }
+    .modal-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+    .form-group input,
+    .form-group select {
+      padding: 10px 12px !important;
+      border: 1.5px solid #e4e4e7 !important;
+      border-radius: 8px !important;
+      font-family: Poppins, sans-serif !important;
+      font-size: 0.85rem !important;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      box-sizing: border-box;
+      background: #ffffff !important;
+      box-shadow: none !important;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #18181b !important;
+      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08) !important;
+    }
+    .modal-checkbox-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px dashed #e2e8f0;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem !important;
+      font-weight: 600 !important;
+      color: #4b5563 !important;
+      cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+      accent-color: #18181b !important;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 12px !important;
+      font-weight: 700 !important;
+      font-family: Poppins, sans-serif !important;
+      border-radius: 10px !important;
+      cursor: pointer;
+      font-size: 0.88rem !important;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    .modal-actions button:hover {
+      transform: translateY(-1px) !important;
+    }
+    .modal-actions button:active {
+      transform: translateY(0) !important;
+    }
+    .modal-actions button:not(.secondary) {
+      background: #18181b !important;
+      color: #ffffff !important;
+      border: 1px solid #18181b !important;
+      box-shadow: none !important;
+    }
+    .modal-actions button:not(.secondary):hover {
+      background: #27272a !important;
+      border-color: #27272a !important;
+      box-shadow: 0 4px 12px rgba(24, 24, 27, 0.15) !important;
+    }
+    .modal-actions button.secondary {
+      background: #ffffff !important;
+      color: #71717a !important;
+      border: 1.5px solid #e4e4e7 !important;
+      box-shadow: none !important;
+    }
+    .modal-actions button.secondary:hover {
+      background: #fafafa !important;
+      color: #18181b !important;
+      border-color: #d4d4d8 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .btn-back-floating {
+      position: absolute !important;
+      left: 2.5rem !important;
+      top: 2.5rem !important;
+      margin: 0 !important;
+      background: transparent !important;
+      color: #71717a !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 0.5rem 0.8rem !important;
+      font-family: Poppins, sans-serif !important;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.3rem !important;
+      box-shadow: none !important;
+      transition: all 0.2s ease !important;
+      z-index: 1000 !important;
+    }
+    .btn-back-floating:hover {
+      background: rgba(24, 24, 27, 0.05) !important;
+      color: #18181b !important;
+      transform: translateX(-2px) !important;
+    }
+    .btn-back-floating:active {
+      transform: translateX(0) !important;
+    }
+    @media (max-width: 992px) {
+      .btn-back-floating {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        margin: 0 0 1.5rem 0 !important;
+        width: fit-content !important;
+        display: inline-flex !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
+
+<button onclick="window.location.href='dashboard.html'" class="btn-back-floating">← Back</button>
 
 <script>
   const admin = JSON.parse(localStorage.getItem("currentAdmin"));
@@ -14,10 +358,9 @@
 </script>
 
 <div class="admin-container">
-  <h1>Kelola Paket Foto 💰</h1>
+  <h1>Kelola Paket Foto</h1>
   <div class="admin-topbar">
     <span id="cabangLabel"></span>
-    <button onclick="window.location.href='dashboard.html'" class="secondary">← Dashboard</button>
   </div>
   <button onclick="tambahPaket()" class="btn-add">+ Tambah Paket</button>
   <div id="paketList"><p>Loading...</p></div>
@@ -27,14 +370,39 @@
 <div id="modal" class="modal hidden">
   <div class="modal-content">
     <h2 id="modalTitle">Tambah Paket</h2>
-    <input type="hidden"  id="paketId">
-    <input type="text"    id="formNama"       placeholder="Nama Paket (misal: Basic)" required>
-    <input type="number"  id="formHarga"      placeholder="Harga (Rp)" required>
-    <input type="number"  id="formFotoLimit"  placeholder="Limit Foto (999 = Unlimited)" required>
-    <input type="number"  id="formFrameLimit" placeholder="Limit Frame (999 = All)" required>
-    <label><input type="checkbox" id="formStikerGratis"> Stiker Gratis</label>
-    <label><input type="checkbox" id="formHighlight"> 🔥 Best Seller / Highlight</label>
-    <label><input type="checkbox" id="formActive" checked> Aktif (tampil ke guest)</label>
+    <input type="hidden" id="paketId">
+    
+    <div class="modal-form-grid">
+      <div class="form-group">
+        <label for="formNama" class="form-label">Nama Paket</label>
+        <input type="text" id="formNama" placeholder="misal: Basic" required>
+      </div>
+      <div class="form-group">
+        <label for="formHarga" class="form-label">Harga (Rp)</label>
+        <input type="number" id="formHarga" placeholder="Harga" required>
+      </div>
+      <div class="form-group">
+        <label for="formFotoLimit" class="form-label">Limit Foto</label>
+        <input type="number" id="formFotoLimit" placeholder="999 = Unlimited" required>
+      </div>
+      <div class="form-group">
+        <label for="formFrameLimit" class="form-label">Limit Frame</label>
+        <input type="number" id="formFrameLimit" placeholder="999 = All" required>
+      </div>
+    </div>
+    
+    <div class="modal-checkbox-row">
+      <label class="checkbox-label">
+        <input type="checkbox" id="formStikerGratis"> Stiker Gratis
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="formHighlight"> 🔥 Best Seller
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="formActive" checked> Aktif (Tampil)
+      </label>
+    </div>
+    
     <div class="modal-actions">
       <button onclick="simpanPaket()">Simpan</button>
       <button onclick="tutupModal()" class="secondary">Batal</button>
@@ -70,15 +438,23 @@
     list.innerHTML = data.map(p => `
       <div class="paket-row ${!p.is_active ? "inactive" : ""}">
         <div class="paket-info">
-          <strong>${p.nama}</strong>
-          ${p.is_highlight ? "🔥" : ""}
-          ${!p.is_active ? '<span class="tag-nonaktif">Nonaktif</span>' : ""}
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
+            <strong>${p.nama}</strong>
+            ${p.is_highlight ? "🔥" : ""}
+            ${!p.is_active ? '<span class="tag-nonaktif">Nonaktif</span>' : ""}
+          </div>
           <span class="paket-harga">Rp ${p.harga.toLocaleString("id-ID")}</span>
-          <small>
-            ${p.foto_limit  >= 999 ? "Unlimited" : p.foto_limit}  Foto &nbsp;·&nbsp;
-            ${p.frame_limit >= 999 ? "All"       : p.frame_limit} Frame &nbsp;·&nbsp;
-            ${p.stiker_gratis ? "✅ Stiker Gratis" : "❌ No Stiker"}
-          </small>
+          <ul class="paket-specs" style="list-style: none; padding: 0; margin: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
+            <li style="font-size: 0.82rem; color: #71717a; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+              📸 <span>${p.foto_limit >= 999 ? "Unlimited" : p.foto_limit} Foto</span>
+            </li>
+            <li style="font-size: 0.82rem; color: #71717a; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+              🖼️ <span>${p.frame_limit >= 999 ? "Semua" : p.frame_limit} Frame</span>
+            </li>
+            <li style="font-size: 0.82rem; color: #71717a; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+              ${p.stiker_gratis ? "✅ <span>Stiker Gratis</span>" : "❌ <span>Tanpa Stiker</span>"}
+            </li>
+          </ul>
         </div>
         <div class="paket-actions">
           <button onclick="editPaket('${p.id}')">Edit</button>

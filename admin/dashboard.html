@@ -1,293 +1,549 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styleadmins.css">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css?v=monochrome-v20">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f6f8fb;
+    }
+
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      padding: 24px 16px;
+      box-sizing: border-box;
+    }
+
+    .sidebar-brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 0 4px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    #adminInfo {
+      font-size: 0.76rem;
+      color: #64748b;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #f1f5f9;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      word-break: break-all;
+      box-sizing: border-box;
+      max-width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    #adminInfo strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .sidebar-menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      color: #475569;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .sidebar-menu-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      transform: translateX(3px);
+    }
+
+    .sidebar-menu-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .sidebar-menu-btn .menu-icon {
+      font-size: 1.1rem;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .sidebar-logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      color: #64748b;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .sidebar-logout-btn:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 32px;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
+    .top-header {
+      margin-bottom: 28px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .topbar-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .topbar-subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .stats-row {
+      margin-top: 0 !important;
+      margin-bottom: 28px !important;
+      max-width: 100% !important;
+    }
+
+    .dash-body {
+      padding: 0 !important;
+      max-width: 100% !important;
+    }
+
+    @media (max-width: 992px) {
+      .dashboard-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: static;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 16px;
+      }
+    }
+  </style>
+
 </head>
+
 <body>
 
-<script>
-  if (!localStorage.getItem("currentAdmin")) {
-    window.location.href = "../index.html";
-  }
-</script>
-
-<!-- ── Header ── -->
-<div class="dash-header">
-  <div class="header-top">
-    <h1>📊 Dashboard</h1>
-    <button class="btn-logout" onclick="logout()">Logout →</button>
-  </div>
-  <div class="header-meta" id="adminInfo">Loading...</div>
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num" id="statTotal">0</div>
-      <div class="stat-label">Sesi Hari Ini</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statPaid">0</div>
-      <div class="stat-label">Lunas</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statWaiting">0</div>
-      <div class="stat-label">Menunggu</div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Body ── -->
-<div class="dash-body">
-
-  <!-- Nav buttons -->
-  <div class="nav-grid">
-    <button class="nav-btn" onclick="goToPaket()">
-      <span class="nb-icon">🎁</span>
-      <span class="nb-label">Kelola Paket</span>
-    </button>
-    <button class="nav-btn" onclick="goToPayment()">
-      <span class="nb-icon">💳</span>
-      <span class="nb-label">Payment Setting</span>
-    </button>
-    <button class="nav-btn" onclick="goToFrames()">
-      <span class="nb-icon">🖼️</span>
-      <span class="nb-label">Edit Frame</span>
-    </button>
-    <button class="nav-btn" onclick="goToStiker()">
-      <span class="nb-icon">✨</span>
-      <span class="nb-label">Edit Stiker</span>
-    </button>
-    <button class="nav-btn" onclick="goToFolder()">
-      <span class="nb-icon">📁</span>
-      <span class="nb-label">Folder</span>
-    </button>
-    <button class="nav-btn" onclick="refreshAll()">
-      <span class="nb-icon">🔄</span>
-      <span class="nb-label">Refresh</span>
-    </button>
-    <button class="nav-btn" onclick="guestAll()">
-      <span class="nb-icon">👤</span>
-      <span class="nb-label">Customer</span>
-    </button>
-  </div>
-
-  <!-- ── Chart 7 Hari ── -->
-  <div class="chart-section">
-    <div class="chart-header">
-      <div class="chart-title">
-        📈 Pendapatan & Sesi — 7 Hari Terakhir
-      </div>
-      <div class="chart-legend">
-        <span><span class="legend-dot" style="background:#e91e8c"></span>Pendapatan</span>
-        <span><span class="legend-dot" style="background:#00c8b4"></span>Sesi</span>
-      </div>
-    </div>
-    <div class="chart-bars" id="chartBars">
-      <!-- rendered by JS -->
-    </div>
-  </div>
-
-  <!-- ── Konfirmasi Pembayaran (accordion) ── -->
-  <div class="section-card" id="cardKonfirmasi">
-    <div class="section-header" onclick="toggleSection('konfirmasi')">
-      <div class="section-title">
-        <div class="section-icon icon-orange">⏳</div>
-        <span>Konfirmasi Pembayaran</span>
-      </div>
-      <div class="section-right">
-        <span class="badge orange" id="badgeWaiting">0</span>
-        <span class="chevron open" id="chevKonfirmasi">▼</span>
-      </div>
-    </div>
-    <div class="section-body open" id="bodyKonfirmasi">
-      <div class="section-inner">
-        <div class="gateway-banner hidden" id="gatewayBanner">
-          ⚡ Mode Payment Gateway aktif — pembayaran otomatis dikonfirmasi tanpa perlu aksi admin.
-        </div>
-        <div id="waitingList"><p class="empty-state">⏳ Loading...</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Sesi Hari Ini (accordion) ── -->
-  <div class="section-card">
-    <div class="section-header" onclick="toggleSection('sesi')">
-      <div class="section-title">
-        <div class="section-icon icon-pink">📋</div>
-        <span>Sesi Hari Ini</span>
-      </div>
-      <div class="section-right">
-        <span class="badge" id="badgeSesi">0</span>
-        <span class="refresh-dot" title="Auto-refresh 5s"></span>
-        <span class="chevron open" id="chevSesi">▼</span>
-      </div>
-    </div>
-    <div class="section-body open" id="bodySesi">
-      <div class="section-inner">
-        <div style="display:flex;justify-content:flex-end;padding:0 0 8px;">
-          <button class="download-btn" onclick="downloadTodayCSV()">⬇ CSV Hari Ini</button>
-        </div>
-        <div id="sesiList"><p class="empty-state">⏳ Loading...</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Semua Sesi (accordion) ── -->
-  <div class="section-card">
-    <div class="section-header" onclick="toggleSection('allSesi')">
-      <div class="section-title">
-        <div class="section-icon icon-pink">🗂️</div>
-        <span>Semua Sesi</span>
-      </div>
-      <div class="section-right">
-        <span class="badge" id="badgeAllSesi">0</span>
-        <span class="chevron" id="chevAllSesi">▼</span>
-      </div>
-    </div>
-    <div class="section-body" id="bodyAllSesi">
-      <div class="section-inner" style="padding:0">
-
-        <!-- Filter strip -->
-        <div class="filter-strip">
-          <button class="fs-btn active" onclick="filterAll('all',this)">Semua</button>
-          <button class="fs-btn" onclick="filterAll('today',this)">Hari Ini</button>
-          <button class="fs-btn" onclick="filterAll('week',this)">7 Hari</button>
-          <button class="fs-btn" onclick="filterAll('month',this)">30 Hari</button>
-          <button class="fs-btn" onclick="filterAll('paid',this)">Lunas</button>
-          <button class="fs-btn" onclick="filterAll('waiting',this)">Menunggu</button>
-          <button class="download-btn" onclick="downloadAllCSV()">⬇ Download CSV</button>
-        </div>
-
-        <!-- Count + total rev -->
-        <div class="sesi-count-row">
-          <span id="allSesiCount">0 sesi</span>
-          <span class="rev-total" id="allSesiRev">Rp 0</span>
-        </div>
-
-        <div id="allSesiList"><p class="empty-state" style="padding:16px;">⏳ Loading...</p></div>
-
-        <!-- Pagination -->
-        <div class="pagination" id="allSesiPagination"></div>
-
-      </div>
-    </div>
-  </div>
-
-</div><!-- /dash-body -->
-
-<!-- Plain script -->
-<script>
-  function toggleSection(id) {
-    const key  = id.charAt(0).toUpperCase() + id.slice(1);
-    const body = document.getElementById("body" + key);
-    const chev = document.getElementById("chev" + key);
-    const isOpen = body.classList.contains("open");
-    body.classList.toggle("open", !isOpen);
-    if (chev) chev.classList.toggle("open", !isOpen);
-  }
-
-  function goToPaket()   { window.location.href = "paket.html"; }
-  function goToPayment() { window.location.href = "payment.html"; }
-  function goToFrames()  { window.location.href = "edit-frame.html"; }
-  function goToStiker()  { window.location.href = "edit-stiker.html"; }
-  function goToFolder()  { window.location.href = "folder.html"; }
-  function guestAll()  { window.location.href = "../guest-login.html"; }
-  function refreshAll()  { if (window._refreshAll) window._refreshAll(); }
-  function konfirmasi(id){ if (window._konfirmasi) window._konfirmasi(id); }
-  function logout()      { if (window._logout) window._logout(); }
-  function filterAll(f,btn) { if (window._filterAll) window._filterAll(f,btn); }
-  function downloadTodayCSV(){ if (window._downloadTodayCSV) window._downloadTodayCSV(); }
-  function downloadAllCSV()  { if (window._downloadAllCSV)  window._downloadAllCSV(); }
-</script>
-
-<script type="module">
-  import { supabase } from "../assets/js/supabase.js";
-
-  const admin    = JSON.parse(localStorage.getItem("currentAdmin"));
-  const branchId = admin.branch_id;
-
-  document.getElementById("adminInfo").innerHTML =
-    `<strong>${admin.branch_name ?? admin.username}</strong> · ${admin.role}`;
-
-  // ── State ─────────────────────────────────────────────────────────
-  let paymentMode  = "manual";
-  let allSessions  = [];   // all sessions dari branch ini
-  let filteredSess = [];   // setelah filter
-  let todaySessions= [];
-  let currentPage  = 1;
-  const PAGE_SIZE  = 15;
-  let currentFilter= "all";
-
-  // ── Load payment mode ─────────────────────────────────────────────
-  async function loadPaymentMode() {
-    const { data } = await supabase
-      .from("payment_settings")
-      .select("gateway_config")
-      .eq("branch_id", branchId)
-      .single();
-    if (data?.gateway_config) {
-      try {
-        const cfg = typeof data.gateway_config === "string"
-          ? JSON.parse(data.gateway_config) : data.gateway_config;
-        paymentMode = cfg.mode ?? "manual";
-      } catch(e) { paymentMode = "manual"; }
+  <script>
+    if (!localStorage.getItem("currentAdmin")) {
+      window.location.href = "../index.html";
     }
-    if (paymentMode !== "manual")
-      document.getElementById("gatewayBanner").classList.remove("hidden");
-  }
+  </script>
 
-  // ── Load ALL sessions (for chart + all-sesi) ──────────────────────
-  async function loadAllSessions() {
-    const { data } = await supabase
-      .from("sessions")
-      .select("id, paket, harga, pembayaran, status, created_at")
-      .eq("branch_id", branchId)
-      .order("created_at", { ascending: false });
-    allSessions = data ?? [];
-    document.getElementById("badgeAllSesi").textContent = allSessions.length;
-    applyFilter(currentFilter);
-    renderChart();
-  }
+  <div class="dashboard-container">
 
-  // ── Chart 7 hari ─────────────────────────────────────────────────
-  function renderChart() {
-    const days = 7;
-    const labels = [];
-    const revData = [];
-    const sessData = [];
+    <!-- SIDEBAR (LEFT SIDE NAVBAR) -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="../img/Logo_photobooth_LTI.png" alt="Logo Photobooth" style="width: 28px; height: 28px; object-fit: contain; border-radius: 6px; margin-right: 8px;" />
+        <span>Photobox Admin</span>
+      </div>
 
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      d.setHours(0,0,0,0);
-      const dEnd = new Date(d); dEnd.setDate(dEnd.getDate() + 1);
+      <!-- Admin Info (populated dynamically by JS) -->
+      <div class="header-meta" id="adminInfo">Loading...</div>
 
-      const dayLabel = d.toLocaleDateString("id-ID", { weekday:"short", day:"numeric" });
-      labels.push(dayLabel);
+      <!-- Sidebar Navigation Menu -->
+      <nav class="sidebar-menu">
+        <button class="sidebar-menu-btn active" onclick="location.reload()">
+          <span class="menu-icon">📊</span>
+          <span>Overview</span>
+        </button>
+        <button class="sidebar-menu-btn" onclick="goToPaket()">
+          <span class="menu-icon">🎁</span>
+          <span>Kelola Paket</span>
+        </button>
+        <button class="sidebar-menu-btn" onclick="goToPayment()">
+          <span class="menu-icon">💳</span>
+          <span>Payment Setting</span>
+        </button>
+        <button class="sidebar-menu-btn" onclick="goToFrames()">
+          <span class="menu-icon">🖼️</span>
+          <span>Edit Frame</span>
+        </button>
+        <button class="sidebar-menu-btn" onclick="goToStiker()">
+          <span class="menu-icon">✨</span>
+          <span>Edit Stiker</span>
+        </button>
+        <button class="sidebar-menu-btn" onclick="goToFolder()">
+          <span class="menu-icon">📁</span>
+          <span>Folder</span>
+        </button>
+        <button class="sidebar-menu-btn" onclick="guestAll()">
+          <span class="menu-icon">👤</span>
+          <span>Customer</span>
+        </button>
+      </nav>
 
-      const daySessions = allSessions.filter(s => {
-        const sd = new Date(s.created_at);
-        return sd >= d && sd < dEnd;
-      });
-      const dayPaid = daySessions.filter(s => s.status === "paid" || s.status === "done");
-      const dayRev  = dayPaid.reduce((a,s) => a + (s.harga||0), 0);
+      <!-- Sidebar Footer (Logout) -->
+      <div class="sidebar-footer">
+        <button class="sidebar-logout-btn" onclick="logout()">
+          <span class="menu-icon">🚪</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
 
-      revData.push(dayRev);
-      sessData.push(daySessions.length);
+    <!-- MAIN CONTENT CONTAINER (RIGHT SIDE) -->
+    <main class="main-content">
+
+      <!-- Clean top-header -->
+      <div class="top-header">
+        <h1 class="topbar-title">Dashboard Overview</h1>
+        <p class="topbar-subtitle">Selamat datang kembali! Kelola sesi, pendapatan, dan konfigurasi photobox.</p>
+      </div>
+
+      <div class="stats-row">
+        <!-- Card 1: Sesi Hari Ini (Yellow Theme) -->
+        <div class="stat-card yellow-theme">
+          <div class="stat-card-header">
+            <div class="stat-card-icon-badge">📊</div>
+          </div>
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">Sesi Hari Ini</div>
+        </div>
+
+        <!-- Card 2: Lunas (Green Theme) -->
+        <div class="stat-card green-theme">
+          <div class="stat-card-header">
+            <div class="stat-card-icon-badge">✅</div>
+          </div>
+          <div class="stat-num" id="statPaid">0</div>
+          <div class="stat-label">Lunas</div>
+        </div>
+
+        <!-- Card 3: Menunggu (Purple Theme) -->
+        <div class="stat-card purple-theme">
+          <div class="stat-card-header">
+            <div class="stat-card-icon-badge">⏳</div>
+          </div>
+          <div class="stat-num" id="statWaiting">0</div>
+          <div class="stat-label">Menunggu</div>
+        </div>
+
+        <!-- Card 4: Total Pendapatan (Blue Theme) -->
+        <div class="stat-card blue-theme">
+          <div class="stat-card-header">
+            <div class="stat-card-icon-badge">💰</div>
+          </div>
+          <div class="stat-num" id="statRevenue" style="font-size: 1.8rem !important;">Rp 0</div>
+          <div class="stat-label">Total Pendapatan</div>
+        </div>
+      </div>
+
+      <!-- ── Body ── -->
+      <div class="dash-body">
+
+        <!-- ── Chart 7 Hari ── -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="chart-title">
+              📈 Pendapatan & Sesi — 7 Hari Terakhir
+            </div>
+            <div class="chart-legend">
+              <span><span class="legend-dot" style="background:#0f172a"></span>Pendapatan</span>
+              <span><span class="legend-dot" style="background:#00c8b4"></span>Sesi</span>
+            </div>
+          </div>
+          <div class="chart-bars" id="chartBars">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+
+        <!-- ── Konfirmasi Pembayaran (accordion) ── -->
+        <div class="section-card" id="cardKonfirmasi">
+          <div class="section-header" onclick="toggleSection('konfirmasi')">
+            <div class="section-title">
+              <div class="section-icon icon-orange">⏳</div>
+              <span>Konfirmasi Pembayaran</span>
+            </div>
+            <div class="section-right">
+              <span class="badge orange" id="badgeWaiting">0</span>
+              <span class="chevron open" id="chevKonfirmasi">▼</span>
+            </div>
+          </div>
+          <div class="section-body open" id="bodyKonfirmasi">
+            <div class="section-inner">
+              <div class="gateway-banner hidden" id="gatewayBanner">
+                ⚡ Mode Payment Gateway aktif — pembayaran otomatis dikonfirmasi tanpa perlu aksi admin.
+              </div>
+              <div id="waitingList">
+                <p class="empty-state">⏳ Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Sesi Hari Ini (accordion) ── -->
+        <div class="section-card">
+          <div class="section-header" onclick="toggleSection('sesi')">
+            <div class="section-title">
+              <div class="section-icon icon-pink">📋</div>
+              <span>Sesi Hari Ini</span>
+            </div>
+            <div class="section-right">
+              <span class="badge" id="badgeSesi">0</span>
+              <span class="refresh-dot" title="Auto-refresh 5s"></span>
+              <span class="chevron open" id="chevSesi">▼</span>
+            </div>
+          </div>
+          <div class="section-body open" id="bodySesi">
+            <div class="section-inner">
+              <div style="display:flex;justify-content:flex-end;padding:0 0 8px;">
+                <button class="download-btn" onclick="downloadTodayCSV()">⬇ CSV Hari Ini</button>
+              </div>
+              <div id="sesiList">
+                <p class="empty-state">⏳ Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Semua Sesi (accordion) ── -->
+        <div class="section-card">
+          <div class="section-header" onclick="toggleSection('allSesi')">
+            <div class="section-title">
+              <div class="section-icon icon-pink">🗂️</div>
+              <span>Semua Sesi</span>
+            </div>
+            <div class="section-right">
+              <span class="badge" id="badgeAllSesi">0</span>
+              <span class="chevron" id="chevAllSesi">▼</span>
+            </div>
+          </div>
+          <div class="section-body" id="bodyAllSesi">
+            <div class="section-inner" style="padding:0">
+
+              <!-- Filter strip -->
+              <div class="filter-strip">
+                <button class="fs-btn active" onclick="filterAll('all',this)">Semua</button>
+                <button class="fs-btn" onclick="filterAll('today',this)">Hari Ini</button>
+                <button class="fs-btn" onclick="filterAll('week',this)">7 Hari</button>
+                <button class="fs-btn" onclick="filterAll('month',this)">30 Hari</button>
+                <button class="fs-btn" onclick="filterAll('paid',this)">Lunas</button>
+                <button class="fs-btn" onclick="filterAll('waiting',this)">Menunggu</button>
+                <button class="download-btn" onclick="downloadAllCSV()">⬇ Download CSV</button>
+              </div>
+
+              <!-- Count + total rev -->
+              <div class="sesi-count-row">
+                <span id="allSesiCount">0 sesi</span>
+                <span class="rev-total" id="allSesiRev">Rp 0</span>
+              </div>
+
+              <div id="allSesiList">
+                <p class="empty-state" style="padding:16px;">⏳ Loading...</p>
+              </div>
+
+              <!-- Pagination -->
+              <div class="pagination" id="allSesiPagination"></div>
+
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /dash-body -->
+
+    </main>
+  </div><!-- /dashboard-container -->
+
+  <!-- Plain script -->
+  <script>
+    function toggleSection(id) {
+      const key = id.charAt(0).toUpperCase() + id.slice(1);
+      const body = document.getElementById("body" + key);
+      const chev = document.getElementById("chev" + key);
+      const isOpen = body.classList.contains("open");
+      body.classList.toggle("open", !isOpen);
+      if (chev) chev.classList.toggle("open", !isOpen);
     }
 
-    const maxRev  = Math.max(...revData, 1);
-    const maxSess = Math.max(...sessData, 1);
+    function goToPaket() { window.location.href = "paket.html"; }
+    function goToPayment() { window.location.href = "payment.html"; }
+    function goToFrames() { window.location.href = "edit-frame.html"; }
+    function goToStiker() { window.location.href = "edit-stiker.html"; }
+    function goToFolder() { window.location.href = "folder.html"; }
+    function guestAll() { window.location.href = "../result/guest-login.html"; }
+    function refreshAll() { if (window._refreshAll) window._refreshAll(); }
+    function konfirmasi(id) { if (window._konfirmasi) window._konfirmasi(id); }
+    function logout() { if (window._logout) window._logout(); }
+    function filterAll(f, btn) { if (window._filterAll) window._filterAll(f, btn); }
+    function downloadTodayCSV() { if (window._downloadTodayCSV) window._downloadTodayCSV(); }
+    function downloadAllCSV() { if (window._downloadAllCSV) window._downloadAllCSV(); }
+  </script>
 
-    const container = document.getElementById("chartBars");
-    container.innerHTML = labels.map((lbl, i) => {
-      const revH  = Math.round((revData[i] / maxRev) * 75);
-      const sessH = Math.round((sessData[i] / maxSess) * 75);
-      const revTip  = "Rp " + (revData[i]).toLocaleString("id-ID");
-      const sessTip = sessData[i] + " sesi";
-      return `
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
+
+    const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+    const branchId = admin.branch_id;
+
+    document.getElementById("adminInfo").innerHTML =
+      `<strong>${admin.branch_name ?? admin.username}</strong> · ${admin.role}`;
+
+    // ── State ─────────────────────────────────────────────────────────
+    let paymentMode = "manual";
+    let allSessions = [];   // all sessions dari branch ini
+    let filteredSess = [];   // setelah filter
+    let todaySessions = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 15;
+    let currentFilter = "all";
+
+    // ── Load payment mode ─────────────────────────────────────────────
+    async function loadPaymentMode() {
+      const { data } = await supabase
+        .from("payment_settings")
+        .select("gateway_config")
+        .eq("branch_id", branchId)
+        .single();
+      if (data?.gateway_config) {
+        try {
+          const cfg = typeof data.gateway_config === "string"
+            ? JSON.parse(data.gateway_config) : data.gateway_config;
+          paymentMode = cfg.mode ?? "manual";
+        } catch (e) { paymentMode = "manual"; }
+      }
+      if (paymentMode !== "manual")
+        document.getElementById("gatewayBanner").classList.remove("hidden");
+    }
+
+    // ── Load ALL sessions (for chart + all-sesi) ──────────────────────
+    async function loadAllSessions() {
+      const { data } = await supabase
+        .from("sessions")
+        .select("id, paket, harga, pembayaran, status, created_at")
+        .eq("branch_id", branchId)
+        .order("created_at", { ascending: false });
+      allSessions = data ?? [];
+      document.getElementById("badgeAllSesi").textContent = allSessions.length;
+
+      // Hitung statistik keseluruhan (All-Time) untuk metrik card
+      const paidCount = allSessions.filter(s => s.status === "paid" || s.status === "done").length;
+      const waitingCount = allSessions.filter(s => s.status === "waiting").length;
+      const totalRev = allSessions
+        .filter(s => s.status === "paid" || s.status === "done")
+        .reduce((sum, s) => sum + (s.harga ?? 0), 0);
+
+      document.getElementById("statPaid").textContent = paidCount;
+      document.getElementById("statWaiting").textContent = waitingCount;
+      document.getElementById("statRevenue").textContent = "Rp " + totalRev.toLocaleString("id-ID");
+
+      applyFilter(currentFilter);
+      renderChart();
+    }
+
+    // ── Chart 7 hari ─────────────────────────────────────────────────
+    function renderChart() {
+      const days = 7;
+      const labels = [];
+      const revData = [];
+      const sessData = [];
+
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        const dEnd = new Date(d); dEnd.setDate(dEnd.getDate() + 1);
+
+        const dayLabel = d.toLocaleDateString("id-ID", { weekday: "short", day: "numeric" });
+        labels.push(dayLabel);
+
+        const daySessions = allSessions.filter(s => {
+          const sd = new Date(s.created_at);
+          return sd >= d && sd < dEnd;
+        });
+        const dayPaid = daySessions.filter(s => s.status === "paid" || s.status === "done");
+        const dayRev = dayPaid.reduce((a, s) => a + (s.harga || 0), 0);
+
+        revData.push(dayRev);
+        sessData.push(daySessions.length);
+      }
+
+      const maxRev = Math.max(...revData, 1);
+      const maxSess = Math.max(...sessData, 1);
+
+      const container = document.getElementById("chartBars");
+      container.innerHTML = labels.map((lbl, i) => {
+        const revH = Math.round((revData[i] / maxRev) * 75);
+        const sessH = Math.round((sessData[i] / maxSess) * 75);
+        const revTip = "Pendapatan: Rp " + (revData[i]).toLocaleString("id-ID");
+        const sessTip = "Total Sesi: " + sessData[i];
+        return `
         <div class="bar-group">
           <div class="bar-wrap">
             <div class="bar rev"  style="height:${revH}px"  data-tip="${revTip}"></div>
@@ -295,69 +551,69 @@
           </div>
           <div class="bar-label">${lbl}</div>
         </div>`;
-    }).join("");
-  }
-
-  // ── Filter semua sesi ─────────────────────────────────────────────
-  function applyFilter(f) {
-    currentFilter = f;
-    const now   = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const week  = new Date(today.getTime() - 6 * 86400000);
-    const month = new Date(today.getTime() - 29 * 86400000);
-
-    filteredSess = allSessions.filter(s => {
-      const d = new Date(s.created_at);
-      if (f === "today")   return d >= today;
-      if (f === "week")    return d >= week;
-      if (f === "month")   return d >= month;
-      if (f === "paid")    return s.status === "paid" || s.status === "done";
-      if (f === "waiting") return s.status === "waiting";
-      return true;
-    });
-
-    const totalRev = filteredSess
-      .filter(s => s.status === "paid" || s.status === "done")
-      .reduce((a,s) => a + (s.harga||0), 0);
-
-    document.getElementById("allSesiCount").textContent = `${filteredSess.length} sesi`;
-    document.getElementById("allSesiRev").textContent   =
-      "Rp " + totalRev.toLocaleString("id-ID");
-
-    currentPage = 1;
-    renderAllSesiPage();
-  }
-
-  window._filterAll = function(f, btn) {
-    document.querySelectorAll(".fs-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    applyFilter(f);
-  };
-
-  // ── Render paginated sesi ─────────────────────────────────────────
-  function renderAllSesiPage() {
-    const total = filteredSess.length;
-    const pages = Math.ceil(total / PAGE_SIZE) || 1;
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const slice = filteredSess.slice(start, start + PAGE_SIZE);
-
-    const list = document.getElementById("allSesiList");
-
-    if (!slice.length) {
-      list.innerHTML = `<div class="empty-state" style="padding:20px;">
-        <div class="empty-icon">📭</div><div>Tidak ada sesi</div></div>`;
-      document.getElementById("allSesiPagination").innerHTML = "";
-      return;
+      }).join("");
     }
 
-    list.innerHTML = slice.map(s => {
-      const metode   = s.pembayaran?.toLowerCase() ?? "qris";
-      const tagClass = ["midtrans","xendit"].includes(metode) ? "gateway" : metode;
-      const dt = new Date(s.created_at);
-      const tgl = dt.toLocaleDateString("id-ID", { day:"2-digit", month:"short", year:"2-digit" });
-      const jam = dt.toLocaleTimeString("id-ID", { hour:"2-digit", minute:"2-digit" });
-      const statusLabel = { paid:"✅ Lunas", waiting:"⏳ Menunggu", done:"🏁 Selesai" }[s.status] ?? s.status;
-      return `
+    // ── Filter semua sesi ─────────────────────────────────────────────
+    function applyFilter(f) {
+      currentFilter = f;
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const week = new Date(today.getTime() - 6 * 86400000);
+      const month = new Date(today.getTime() - 29 * 86400000);
+
+      filteredSess = allSessions.filter(s => {
+        const d = new Date(s.created_at);
+        if (f === "today") return d >= today;
+        if (f === "week") return d >= week;
+        if (f === "month") return d >= month;
+        if (f === "paid") return s.status === "paid" || s.status === "done";
+        if (f === "waiting") return s.status === "waiting";
+        return true;
+      });
+
+      const totalRev = filteredSess
+        .filter(s => s.status === "paid" || s.status === "done")
+        .reduce((a, s) => a + (s.harga || 0), 0);
+
+      document.getElementById("allSesiCount").textContent = `${filteredSess.length} sesi`;
+      document.getElementById("allSesiRev").textContent =
+        "Rp " + totalRev.toLocaleString("id-ID");
+
+      currentPage = 1;
+      renderAllSesiPage();
+    }
+
+    window._filterAll = function (f, btn) {
+      document.querySelectorAll(".fs-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      applyFilter(f);
+    };
+
+    // ── Render paginated sesi ─────────────────────────────────────────
+    function renderAllSesiPage() {
+      const total = filteredSess.length;
+      const pages = Math.ceil(total / PAGE_SIZE) || 1;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const slice = filteredSess.slice(start, start + PAGE_SIZE);
+
+      const list = document.getElementById("allSesiList");
+
+      if (!slice.length) {
+        list.innerHTML = `<div class="empty-state" style="padding:20px;">
+        <div class="empty-icon">📭</div><div>Tidak ada sesi</div></div>`;
+        document.getElementById("allSesiPagination").innerHTML = "";
+        return;
+      }
+
+      list.innerHTML = slice.map(s => {
+        const metode = s.pembayaran?.toLowerCase() ?? "qris";
+        const tagClass = ["midtrans", "xendit"].includes(metode) ? "gateway" : metode;
+        const dt = new Date(s.created_at);
+        const tgl = dt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "2-digit" });
+        const jam = dt.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        const statusLabel = { paid: "✅ Lunas", waiting: "⏳ Menunggu", done: "🏁 Selesai" }[s.status] ?? s.status;
+        return `
         <div class="sesi-row">
           <div class="sesi-dot ${s.status}"></div>
           <div class="sesi-info">
@@ -372,69 +628,69 @@
             <span class="status-badge ${s.status}">${statusLabel}</span>
           </div>
         </div>`;
-    }).join("");
+      }).join("");
 
-    // Pagination
-    const pg = document.getElementById("allSesiPagination");
-    if (pages <= 1) { pg.innerHTML = ""; return; }
+      // Pagination
+      const pg = document.getElementById("allSesiPagination");
+      if (pages <= 1) { pg.innerHTML = ""; return; }
 
-    const maxBtn = 5;
-    let pgStart = Math.max(1, currentPage - 2);
-    let pgEnd   = Math.min(pages, pgStart + maxBtn - 1);
-    if (pgEnd - pgStart < maxBtn - 1) pgStart = Math.max(1, pgEnd - maxBtn + 1);
+      const maxBtn = 5;
+      let pgStart = Math.max(1, currentPage - 2);
+      let pgEnd = Math.min(pages, pgStart + maxBtn - 1);
+      if (pgEnd - pgStart < maxBtn - 1) pgStart = Math.max(1, pgEnd - maxBtn + 1);
 
-    let html = `<button class="pg-btn" onclick="changePage(${currentPage-1})" ${currentPage===1?"disabled":""}>‹</button>`;
-    for (let p = pgStart; p <= pgEnd; p++) {
-      html += `<button class="pg-btn ${p===currentPage?"active":""}" onclick="changePage(${p})">${p}</button>`;
-    }
-    html += `<button class="pg-btn" onclick="changePage(${currentPage+1})" ${currentPage===pages?"disabled":""}>›</button>`;
-    pg.innerHTML = html;
-  }
-
-  window.changePage = function(p) {
-    const pages = Math.ceil(filteredSess.length / PAGE_SIZE) || 1;
-    if (p < 1 || p > pages) return;
-    currentPage = p;
-    renderAllSesiPage();
-    document.getElementById("bodyAllSesi").scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  // ── Load waiting ──────────────────────────────────────────────────
-  async function loadWaiting() {
-    const { data, error } = await supabase
-      .from("sessions")
-      .select("id, paket, harga, pembayaran, created_at")
-      .eq("branch_id", branchId)
-      .eq("status", "waiting")
-      .order("created_at", { ascending: true });
-
-    const list = document.getElementById("waitingList");
-    if (error) { list.innerHTML = `<p class="empty-state" style="color:red;">${error.message}</p>`; return; }
-
-    const count = data?.length ?? 0;
-    document.getElementById("badgeWaiting").textContent = count;
-    document.getElementById("badgeWaiting").className   = "badge " + (count > 0 ? "orange" : "grey");
-    document.getElementById("statWaiting").textContent  = count;
-
-    if (!data || !data.length) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div>Semua sudah terkonfirmasi</div></div>`;
-      return;
-    }
-
-    if (paymentMode !== "manual") {
-      for (const s of data) {
-        if (s.pembayaran !== "cash") {
-          await supabase.from("sessions").update({ status:"paid" }).eq("id", s.id);
-        }
+      let html = `<button class="pg-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
+      for (let p = pgStart; p <= pgEnd; p++) {
+        html += `<button class="pg-btn ${p === currentPage ? "active" : ""}" onclick="changePage(${p})">${p}</button>`;
       }
-      await loadWaiting(); await loadSesi(); return;
+      html += `<button class="pg-btn" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? "disabled" : ""}>›</button>`;
+      pg.innerHTML = html;
     }
 
-    list.innerHTML = data.map(s => {
-      const metode   = s.pembayaran?.toLowerCase() ?? "qris";
-      const tagClass = ["midtrans","xendit"].includes(metode) ? "gateway" : metode;
-      const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour:"2-digit", minute:"2-digit" });
-      return `
+    window.changePage = function (p) {
+      const pages = Math.ceil(filteredSess.length / PAGE_SIZE) || 1;
+      if (p < 1 || p > pages) return;
+      currentPage = p;
+      renderAllSesiPage();
+      document.getElementById("bodyAllSesi").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    // ── Load waiting ──────────────────────────────────────────────────
+    async function loadWaiting() {
+      const { data, error } = await supabase
+        .from("sessions")
+        .select("id, paket, harga, pembayaran, created_at")
+        .eq("branch_id", branchId)
+        .eq("status", "waiting")
+        .order("created_at", { ascending: true });
+
+      const list = document.getElementById("waitingList");
+      if (error) { list.innerHTML = `<p class="empty-state" style="color:red;">${error.message}</p>`; return; }
+
+      const count = data?.length ?? 0;
+      document.getElementById("badgeWaiting").textContent = count;
+      document.getElementById("badgeWaiting").className = "badge " + (count > 0 ? "orange" : "grey");
+      document.getElementById("statWaiting").textContent = count;
+
+      if (!data || !data.length) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div>Semua sudah terkonfirmasi</div></div>`;
+        return;
+      }
+
+      if (paymentMode !== "manual") {
+        for (const s of data) {
+          if (s.pembayaran !== "cash") {
+            await supabase.from("sessions").update({ status: "paid" }).eq("id", s.id);
+          }
+        }
+        await loadWaiting(); await loadSesi(); return;
+      }
+
+      list.innerHTML = data.map(s => {
+        const metode = s.pembayaran?.toLowerCase() ?? "qris";
+        const tagClass = ["midtrans", "xendit"].includes(metode) ? "gateway" : metode;
+        const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        return `
         <div class="waiting-row">
           <div class="waiting-avatar">💳</div>
           <div class="waiting-info">
@@ -444,46 +700,45 @@
           </div>
           <button class="btn-konfirmasi" id="btnKonfirmasi_${s.id}" onclick="konfirmasi('${s.id}')">✅ Konfirmasi</button>
         </div>`;
-    }).join("");
-  }
-
-  window._konfirmasi = async function(id) {
-    const btn = document.getElementById("btnKonfirmasi_" + id);
-    if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
-    const { error } = await supabase.from("sessions").update({ status:"paid" }).eq("id", id);
-    if (error) { alert("Gagal: " + error.message); if(btn){btn.disabled=false;btn.textContent="✅ Konfirmasi";} return; }
-    await loadWaiting(); await loadSesi(); await loadAllSessions();
-  };
-
-  // ── Load sesi hari ini ────────────────────────────────────────────
-  async function loadSesi() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const { data, error } = await supabase
-      .from("sessions")
-      .select("id, paket, harga, pembayaran, status, created_at")
-      .eq("branch_id", branchId)
-      .gte("created_at", today.toISOString())
-      .order("created_at", { ascending: false });
-
-    if (error) return;
-    todaySessions = data ?? [];
-
-    document.getElementById("statTotal").textContent = todaySessions.length;
-    document.getElementById("statPaid").textContent  = todaySessions.filter(s=>s.status==="paid"||s.status==="done").length;
-    document.getElementById("badgeSesi").textContent = todaySessions.length;
-
-    const list = document.getElementById("sesiList");
-    if (!todaySessions.length) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>Belum ada sesi hari ini</div></div>`;
-      return;
+      }).join("");
     }
 
-    list.innerHTML = todaySessions.map(s => {
-      const metode   = s.pembayaran?.toLowerCase() ?? "qris";
-      const tagClass = ["midtrans","xendit"].includes(metode) ? "gateway" : metode;
-      const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour:"2-digit", minute:"2-digit" });
-      const statusLabel = { paid:"✅ Lunas", waiting:"⏳ Menunggu", done:"🏁 Selesai" }[s.status] ?? s.status;
-      return `
+    window._konfirmasi = async function (id) {
+      const btn = document.getElementById("btnKonfirmasi_" + id);
+      if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
+      const { error } = await supabase.from("sessions").update({ status: "paid" }).eq("id", id);
+      if (error) { alert("Gagal: " + error.message); if (btn) { btn.disabled = false; btn.textContent = "✅ Konfirmasi"; } return; }
+      await loadWaiting(); await loadSesi(); await loadAllSessions();
+    };
+
+    // ── Load sesi hari ini ────────────────────────────────────────────
+    async function loadSesi() {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const { data, error } = await supabase
+        .from("sessions")
+        .select("id, paket, harga, pembayaran, status, created_at")
+        .eq("branch_id", branchId)
+        .gte("created_at", today.toISOString())
+        .order("created_at", { ascending: false });
+
+      if (error) return;
+      todaySessions = data ?? [];
+
+      document.getElementById("statTotal").textContent = todaySessions.length;
+      document.getElementById("badgeSesi").textContent = todaySessions.length;
+
+      const list = document.getElementById("sesiList");
+      if (!todaySessions.length) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>Belum ada sesi hari ini</div></div>`;
+        return;
+      }
+
+      list.innerHTML = todaySessions.map(s => {
+        const metode = s.pembayaran?.toLowerCase() ?? "qris";
+        const tagClass = ["midtrans", "xendit"].includes(metode) ? "gateway" : metode;
+        const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        const statusLabel = { paid: "✅ Lunas", waiting: "⏳ Menunggu", done: "🏁 Selesai" }[s.status] ?? s.status;
+        return `
         <div class="sesi-row">
           <div class="sesi-dot ${s.status}"></div>
           <div class="sesi-info">
@@ -495,68 +750,69 @@
             <span class="status-badge ${s.status}">${statusLabel}</span>
           </div>
         </div>`;
-    }).join("");
-  }
+      }).join("");
+    }
 
-  // ── CSV download ──────────────────────────────────────────────────
-  function toCSV(rows) {
-    const headers = ["Tanggal","Jam","Paket","Harga","Metode","Status"];
-    const escape  = v => `"${String(v??"").replace(/"/g,'""')}"`;
-    return [
-      headers.map(escape).join(","),
-      ...rows.map(s => {
-        const d = new Date(s.created_at);
-        return [
-          d.toLocaleDateString("id-ID"),
-          d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}),
-          s.paket ?? "",
-          s.harga ?? 0,
-          s.pembayaran ?? "",
-          s.status ?? ""
-        ].map(escape).join(",");
-      })
-    ].join("\n");
-  }
+    // ── CSV download ──────────────────────────────────────────────────
+    function toCSV(rows) {
+      const headers = ["Tanggal", "Jam", "Paket", "Harga", "Metode", "Status"];
+      const escape = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      return [
+        headers.map(escape).join(","),
+        ...rows.map(s => {
+          const d = new Date(s.created_at);
+          return [
+            d.toLocaleDateString("id-ID"),
+            d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+            s.paket ?? "",
+            s.harga ?? 0,
+            s.pembayaran ?? "",
+            s.status ?? ""
+          ].map(escape).join(",");
+        })
+      ].join("\n");
+    }
 
-  function triggerDownload(csv, filename) {
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
-  }
+    function triggerDownload(csv, filename) {
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
 
-  window._downloadTodayCSV = function() {
-    if (!todaySessions.length) { alert("Belum ada sesi hari ini."); return; }
-    const today = new Date().toISOString().slice(0,10);
-    triggerDownload(toCSV(todaySessions), `sesi_hari_ini_${today}.csv`);
-  };
+    window._downloadTodayCSV = function () {
+      if (!todaySessions.length) { alert("Belum ada sesi hari ini."); return; }
+      const today = new Date().toISOString().slice(0, 10);
+      triggerDownload(toCSV(todaySessions), `sesi_hari_ini_${today}.csv`);
+    };
 
-  window._downloadAllCSV = function() {
-    if (!filteredSess.length) { alert("Tidak ada data untuk diexport."); return; }
-    const label = { all:"semua", today:"hari_ini", week:"7_hari", month:"30_hari", paid:"lunas", waiting:"menunggu" }[currentFilter] ?? "filter";
-    const today = new Date().toISOString().slice(0,10);
-    triggerDownload(toCSV(filteredSess), `sesi_${label}_${today}.csv`);
-  };
+    window._downloadAllCSV = function () {
+      if (!filteredSess.length) { alert("Tidak ada data untuk diexport."); return; }
+      const label = { all: "semua", today: "hari_ini", week: "7_hari", month: "30_hari", paid: "lunas", waiting: "menunggu" }[currentFilter] ?? "filter";
+      const today = new Date().toISOString().slice(0, 10);
+      triggerDownload(toCSV(filteredSess), `sesi_${label}_${today}.csv`);
+    };
 
-  // ── Refresh ───────────────────────────────────────────────────────
-  window._refreshAll = function() {
-    loadWaiting(); loadSesi(); loadAllSessions();
-  };
+    // ── Refresh ───────────────────────────────────────────────────────
+    window._refreshAll = function () {
+      loadWaiting(); loadSesi(); loadAllSessions();
+    };
 
-  // ── Init ──────────────────────────────────────────────────────────
-  await loadPaymentMode();
-  await Promise.all([loadWaiting(), loadSesi(), loadAllSessions()]);
+    // ── Init ──────────────────────────────────────────────────────────
+    await loadPaymentMode();
+    await Promise.all([loadWaiting(), loadSesi(), loadAllSessions()]);
 
-  setInterval(() => { loadWaiting(); loadSesi(); }, 5000);
+    setInterval(() => { loadWaiting(); loadSesi(); }, 5000);
 
-  window._logout = async function() {
-    await supabase.auth.signOut();
-    ["currentAdmin","loggedIn","userId","userRole","branchId","displayName","userEmail"]
-      .forEach(k => localStorage.removeItem(k));
-    window.location.href = "../index.html";
-  };
-</script>
+    window._logout = async function () {
+      await supabase.auth.signOut();
+      ["currentAdmin", "loggedIn", "userId", "userRole", "branchId", "displayName", "userEmail"]
+        .forEach(k => localStorage.removeItem(k));
+      window.location.href = "../index.html";
+    };
+  </script>
 
 </body>
+
 </html>

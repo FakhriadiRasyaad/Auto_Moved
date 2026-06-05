@@ -5,6 +5,7 @@
   <title>Pilih Frame & Layout</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js"></script>
 </head>
 <body>
 
@@ -385,6 +386,76 @@
   function loadImg(src){return new Promise(resolve=>{const img=new Image();img.crossOrigin="anonymous";img.onload=()=>resolve(img);img.onerror=()=>resolve(new Image());img.src=src;});}
 
   function dataURLtoBlob(dataURL){const[h,d]=dataURL.split(",");const mime=h.match(/:(.*?);/)[1];const bytes=atob(d);const buf=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)buf[i]=bytes.charCodeAt(i);return new Blob([buf],{type:mime});}
+
+  async function generateGIF() {
+    const limitPhotos = slotPhotos.filter(Boolean);
+    if (limitPhotos.length === 0) return null;
+
+    // ── PRELOAD ALL SESSION IMAGES ──
+    const loadedImages = [];
+    for (const src of limitPhotos) {
+      if (src) {
+        try {
+          const img = await loadImg(src);
+          if (img && img.width > 0 && img.height > 0) {
+            loadedImages.push(img);
+          }
+        } catch (e) {
+          console.warn("Failed to load image for GIF:", src, e);
+        }
+      }
+    }
+
+    if (loadedImages.length === 0) return null;
+
+    // Determine GIF dimensions based on the first image's original dimensions
+    const img0 = loadedImages[0];
+    const gifW = img0.naturalWidth || img0.width;
+    const gifH = img0.naturalHeight || img0.height;
+
+    const gifFrames = [];
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = gifW;
+    tempCanvas.height = gifH;
+    const tempCtx = tempCanvas.getContext("2d");
+
+    for (const img of loadedImages) {
+      tempCtx.clearRect(0, 0, gifW, gifH);
+      tempCtx.save();
+      
+      // Apply the selected filter to the raw GIF frames for consistency
+      if (currentFilter && currentFilter !== "none") {
+        tempCtx.filter = currentFilter;
+      }
+      
+      // Draw the raw image directly onto the canvas, fitting the frame perfectly
+      tempCtx.drawImage(img, 0, 0, gifW, gifH);
+      tempCtx.restore();
+
+      gifFrames.push(tempCanvas.toDataURL("image/jpeg", 0.95));
+    }
+
+    return new Promise((resolve) => {
+      gifshot.createGIF({
+        images: gifFrames,
+        gifWidth: gifW,
+        gifHeight: gifH,
+        interval: 0.8, // 800ms per frame for a smooth poses slideshow
+        numWorkers: 2,
+        sampleInterval: 5, // Improve color quality and reduce dithering artifacts
+        loop: 0 // Loop infinitely
+      }, function(obj) {
+        if (obj.error) {
+          console.error("Gifshot error:", obj.errorMsg);
+          resolve(null);
+        } else {
+          console.log("GIF generated successfully! Length:", obj.image.length);
+          resolve(obj.image);
+        }
+      });
+    });
+  }
+
   function showOverlay(desc){document.getElementById("uploadOverlay").classList.add("show");document.getElementById("uploadDesc").textContent=desc;setProgress(0,0);}
   function hideOverlay(){document.getElementById("uploadOverlay").classList.remove("show");}
   function setProgress(done,total){const pct=total>0?Math.round(done/total*100):0;document.getElementById("progressFill").style.width=pct+"%";document.getElementById("uploadStatus").textContent=total>0?`${done} / ${total} file`:pct+"%";}
@@ -411,6 +482,26 @@
       const{error:hasilErr}=await supabase.storage.from("photos").upload(editPath,hasilBlob,{contentType:"image/jpeg",upsert:true});
       if(hasilErr&&hasilErr.statusCode!=="409")throw new Error("Gagal upload: "+hasilErr.message);
       setProgress(1,1);
+
+      try {
+        showOverlay("Membuat animasi GIF...");
+        const gifDataURL = await generateGIF();
+        if (gifDataURL) {
+          showOverlay("Mengupload animasi GIF...");
+          const gifBlob = dataURLtoBlob(gifDataURL);
+          const gifPath = `${sessionFolderPath}/edit/hasil.gif`;
+          const { error: gifErr } = await supabase.storage
+            .from("photos")
+            .upload(gifPath, gifBlob, { contentType: "image/gif", upsert: true });
+          
+          if (gifErr && gifErr.statusCode !== "409") {
+            console.warn("Gagal upload GIF:", gifErr.message);
+          }
+        }
+      } catch (gifErr) {
+        console.warn("Gagal membuat GIF:", gifErr);
+      }
+
       const{data:signedData,error:signErr}=await supabase.storage.from("photos").createSignedUrl(editPath,3600);
       if(signErr)throw new Error("Gagal buat signed URL: "+signErr.message);
       const finalUrl=signedData.signedUrl;
