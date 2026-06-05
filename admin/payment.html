@@ -4,9 +4,167 @@
   <meta charset="UTF-8">
   <title>Payment Setting</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css?v=monochrome-v13">
+  <style>
+    body {
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      margin: 0 !important;
+      padding: 40px 20px !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+      min-height: 100vh !important;
+    }
+    .admin-container {
+      width: 100% !important;
+      max-width: 600px !important;
+      margin: 0 auto !important;
+    }
+    .admin-container::before,
+    .admin-container::after {
+      display: none !important;
+    }
+    .btn-back-floating {
+      position: absolute !important;
+      left: 2.5rem !important;
+      top: 2.5rem !important;
+      margin: 0 !important;
+      background: transparent !important;
+      color: #71717a !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 0.5rem 0.8rem !important;
+      font-family: Poppins, sans-serif !important;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.3rem !important;
+      box-shadow: none !important;
+      transition: all 0.2s ease !important;
+      z-index: 1000 !important;
+    }
+    .btn-back-floating:hover {
+      background: rgba(24, 24, 27, 0.05) !important;
+      color: #18181b !important;
+      transform: translateX(-2px) !important;
+    }
+    .btn-back-floating:active {
+      transform: translateX(0) !important;
+    }
+    @media (max-width: 768px) {
+      .btn-back-floating {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        margin: 0 0 1.5rem 0 !important;
+        width: fit-content !important;
+        display: inline-flex !important;
+        box-shadow: none !important;
+      }
+    }
+    #msgSetting:empty {
+      display: none !important;
+    }
+    .checkbox-row {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      gap: 24px !important;
+      margin-top: 10px !important;
+    }
+    .setting-card {
+      background: #ffffff !important;
+      border: 1px solid #e4e4e7 !important;
+      border-radius: 16px !important;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05) !important;
+      padding: 1.5rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+    .setting-card h2 {
+      color: #18181b !important;
+      border-bottom: 1.5px solid #e4e4e7 !important;
+      padding-bottom: 8px !important;
+      font-family: Poppins, sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 1.25rem !important;
+    }
+    .setting-card h2::before {
+      content: none !important;
+    }
+    .setting-card p,
+    .mode-panel p {
+      color: #71717a !important;
+      font-family: Poppins, sans-serif !important;
+    }
+    .mode-panel h3 {
+      color: #18181b !important;
+      font-family: Poppins, sans-serif !important;
+      font-weight: 700 !important;
+    }
+    .tab-btn {
+      color: #71717a !important;
+      font-family: Poppins, sans-serif !important;
+    }
+    .tab-btn:hover {
+      color: #18181b !important;
+    }
+    .tab-btn.active {
+      border-bottom-color: #18181b !important;
+      color: #18181b !important;
+    }
+    .setting-card input[type="checkbox"] {
+      accent-color: #18181b !important;
+    }
+    .setting-card label {
+      color: #4b5563 !important;
+      font-family: Poppins, sans-serif !important;
+      font-weight: 600 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      margin-right: 0 !important;
+    }
+    .setting-card textarea,
+    .setting-card input[type="text"] {
+      border: 1.5px solid #e4e4e7 !important;
+      border-radius: 8px !important;
+      font-family: Poppins, sans-serif !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: #ffffff !important;
+    }
+    .setting-card textarea:focus,
+    .setting-card input[type="text"]:focus {
+      border-color: #18181b !important;
+      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08) !important;
+    }
+    .info-box {
+      background: #f8fafc !important;
+      border: 1px dashed #e2e8f0 !important;
+      color: #64748b !important;
+      border-radius: 8px !important;
+    }
+    .setting-form-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 16px !important;
+      margin-bottom: 16px !important;
+    }
+    @media (max-width: 600px) {
+      .setting-form-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
 </head>
 <body>
+
+<button onclick="window.location.href='dashboard.html'" class="btn-back-floating">← Back</button>
 
 <script>
   const admin = JSON.parse(localStorage.getItem("currentAdmin"));
@@ -14,16 +172,17 @@
 </script>
 
 <div class="admin-container">
-  <h1>Payment Setting 💳</h1>
+  <h1>Payment Setting</h1>
   <div class="admin-topbar">
     <span id="cabangLabel"></span>
-    <button onclick="window.location.href='dashboard.html'" class="secondary">← Dashboard</button>
   </div>
 
   <div class="setting-card">
     <h2>Metode Pembayaran</h2>
-    <label><input type="checkbox" id="enableQris"> Aktifkan QRIS</label><br><br>
-    <label><input type="checkbox" id="enableCash"> Aktifkan Cash</label>
+    <div class="checkbox-row">
+      <label><input type="checkbox" id="enableQris"> Aktifkan QRIS</label>
+      <label><input type="checkbox" id="enableCash"> Aktifkan Cash</label>
+    </div>
   </div>
 
   <div class="setting-card">
@@ -31,40 +190,44 @@
     <p>Pilih cara QRIS bekerja:</p>
 
     <div class="mode-tabs">
-      <button class="tab-btn active" id="tabManual"    onclick="switchMode('manual')">📋 QRIS String</button>
-      <button class="tab-btn"        id="tabMidtrans"  onclick="switchMode('midtrans')">⚡ Midtrans</button>
-      <button class="tab-btn"        id="tabXendit"    onclick="switchMode('xendit')">⚡ Xendit</button>
+      <button class="tab-btn active" id="tabManual"    onclick="switchMode('manual')">QRIS String</button>
+      <button class="tab-btn"        id="tabMidtrans"  onclick="switchMode('midtrans')">Midtrans</button>
+      <button class="tab-btn"        id="tabXendit"    onclick="switchMode('xendit')">Xendit</button>
     </div>
 
     <div id="modeManual" class="mode-panel">
       <h3>QRIS String Statis</h3>
       <p>Paste QRIS string dari merchant. Sistem generate QR dinamis sesuai nominal. Konfirmasi manual oleh admin.</p>
       <textarea id="qrisInput" rows="6" placeholder="Paste QRIS string di sini..."></textarea>
-      <div class="info-box">ℹ️ Buka aplikasi bank → menu QRIS → Salin string → paste di sini.</div>
+      <div class="info-box">Buka aplikasi bank → menu QRIS → Salin string → paste di sini.</div>
     </div>
 
     <div id="modeMidtrans" class="mode-panel hidden">
       <h3>Midtrans Payment Gateway</h3>
       <p>Pembayaran otomatis terdeteksi tanpa konfirmasi admin.</p>
-      <input type="text" id="midtransServerKey" placeholder="Server Key (SB-Mid-server-xxx)">
-      <input type="text" id="midtransClientKey" placeholder="Client Key (SB-Mid-client-xxx)">
+      <div class="setting-form-grid">
+        <input type="text" id="midtransServerKey" placeholder="Server Key (SB-Mid-server-xxx)">
+        <input type="text" id="midtransClientKey" placeholder="Client Key (SB-Mid-client-xxx)">
+      </div>
       <div class="radio-group">
         <label><input type="radio" name="midtransEnv" value="sandbox" checked> Sandbox</label>
         <label><input type="radio" name="midtransEnv" value="production"> Production</label>
       </div>
-      <div class="info-box">ℹ️ Daftar di <a href="https://midtrans.com" target="_blank">midtrans.com</a> → Settings → Access Keys</div>
+      <div class="info-box">Daftar di <a href="https://midtrans.com" target="_blank">midtrans.com</a> → Settings → Access Keys</div>
     </div>
 
     <div id="modeXendit" class="mode-panel hidden">
       <h3>Xendit Payment Gateway</h3>
       <p>Pembayaran otomatis terdeteksi tanpa konfirmasi admin.</p>
-      <input type="text" id="xenditApiKey"        placeholder="API Key (xnd_development_xxx)">
-      <input type="text" id="xenditCallbackToken" placeholder="Callback Token">
+      <div class="setting-form-grid">
+        <input type="text" id="xenditApiKey"        placeholder="API Key (xnd_development_xxx)">
+        <input type="text" id="xenditCallbackToken" placeholder="Callback Token">
+      </div>
       <div class="radio-group">
         <label><input type="radio" name="xenditEnv" value="development" checked> Development</label>
         <label><input type="radio" name="xenditEnv" value="production"> Production</label>
       </div>
-      <div class="info-box">ℹ️ Daftar di <a href="https://xendit.co" target="_blank">xendit.co</a> → Settings → API Keys</div>
+      <div class="info-box">Daftar di <a href="https://xendit.co" target="_blank">xendit.co</a> → Settings → API Keys</div>
     </div>
   </div>
 

@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Frame & Layout — Photobooth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js"></script>
+
+  <style>
+    /* ── BASE RESET & MODERN MONOCHROME THEME ── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4f4f5, #e4e4e7, #d4d4d8);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      color: #18181b;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── GLOBAL HEADER ── */
+    .global-header {
+      height: 65px;
+      background: #ffffff;
+      border-bottom: 2px solid #e4e4e7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .global-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .global-header .logo img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .global-header .logo-text {
+      font-size: 19px;
+      font-weight: 800;
+      color: #18181b;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── STEPS PROGRESS ── */
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      border: 2px solid #18181b;
+      color: #18181b;
+      background: transparent;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    .step:hover,
+    .step.active {
+      transform: scale(1.1);
+      background: #18181b;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(24, 24, 27, 0.2);
+    }
+
+    .step-line {
+      width: 35px;
+      border-top: 2px dashed #a1a1aa;
+    }
+
+    /* ── 3 COLUMN LAYOUT ── */
+    .editor-page {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 65px);
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(24, 24, 27, 0.08);
+      overflow: hidden;
+    }
+
+    .preview-col {
+      width: 38%;
+      min-width: 360px;
+    }
+
+    .editor-col {
+      width: 32%;
+      min-width: 300px;
+    }
+
+    .slot-col {
+      width: 30%;
+      min-width: 280px;
+      border-right: none;
+    }
+
+    .col-header {
+      height: 55px;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: #18181b;
+      color: #ffffff;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .col-body {
+      padding: 24px;
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    /* Custom Scrollbar */
+    .col-body::-webkit-scrollbar,
+    .slot-grid::-webkit-scrollbar,
+    .foto-bank::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .col-body::-webkit-scrollbar-thumb,
+    .slot-grid::-webkit-scrollbar-thumb,
+    .foto-bank::-webkit-scrollbar-thumb {
+      background: rgba(24, 24, 27, 0.15);
+      border-radius: 99px;
+    }
+
+    /* ── CANVAS PREVIEW SECTION ── */
+    .canvas-wrapper {
+      position: relative;
+      background: #09090b;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.4), 0 10px 25px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+    }
+
+    #previewCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    #stikerLayer {
+      position: absolute;
+      inset: 16px;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: 6px;
+    }
+
+    .preview-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-cetak {
+      width: 100%;
+      height: 48px;
+      background: #18181b;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(24, 24, 27, 0.15);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-cetak:hover {
+      background: #27272a;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(24, 24, 27, 0.25);
+    }
+
+    .btn-back-small {
+      width: 100%;
+      height: 44px;
+      background: transparent;
+      color: #71717a;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back-small:hover {
+      background: #f4f4f5;
+      color: #18181b;
+      border-color: #d4d4d8;
+    }
+
+    #msgStatus {
+      font-size: 12.5px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* ── TABS IN EDITOR COLUMN ── */
+    .tab-nav {
+      height: 55px;
+      display: flex;
+      background: #18181b;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: #a1a1aa;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: #27272a;
+      border-bottom-color: #ffffff;
+    }
+
+    .tab-panel {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: #71717a;
+      margin-bottom: -2px;
+    }
+
+    /* ── LAYOUT & OPTIONS GRID ── */
+    .orientasi-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .ori-btn {
+      flex: 1;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ori-btn:hover {
+      background: #f4f4f5;
+    }
+
+    .ori-btn.active {
+      background: #18181b;
+      color: #ffffff;
+      border-color: #18181b;
+    }
+
+    .layout-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .layout-item {
+      background: #ffffff;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .layout-item:hover:not(.disabled) {
+      border-color: #18181b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .layout-item.active {
+      border-color: #18181b;
+      background: rgba(24, 24, 27, 0.02);
+      box-shadow: 0 0 0 1px #18181b;
+    }
+
+    .layout-item.disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .layout-thumb {
+      background: #f4f4f5;
+      border-radius: 6px;
+      padding: 3px;
+    }
+
+    .layout-cell {
+      background: #ffffff;
+      border: 1px solid #e4e4e7;
+      border-radius: 2px;
+    }
+
+    .layout-item strong {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #18181b;
+      margin-top: 6px;
+    }
+
+    .layout-item small {
+      font-size: 10px;
+      color: #a1a1aa;
+    }
+
+    /* ── FRAME, FILTER & STICKERS GRID ── */
+    .frame-grid,
+    .filter-grid,
+    .stiker-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .frame-item,
+    .filter-item,
+    .stiker-btn {
+      background: #ffffff;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 8px;
+    }
+
+    .frame-item img,
+    .stiker-btn img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .frame-item:hover,
+    .stiker-btn:hover,
+    .filter-item:hover {
+      border-color: #18181b;
+      transform: translateY(-2px);
+    }
+
+    .frame-item.active,
+    .filter-item.active {
+      border-color: #18181b;
+      box-shadow: 0 0 0 1px #18181b;
+    }
+
+    .no-frame {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .filter-thumb {
+      width: 100%;
+      height: 52px;
+      border-radius: 6px;
+      object-fit: cover;
+      margin-bottom: 6px;
+    }
+
+    .filter-item span {
+      font-size: 10px;
+      font-weight: 600;
+      color: #27272a;
+    }
+
+    /* ── DRAGGABLE STICKER ELEMENTS ── */
+    .stiker-el {
+      position: absolute;
+      cursor: move;
+      border: 1px dashed transparent;
+      user-select: none;
+    }
+
+    .stiker-el.selected {
+      border-color: #18181b;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .stiker-el img {
+      width: 100%;
+      display: block;
+    }
+
+    .stiker-el .s-delete {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #ffffff;
+      border: none;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .stiker-el.selected .s-delete {
+      display: flex;
+    }
+
+    .stiker-el .s-resize {
+      position: absolute;
+      bottom: -8px;
+      right: -8px;
+      width: 14px;
+      height: 14px;
+      background: #18181b;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      cursor: se-resize;
+      display: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .stiker-el.selected .s-resize {
+      display: block;
+    }
+
+    .active-stiker-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f4f4f5;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .active-stiker-row img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .active-stiker-row span {
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .active-stiker-row button {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── PHOTO SLOT LAYOUT GRID ── */
+    .slot-info {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #71717a;
+      margin-bottom: -4px;
+    }
+
+    .slot-col .col-body {
+      overflow-y: hidden;
+    }
+
+    .slot-grid {
+      display: grid;
+      gap: 10px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding-right: 4px;
+      align-content: start;
+    }
+
+    .slot-cell {
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+      width: 100%;
+      min-height: 100px;
+    }
+
+    .slot-cell.filled {
+      border-style: solid;
+      border-color: #18181b;
+    }
+
+    .slot-cell.drag-over {
+      background: rgba(24, 24, 27, 0.04);
+      border-color: #18181b;
+    }
+
+    .slot-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: #e4e4e7;
+    }
+
+    .slot-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .slot-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(24, 24, 27, 0.75);
+      color: #ffffff;
+      border: none;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s;
+    }
+
+    .slot-remove:hover {
+      background: #ef4444;
+    }
+
+    .bank-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: #71717a;
+      margin-bottom: -2px;
+    }
+
+    .foto-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      overflow-y: auto;
+      flex-grow: 1;
+      min-height: 0;
+      padding-right: 4px;
+      align-content: flex-start;
+    }
+
+    .bank-item {
+      background: #ffffff;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      cursor: grab;
+      transition: all 0.2s;
+      width: calc((100% - 20px) / 3);
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .bank-item:hover {
+      border-color: #18181b;
+      transform: translateY(-2px);
+    }
+
+    .bank-item.used {
+      opacity: 0.25;
+      cursor: not-allowed;
+      border-color: #e4e4e7 !important;
+      transform: none !important;
+    }
+
+    .bank-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .bank-item-tag {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      font-size: 9px;
+      font-weight: 600;
+      background: rgba(24, 24, 27, 0.6);
+      color: white;
+      border-radius: 4px;
+      padding: 1px 6px;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ── UPLOAD & OVERLAY MODALS ── */
+    #uploadOverlay,
+    #loadingOverlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    #uploadOverlay {
+      z-index: 3000;
+      background: rgba(9, 9, 11, 0.8);
+    }
+
+    #uploadOverlay.show {
+      display: flex;
+    }
+
+    #loadingOverlay {
+      z-index: 2000;
+      background: rgba(255, 255, 255, 0.95);
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .upload-box {
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .upload-box h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #18181b;
+      margin-bottom: 6px;
+    }
+
+    .upload-box p {
+      font-size: 13px;
+      color: #71717a;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f4f4f5;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      border: 1px solid #e4e4e7;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #18181b;
+      width: 0%;
+      transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .upload-status {
+      font-size: 12px;
+      font-weight: 600;
+      color: #18181b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script>
+    (function () {
+      const sfp = sessionStorage.getItem("sessionFolderPath");
+      const gd = sessionStorage.getItem("guestData");
+      const br = sessionStorage.getItem("selectedBranch");
+      if (sfp) {
+        window._isAdminFlow = true;
+        window._sessionFolderPath = sfp;
+        window._sessionGuestNama = sessionStorage.getItem("sessionGuestNama") || "user";
+        window._sessionBranchId = sessionStorage.getItem("sessionBranchId") || "";
+      } else if (gd && br) {
+        try { window._guestData = JSON.parse(gd); window._branchData = JSON.parse(br); window._isAdminFlow = false; }
+        catch (e) { window.location.href = "guest-login.html"; }
+      } else {
+        const cu = localStorage.getItem("currentUser"), ca = localStorage.getItem("currentAdmin");
+        if (cu && ca) window.location.href = "../pilih-foto.html";
+        else window.location.href = "guest-login.html";
+      }
+    })();
+  </script>
+
+  <div id="uploadOverlay">
+    <div class="upload-box">
+      <h3> Mengupload Foto...</h3>
+      <p id="uploadDesc">Menyimpan foto ke server</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p class="upload-status" id="uploadStatus">0 / 0</p>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" style="display: flex;">
+    <div style="font-size: 3rem; animation: pulse 1.5s infinite alternate;">📸</div>
+    <p style="font-size: 16px; color: #18181b; font-weight: 600;">Memuat foto dari server...</p>
+    <p id="loadingMsg" style="font-size: 13px; color: #71717a; max-width: 80%; text-align: center;"></p>
+  </div>
+
+  <div class="global-header">
+    <div class="logo">
+      <img src="../img/Logo_photobooth_LTI.png" alt="Logo" onerror="this.src='../assets/img/logo.png'">
+      <span class="logo-text">PHOTOBOOTH</span>
+    </div>
+    <div class="steps">
+      <div class="step" onclick="history.back()">1</div>
+      <div class="step-line"></div>
+      <div class="step active">2</div>
+      <div class="step-line"></div>
+      <div class="step">3</div>
+      <div class="step-line"></div>
+      <div class="step">4</div>
+    </div>
+  </div>
+
+  <div class="editor-page">
+    <div class="col preview-col">
+      <div class="col-header">👁️ Preview</div>
+      <div class="col-body">
+        <div class="canvas-wrapper">
+          <canvas id="previewCanvas"></canvas>
+          <div id="stikerLayer"></div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-cetak" id="btnCetak" onclick="lanjut()">🖨️ Cetak — Continue</button>
+          <button class="btn-back-small" onclick="history.back()">← Kembali</button>
+        </div>
+        <p id="msgStatus"></p>
+      </div>
+    </div>
+
+    <div class="col editor-col">
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('layout')" id="tnLayout">📐 Layout</button>
+        <button class="tab-btn" onclick="switchTab('frame')" id="tnFrame">🖼️ Frame</button>
+        <button class="tab-btn" onclick="switchTab('filter')" id="tnFilter">🎨 Filter</button>
+        <button class="tab-btn" onclick="switchTab('stiker')" id="tnStiker">✨ Stiker</button>
+      </div>
+      <div class="col-body">
+        <div class="tab-panel active" id="tabLayout">
+          <p class="section-title">Orientasi</p>
+          <div class="orientasi-row">
+            <div class="ori-btn active" id="oriBtnPotret" onclick="setOrientasi('potret')">📱 Potret</div>
+            <div class="ori-btn" id="oriBtnLandscape" onclick="setOrientasi('landscape')">🖥️ Landscape
+            </div>
+          </div>
+          <p class="section-title">Pilih Layout</p>
+          <div class="layout-list" id="layoutList"></div>
+        </div>
+        <div class="tab-panel" id="tabFrame">
+          <p class="section-title">Pilih Frame</p>
+          <div class="frame-grid" id="frameList">
+            <div class="frame-item active" onclick="setFrame(null,this)">
+              <div class="no-frame">Tanpa Frame</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="tabFilter">
+          <p class="section-title">Pilih Filter</p>
+          <div class="filter-grid" id="filterList"></div>
+        </div>
+        <div class="tab-panel" id="tabStiker">
+          <p class="section-title">Tap untuk Tambah</p>
+          <div class="stiker-grid" id="stikerList">
+            <p style="font-size:12px;color:#a1a1aa;grid-column:1/-1;text-align:center;">Loading stickers...
+            </p>
+          </div>
+          <p class="section-title" style="margin-top:14px;">Stiker Aktif</p>
+          <div id="activeStikers">
+            <p style="font-size:12px;color:#a1a1aa;">Belum ada stiker.</p>
+          </div>
+          <button onclick="clearAllStiker()"
+            style="margin-top:8px;width:100%;background:white;color:#ef4444;border:1.5px solid #ef4444;border-radius:10px;padding:10px;font-family:Poppins;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s ease;">🗑️
+            Hapus Semua</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col slot-col">
+      <div class="col-header">🎯 Susun Foto ke Slot</div>
+      <div class="col-body">
+        <p class="slot-info">Drag foto dari bawah ke slot layout.</p>
+        <div class="slot-grid" id="slotGrid">
+          <p style="font-size:12px;color:#a1a1aa;text-align:center;padding:20px 0;">← Pilih layout terlebih
+            dahulu</p>
+        </div>
+        <p class="bank-title">Foto Tersedia:</p>
+        <div class="foto-bank" id="fotoBank">
+          <p style="font-size:12px;color:#a1a1aa;text-align:center;padding:12px 0;">Memuat foto...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
+
+    const IS_ADMIN_FLOW = !!window._isAdminFlow;
+    const guestInfo = IS_ADMIN_FLOW ? { nama: window._sessionGuestNama||"user" } : (window._guestData?.guest??{nama:"guest"});
+    const branchId  = IS_ADMIN_FLOW ? window._sessionBranchId : (window._branchData?.id??"");
+    const ALLOWED   = ['asli','noedit'];
+
+    let fotos=[],fotosMeta=[],dragSrc=null;
+    let sessionFolderPath = IS_ADMIN_FLOW ? window._sessionFolderPath : null;
+    let currentOrientasi="potret",currentLayout=null,slotPhotos=[],currentFrame=null,currentFilter="none",currentFilterName="Original",activeStiker=[];
+
+    const canvas=document.getElementById("previewCanvas"), ctx=canvas.getContext("2d"), stikerLayer=document.getElementById("stikerLayer");
+
+    const layoutsPotret=[
+      {id:"1x1",nama:"Single",rows:1,cols:1,minFoto:1},{id:"2x1",nama:"Stack 2",rows:2,cols:1,minFoto:2},
+      {id:"2x2",nama:"Grid 4",rows:2,cols:2,minFoto:4},{id:"3x2",nama:"Grid 6",rows:3,cols:2,minFoto:6},
+      {id:"strip-2",nama:"Strip 2",rows:2,cols:1,minFoto:2,isStrip:true},{id:"strip-3",nama:"Strip 3",rows:3,cols:1,minFoto:3,isStrip:true},
+      {id:"strip-4",nama:"Strip 4",rows:4,cols:1,minFoto:4,isStrip:true},{id:"strip-6",nama:"Strip 6",rows:6,cols:1,minFoto:6,isStrip:true},
+    ];
+    const layoutsLandscape=[
+      {id:"1x1-l",nama:"Single",rows:1,cols:1,minFoto:1},{id:"1x2-l",nama:"Side 2",rows:1,cols:2,minFoto:2},
+      {id:"1x3-l",nama:"Side 3",rows:1,cols:3,minFoto:3},{id:"2x2-l",nama:"Grid 4",rows:2,cols:2,minFoto:4},
+      {id:"2x3-l",nama:"Grid 6",rows:2,cols:3,minFoto:6},{id:"sh-2",nama:"Strip H2",rows:1,cols:2,minFoto:2,isStrip:true},
+      {id:"sh-3",nama:"Strip H3",rows:1,cols:3,minFoto:3,isStrip:true},
+    ];
+    const filters=[
+      {id:"none",nama:"Original",css:"none"},{id:"bw",nama:"B&W",css:"grayscale(100%)"},
+      {id:"sepia",nama:"Sepia",css:"sepia(80%)"},{id:"warm",nama:"Warm",css:"sepia(30%) saturate(150%) brightness(105%)"},
+      {id:"cool",nama:"Cool",css:"hue-rotate(180deg) saturate(120%)"},{id:"vivid",nama:"Vivid",css:"saturate(200%) contrast(110%)"},
+      {id:"fade",nama:"Fade",css:"brightness(110%) contrast(90%) saturate(80%)"},{id:"dramatic",nama:"Dramatic",css:"contrast(140%) brightness(90%)"},
+      {id:"vintage",nama:"Vintage",css:"sepia(50%) contrast(90%) brightness(110%)"},
+    ];
+
+    async function fetchPhotos() {
+      const lm=document.getElementById("loadingMsg");
+
+      // ── ALUR ADMIN: path sudah pasti dari foto.html ──
+      if (IS_ADMIN_FLOW && sessionFolderPath) {
+        lm.textContent=`Memuat dari: ${sessionFolderPath}`;
+        try {
+          const {data:sub,error:subErr}=await supabase.storage.from("photos").list(sessionFolderPath,{limit:20});
+          if(subErr)throw subErr; if(!sub?.length)throw new Error("Folder sesi kosong.");
+          let all=[];
+          for(const item of sub){
+            if(!item.metadata){
+              if(!ALLOWED.includes(item.name))continue;
+              lm.textContent=`Memuat folder ${item.name}...`;
+              const{data:files}=await supabase.storage.from("photos").list(`${sessionFolderPath}/${item.name}`,{limit:100});
+              if(files) files.forEach(f=>{if(f.metadata)all.push({path:`${sessionFolderPath}/${item.name}/${f.name}`,kind:item.name,name:f.name});});
+            } else {
+              if(item.name!=='hasil.jpg')all.push({path:`${sessionFolderPath}/${item.name}`,kind:'asli',name:item.name});
+            }
+          }
+          if(!all.length)throw new Error("Tidak ada foto di folder sesi ini.");
+          const ko={asli:0,noedit:1};
+          all.sort((a,b)=>(ko[a.kind]??9)-(ko[b.kind]??9)||a.name.localeCompare(b.name));
+          lm.textContent=`Membuat URL untuk ${all.length} foto...`;
+          await buildUrls(all); return true;
+        } catch(e){ console.error(e); lm.textContent="❌ "+e.message; return false; }
+      }
+
+      // ── ALUR GUEST: cari folder berdasarkan nama guest ──
+      lm.textContent="Mencari folder sesi...";
+      try {
+        const{data:folders,error:listErr}=await supabase.storage.from("photos").list(branchId,{limit:100,sortBy:{column:"name",order:"desc"}});
+        if(listErr)throw listErr; if(!folders?.length)throw new Error("Tidak ada folder ditemukan.");
+        const prefix=guestInfo.nama+'_';
+        const gf=folders.filter(f=>f.name.startsWith(prefix)&&!f.metadata);
+        if(!gf.length)throw new Error("Belum ada foto untuk sesi ini.");
+        const latest=gf[0]; sessionFolderPath=`${branchId}/${latest.name}`; lm.textContent=`Folder: ${latest.name}`;
+        const{data:sub}=await supabase.storage.from("photos").list(sessionFolderPath,{limit:20});
+        if(!sub)throw new Error("Folder sesi kosong.");
+        let all=[];
+        for(const item of sub){
+          if(!item.metadata){
+            if(!ALLOWED.includes(item.name))continue;
+            lm.textContent=`Memuat folder ${item.name}...`;
+            const{data:files}=await supabase.storage.from("photos").list(`${sessionFolderPath}/${item.name}`,{limit:100});
+            if(files) files.forEach(f=>{if(f.metadata)all.push({path:`${sessionFolderPath}/${item.name}/${f.name}`,kind:item.name,name:f.name});});
+          } else {
+            if(item.name!=='hasil.jpg')all.push({path:`${sessionFolderPath}/${item.name}`,kind:'asli',name:item.name});
+          }
+        }
+        if(!all.length)throw new Error("Tidak ada foto asli/noedit ditemukan.");
+        const ko={asli:0,noedit:1};
+        all.sort((a,b)=>(ko[a.kind]??9)-(ko[b.kind]??9)||a.name.localeCompare(b.name));
+        lm.textContent=`Membuat URL untuk ${all.length} foto...`;
+        await buildUrls(all); return true;
+      } catch(e){ console.error(e); lm.textContent="❌ "+e.message; return false; }
+    }
+
+    async function buildUrls(all){
+      const paths=all.map(f=>f.path); let urls=[];
+      try{
+        const{data:signed,error:se}=await supabase.storage.from("photos").createSignedUrls(paths,3600);
+        if(se)throw se; urls=signed.map(s=>s.signedUrl);
+      }catch(e){ urls=paths.map(p=>supabase.storage.from("photos").getPublicUrl(p).data.publicUrl); }
+      fotos=urls; fotosMeta=all;
+    }
+
+    async function init(){
+      const ok=await fetchPhotos();
+      document.getElementById("loadingOverlay").style.display="none";
+      if(!ok||!fotos.length){
+        document.getElementById("msgStatus").style.color="red";
+        document.getElementById("msgStatus").textContent="❌ Gagal memuat foto.";
+        document.getElementById("btnCetak").disabled=true; return;
+      }
+
+      // Restore session storage state if editData exists
+      const prevCetakRaw = sessionStorage.getItem("cetakData");
+      let prevData = null;
+      if (prevCetakRaw) {
+        try {
+          prevData = JSON.parse(prevCetakRaw);
+        } catch(e) {
+          console.warn("Gagal parse cetakData lama:", e);
+        }
+      }
+
+      if (prevData) {
+        currentOrientasi = prevData.layout?.orientasi || "potret";
+        currentFilter = prevData.filter || "none";
+        const matchedFilter = filters.find(f => f.css === currentFilter);
+        currentFilterName = matchedFilter ? matchedFilter.nama : "Original";
+        currentFrame = prevData.frame || null;
+        activeStiker = prevData.stiker || [];
+      }
+
+      document.getElementById("oriBtnPotret").classList.toggle("active", currentOrientasi === "potret");
+      document.getElementById("oriBtnLandscape").classList.toggle("active", currentOrientasi === "landscape");
+
+      renderFilters();
+      renderFotoBank();
+      await loadFrames();
+      await loadStiker();
+
+      if (prevData && prevData.layout) {
+        const layouts = currentOrientasi === "potret" ? layoutsPotret : layoutsLandscape;
+        const savedLayout = layouts.find(l => l.id === prevData.layout.id);
+        if (savedLayout) {
+          currentLayout = savedLayout;
+          if (prevData.slotPhotos && Array.isArray(prevData.slotPhotos)) {
+            slotPhotos = prevData.slotPhotos;
+          } else {
+            const total = currentLayout.rows * currentLayout.cols;
+            slotPhotos = Array(total).fill(null);
+            fotos.slice(0, total).forEach((f, i) => slotPhotos[i] = f);
+          }
+        }
+      }
+
+      renderLayouts(currentOrientasi);
+
+      if (!currentLayout) {
+        const def = (currentOrientasi === "potret" ? layoutsPotret : layoutsLandscape).find(l => fotos.length >= l.minFoto);
+        if (def) {
+          setLayout(def);
+          setTimeout(() => {
+            const f = document.querySelector(".layout-item:not(.disabled)");
+            if (f) f.classList.add("active");
+          }, 50);
+        }
+      } else {
+        renderSlots();
+        renderFotoBank();
+        drawCanvas();
+      }
+
+      if (activeStiker.length > 0) {
+        const activeStikersDiv = document.getElementById("activeStikers");
+        if (activeStikersDiv) activeStikersDiv.innerHTML = "";
+        activeStiker.forEach(s => {
+          renderStikerEl(s);
+        });
+        renderActiveStikerPanel();
+      }
+
+      document.addEventListener("click",e=>{if(!e.target.closest(".stiker-el"))deselectStiker();});
+    }
+    init();
+
+    window.switchTab=function(tab){
+      ["layout","frame","filter","stiker"].forEach(t=>{
+        const T=t[0].toUpperCase()+t.slice(1);
+        document.getElementById("tab"+T).classList.toggle("active",t===tab);
+        document.getElementById("tn"+T).classList.toggle("active",t===tab);
+      });
+    };
+
+    window.setOrientasi=function(ori){
+      currentOrientasi=ori;currentLayout=null;slotPhotos=[];
+      document.getElementById("oriBtnPotret").classList.toggle("active",ori==="potret");
+      document.getElementById("oriBtnLandscape").classList.toggle("active",ori==="landscape");
+      renderLayouts(ori);
+      document.getElementById("slotGrid").innerHTML='<p style="font-size:12px;color:#888;text-align:center;padding:20px 0;">← Pilih layout dulu</p>';
+      stikerLayer.innerHTML=""; ctx.clearRect(0,0,canvas.width,canvas.height);
+    };
+
+    function renderLayouts(ori){
+      const layouts=ori==="potret"?layoutsPotret:layoutsLandscape;
+      const list=document.getElementById("layoutList"); list.innerHTML="";
+      layouts.forEach(l=>{
+        const cukup=fotos.length>=l.minFoto;
+        const isActive = currentLayout && currentLayout.id === l.id;
+        const item=document.createElement("div"); item.className="layout-item"+(cukup?"":" disabled")+(isActive?" active":"");
+        const isLand=ori==="landscape",tw=isLand?40:26,th=isLand?26:40;
+        item.innerHTML=`<div class="layout-thumb" style="width:${tw}px;height:${th}px;display:grid;grid-template-columns:repeat(${l.cols},1fr);grid-template-rows:repeat(${l.rows},1fr);gap:2px;margin:0 auto 3px;">${Array(l.rows*l.cols).fill('<div class="layout-cell"></div>').join("")}</div><strong>${l.nama}</strong><small>${l.minFoto}f</small>`;
+        if(cukup)item.onclick=()=>{document.querySelectorAll(".layout-item.active").forEach(e=>e.classList.remove("active"));item.classList.add("active");setLayout(l);};
+        list.appendChild(item);
+      });
+    }
+
+    function setLayout(layout){
+      currentLayout=layout; const total=layout.rows*layout.cols;
+      slotPhotos=Array(total).fill(null); fotos.slice(0,total).forEach((f,i)=>slotPhotos[i]=f);
+      renderSlots(); renderFotoBank(); drawCanvas();
+    }
+
+    function renderSlots(){
+      if(!currentLayout)return;
+      const grid=document.getElementById("slotGrid");
+      grid.style.gridTemplateColumns=`repeat(${currentLayout.cols},1fr)`; grid.innerHTML="";
+      slotPhotos.forEach((foto,idx)=>{
+        const cell=document.createElement("div"); cell.className="slot-cell"+(foto?" filled":"");
+        cell.innerHTML=foto?`<img src="${foto}" draggable="false"><button class="slot-remove" onclick="removeFromSlot(${idx})">✕</button>`:`<span class="slot-num">${idx+1}</span>`;
+        cell.addEventListener("dragover",e=>{e.preventDefault();cell.classList.add("drag-over");});
+        cell.addEventListener("dragleave",()=>cell.classList.remove("drag-over"));
+        cell.addEventListener("drop",e=>{e.preventDefault();cell.classList.remove("drag-over");dropToSlot(idx);});
+        cell.addEventListener("touchend",()=>{if(dragSrc!==null)dropToSlot(idx);});
+        grid.appendChild(cell);
+      });
+    }
+
+    function renderFotoBank(){
+      const bank=document.getElementById("fotoBank"); bank.innerHTML="";
+      if(!fotos.length){bank.innerHTML='<p style="font-size:12px;color:#aaa;text-align:center;padding:12px 0;">Tidak ada foto tersedia.</p>';return;}
+      fotos.forEach((foto,i)=>{
+        const isUsed=slotPhotos.includes(foto),meta=fotosMeta[i];
+        const item=document.createElement("div"); item.className="bank-item"+(isUsed?" used":""); item.draggable=!isUsed;
+        item.innerHTML=`<img src="${foto}" draggable="false"><span style="position:absolute;bottom:2px;left:3px;font-size:8px;background:rgba(0,0,0,0.5);color:white;border-radius:3px;padding:1px 4px;">${meta?.kind??''}</span>`;
+        item.style.position="relative";
+        item.addEventListener("dragstart",()=>{if(!isUsed)dragSrc=i;});
+        item.addEventListener("dragend",()=>dragSrc=null);
+        item.addEventListener("touchstart",()=>{if(!isUsed)dragSrc=i;});
+        bank.appendChild(item);
+      });
+    }
+
+    function dropToSlot(slotIdx){
+      if(dragSrc===null)return;
+      const foto=fotos[dragSrc],ex=slotPhotos.indexOf(foto);
+      if(ex!==-1)slotPhotos[ex]=slotPhotos[slotIdx];
+      slotPhotos[slotIdx]=foto; dragSrc=null;
+      renderSlots(); renderFotoBank(); drawCanvas();
+    }
+    window.removeFromSlot=function(idx){slotPhotos[idx]=null;renderSlots();renderFotoBank();drawCanvas();};
+
+    async function loadFrames(){
+      const{data}=await supabase.from("frames").select("*").eq("branch_id",branchId).eq("is_active",true);
+      if(!data||!data.length)return;
+      const list=document.getElementById("frameList");
+      
+      if (currentFrame) {
+        const tanpaFrameEl = list.querySelector(".frame-item");
+        if (tanpaFrameEl) tanpaFrameEl.classList.remove("active");
+      }
+
+      data.forEach(frame=>{
+        const isActive = currentFrame && currentFrame.id === frame.id;
+        const item=document.createElement("div");
+        item.className="frame-item" + (isActive ? " active" : "");
+        item.innerHTML=`<img src="${frame.url}" alt="${frame.name}">`;
+        item.onclick=()=>setFrame(frame,item);
+        list.appendChild(item);
+      });
+    }
+    window.setFrame=function(frame,el){document.querySelectorAll(".frame-item.active").forEach(e=>e.classList.remove("active"));el.classList.add("active");currentFrame=frame;drawCanvas();};
+
+    function renderFilters(){
+      const list=document.getElementById("filterList");
+      list.innerHTML="";
+      filters.forEach(f=>{
+        const isActive = (currentFilter === f.css || (currentFilter === "none" && f.id === "none"));
+        const item=document.createElement("div"); item.className="filter-item"+(isActive?" active":"");
+        const thumb=document.createElement("canvas"); thumb.width=thumb.height=70; thumb.className="filter-thumb";
+        const tctx=thumb.getContext("2d"),img=new Image(); img.crossOrigin="anonymous";
+        img.onload=()=>{tctx.filter=f.css;tctx.drawImage(img,0,0,70,70);}; img.src=fotos[0]||"";
+        item.appendChild(thumb); const lbl=document.createElement("span"); lbl.textContent=f.nama; item.appendChild(lbl);
+        item.onclick=()=>{document.querySelectorAll(".filter-item.active").forEach(e=>e.classList.remove("active"));item.classList.add("active");currentFilter=f.css;currentFilterName=f.nama;drawCanvas();};
+        list.appendChild(item);
+      });
+    }
+
+    async function loadStiker(){
+      const{data}=await supabase.from("stickers").select("*").eq("branch_id",branchId).eq("is_active",true);
+      const list=document.getElementById("stikerList");
+      if(!data||!data.length){list.innerHTML="<p style='font-size:11px;color:#888;grid-column:1/-1;'>Belum ada stiker.</p>";return;}
+      list.innerHTML="";
+      data.forEach(s=>{const btn=document.createElement("div");btn.className="stiker-btn";btn.innerHTML=`<img src="${s.url}" alt="${s.name}">`;btn.onclick=()=>addStiker(s);list.appendChild(btn);});
+    }
+
+    function addStiker(s){const uid=Date.now()+Math.random();const obj={uid,id:s.id,url:s.url,nama:s.name,xPct:0.5,yPct:0.35,wPct:0.25};activeStiker.push(obj);renderStikerEl(obj);renderActiveStikerPanel();}
+
+    function renderStikerEl(obj){
+      const lw=stikerLayer.offsetWidth||260,lh=stikerLayer.offsetHeight||260;
+      const el=document.createElement("div"); el.className="stiker-el"; el.dataset.uid=String(obj.uid);
+      const w=obj.wPct*lw;
+      el.style.cssText=`width:${w}px;left:${obj.xPct*lw-w/2}px;top:${obj.yPct*lh-w/2}px;pointer-events:all;`;
+      el.innerHTML=`<img src="${obj.url}"><button class="s-delete" onclick="removeStikerByUid(${obj.uid})">✕</button><div class="s-resize"></div>`;
+      el.addEventListener("mousedown",e=>{e.stopPropagation();selectStiker(el);startDrag(e,el,obj);});
+      el.addEventListener("touchstart",e=>{e.stopPropagation();selectStiker(el);startTouchDrag(e,el,obj);},{passive:false});
+      el.querySelector(".s-resize").addEventListener("mousedown",e=>{e.stopPropagation();startResize(e,el,obj);});
+      el.querySelector(".s-resize").addEventListener("touchstart",e=>{e.stopPropagation();startTouchResize(e,el,obj);},{passive:false});
+      stikerLayer.appendChild(el);
+    }
+
+    function selectStiker(el){deselectStiker();el.classList.add("selected");}
+    function deselectStiker(){document.querySelectorAll(".stiker-el.selected").forEach(e=>e.classList.remove("selected"));}
+
+    function startDrag(e,el,obj){
+      if(["s-delete","s-resize"].some(c=>e.target.classList.contains(c)))return; e.preventDefault();
+      const lw=stikerLayer.offsetWidth,lh=stikerLayer.offsetHeight,sx=e.clientX-el.offsetLeft,sy=e.clientY-el.offsetTop;
+      const move=ev=>{const nx=Math.max(0,Math.min(lw-el.offsetWidth,ev.clientX-sx));const ny=Math.max(0,Math.min(lh-el.offsetHeight,ev.clientY-sy));el.style.left=nx+"px";el.style.top=ny+"px";obj.xPct=(nx+el.offsetWidth/2)/lw;obj.yPct=(ny+el.offsetHeight/2)/lh;};
+      const up=()=>{document.removeEventListener("mousemove",move);document.removeEventListener("mouseup",up);};
+      document.addEventListener("mousemove",move);document.addEventListener("mouseup",up);
+    }
+    function startTouchDrag(e,el,obj){
+      if(["s-delete","s-resize"].some(c=>e.target.classList.contains(c)))return; e.preventDefault();
+      const lw=stikerLayer.offsetWidth,lh=stikerLayer.offsetHeight,sx=e.touches[0].clientX-el.offsetLeft,sy=e.touches[0].clientY-el.offsetTop;
+      const move=ev=>{const nx=Math.max(0,Math.min(lw-el.offsetWidth,ev.touches[0].clientX-sx));const ny=Math.max(0,Math.min(lh-el.offsetHeight,ev.touches[0].clientY-sy));el.style.left=nx+"px";el.style.top=ny+"px";obj.xPct=(nx+el.offsetWidth/2)/lw;obj.yPct=(ny+el.offsetHeight/2)/lh;};
+      const end=()=>{document.removeEventListener("touchmove",move);document.removeEventListener("touchend",end);};
+      document.addEventListener("touchmove",move,{passive:false});document.addEventListener("touchend",end);
+    }
+    function startResize(e,el,obj){e.preventDefault();const lw=stikerLayer.offsetWidth,sx=e.clientX,sw=el.offsetWidth;const move=ev=>{const nw=Math.max(24,sw+(ev.clientX-sx));el.style.width=nw+"px";obj.wPct=nw/lw;};const up=()=>{document.removeEventListener("mousemove",move);document.removeEventListener("mouseup",up);};document.addEventListener("mousemove",move);document.addEventListener("mouseup",up);}
+    function startTouchResize(e,el,obj){e.preventDefault();const lw=stikerLayer.offsetWidth,sx=e.touches[0].clientX,sw=el.offsetWidth;const move=ev=>{const nw=Math.max(24,sw+(ev.touches[0].clientX-sx));el.style.width=nw+"px";obj.wPct=nw/lw;};const end=()=>{document.removeEventListener("touchmove",move);document.removeEventListener("touchend",end);};document.addEventListener("touchmove",move,{passive:false});document.addEventListener("touchend",end);}
+
+    window.removeStikerByUid=function(uid){activeStiker=activeStiker.filter(s=>s.uid!==uid);const el=stikerLayer.querySelector(`[data-uid="${uid}"]`);if(el)el.remove();renderActiveStikerPanel();};
+    window.clearAllStiker=function(){activeStiker=[];stikerLayer.innerHTML="";renderActiveStikerPanel();};
+    function renderActiveStikerPanel(){const div=document.getElementById("activeStikers");if(!activeStiker.length){div.innerHTML="<p style='font-size:11px;color:#888;'>Belum ada stiker.</p>";return;}div.innerHTML="";activeStiker.forEach(s=>{const row=document.createElement("div");row.className="active-stiker-row";row.innerHTML=`<img src="${s.url}"><span>${s.nama}</span><button onclick="removeStikerByUid(${s.uid})">✕</button>`;div.appendChild(row);});}
+
+    async function drawCanvas(){
+      if(!currentLayout)return;
+      const layout=currentLayout,pad=10;let cw,ch;
+      if(currentOrientasi==="potret"){cw=layout.isStrip?240:480;ch=layout.isStrip?240*layout.rows:Math.round(480*layout.rows/layout.cols);}
+      else{cw=600;ch=layout.isStrip?200:Math.round(600*layout.rows/layout.cols);}
+      canvas.width=cw;canvas.height=ch;ctx.fillStyle="#fff";ctx.fillRect(0,0,cw,ch);
+      const cellW=(cw-pad*(layout.cols+1))/layout.cols,cellH=(ch-pad*(layout.rows+1))/layout.rows;
+      for(let i=0;i<layout.rows*layout.cols;i++){
+        const row=Math.floor(i/layout.cols),col=i%layout.cols,x=pad+col*(cellW+pad),y=pad+row*(cellH+pad),src=slotPhotos[i];
+        if(src){const img=await loadImg(src);ctx.save();ctx.filter=currentFilter;const scale=Math.max(cellW/img.width,cellH/img.height);const sw=cellW/scale,sh=cellH/scale;ctx.drawImage(img,(img.width-sw)/2,(img.height-sh)/2,sw,sh,x,y,cellW,cellH);ctx.restore();}
+        else{ctx.fillStyle="#f0e0ec";ctx.fillRect(x,y,cellW,cellH);ctx.fillStyle="#c0a0b0";ctx.font=`${Math.min(cellW,cellH)*0.2}px sans-serif`;ctx.textAlign="center";ctx.fillText(String(i+1),x+cellW/2,y+cellH/2+6);}
+      }
+      if(currentFrame?.url){const fImg=await loadImg(currentFrame.url);ctx.drawImage(fImg,0,0,cw,ch);}
+    }
+
+    // Ubah muatan gambar agar menggunakan proxy atau setel crossOrigin agar RLS/Storage CORS berfungsi
+    function loadImg(src){return new Promise(resolve=>{const img=new Image();img.crossOrigin="anonymous";img.onload=()=>resolve(img);img.onerror=()=>resolve(new Image());img.src=src;});}
+
+    function dataURLtoBlob(dataURL){const[h,d]=dataURL.split(",");const mime=h.match(/:(.*?);/)[1];const bytes=atob(d);const buf=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)buf[i]=bytes.charCodeAt(i);return new Blob([buf],{type:mime});}
+    function showOverlay(desc){document.getElementById("uploadOverlay").classList.add("show");document.getElementById("uploadDesc").textContent=desc;setProgress(0,0);}
+    function hideOverlay(){document.getElementById("uploadOverlay").classList.remove("show");}
+    function setProgress(done,total){const pct=total>0?Math.round(done/total*100):0;document.getElementById("progressFill").style.width=pct+"%";document.getElementById("uploadStatus").textContent=total>0?`${done} / ${total} file`:pct+"%";}
+
+    async function generateGIF() {
+      const limitPhotos = slotPhotos.filter(Boolean);
+      if (limitPhotos.length === 0) return null;
+
+      // ── PRELOAD ALL SESSION IMAGES ──
+      const loadedImages = [];
+      for (const src of limitPhotos) {
+        if (src) {
+          try {
+            const img = await loadImg(src);
+            if (img && img.width > 0 && img.height > 0) {
+              loadedImages.push(img);
+            }
+          } catch (e) {
+            console.warn("Failed to load image for GIF:", src, e);
+          }
+        }
+      }
+
+      if (loadedImages.length === 0) return null;
+
+      // Determine GIF dimensions based on the first image's original dimensions
+      const img0 = loadedImages[0];
+      const gifW = img0.naturalWidth || img0.width;
+      const gifH = img0.naturalHeight || img0.height;
+
+      const gifFrames = [];
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = gifW;
+      tempCanvas.height = gifH;
+      const tempCtx = tempCanvas.getContext("2d");
+
+      for (const img of loadedImages) {
+        tempCtx.clearRect(0, 0, gifW, gifH);
+        tempCtx.save();
+        
+        // Apply the selected filter to the raw GIF frames for consistency
+        if (currentFilter && currentFilter !== "none") {
+          tempCtx.filter = currentFilter;
+        }
+        
+        // Draw the raw image directly onto the canvas, fitting the frame perfectly
+        tempCtx.drawImage(img, 0, 0, gifW, gifH);
+        tempCtx.restore();
+
+        gifFrames.push(tempCanvas.toDataURL("image/jpeg", 0.95));
+      }
+
+      return new Promise((resolve) => {
+        gifshot.createGIF({
+          images: gifFrames,
+          gifWidth: gifW,
+          gifHeight: gifH,
+          interval: 0.8, // 800ms per frame for a smooth poses slideshow
+          numWorkers: 2,
+          sampleInterval: 5, // Improve color quality and reduce dithering artifacts
+          loop: 0 // Loop infinitely
+        }, function(obj) {
+          if (obj.error) {
+            console.error("Gifshot error:", obj.errorMsg);
+            resolve(null);
+          } else {
+            console.log("GIF generated successfully! Length:", obj.image.length);
+            resolve(obj.image);
+          }
+        });
+      });
+    }
+
+    window.lanjut=async function(){
+      if(!currentLayout){alert("Pilih layout dulu!");return;}
+      if(!slotPhotos.some(Boolean)){alert("Isi minimal 1 slot foto!");return;}
+      if(!sessionFolderPath){alert("Folder sesi tidak ditemukan!");return;}
+      const btn=document.getElementById("btnCetak"),msg=document.getElementById("msgStatus");
+      btn.disabled=true;
+      try{
+        msg.style.color="#666";msg.textContent="Membuat gambar...";
+        const fc=document.createElement("canvas");fc.width=canvas.width;fc.height=canvas.height;
+        const fctx=fc.getContext("2d");fctx.drawImage(canvas,0,0);
+        for(const s of activeStiker){const sImg=await loadImg(s.url);const sw=s.wPct*fc.width,sh=sw*(sImg.height/sImg.width);fctx.drawImage(sImg,s.xPct*fc.width-sw/2,s.yPct*fc.height-sh/2,sw,sh);}
+        const MAX_W=1200;let _fc=fc;
+        if(fc.width>MAX_W){const sc=document.createElement("canvas");sc.width=MAX_W;sc.height=Math.round(fc.height*MAX_W/fc.width);sc.getContext("2d").drawImage(fc,0,0,sc.width,sc.height);_fc=sc;}
+        let quality=0.85,finalDataURL=_fc.toDataURL("image/jpeg",quality);
+        while(finalDataURL.length>5.5*1024*1024&&quality>0.3){quality-=0.1;finalDataURL=_fc.toDataURL("image/jpeg",quality);}
+        if(!finalDataURL||finalDataURL.length<200)throw new Error("Canvas kosong.");
+        // Coba bersihkan hasil edit sebelumnya untuk menghemat penyimpanan (jika didukung RLS)
+        try {
+          const prevCetakRaw = sessionStorage.getItem("cetakData");
+          if (prevCetakRaw) {
+            const prevCetak = JSON.parse(prevCetakRaw);
+            if (prevCetak.editPath) {
+              await supabase.storage.from("photos").remove([prevCetak.editPath]);
+            }
+          }
+        } catch (e) {
+          console.warn("Abaikan gagal hapus edit lama:", e);
+        }
+
+        // Gunakan timestamp unik agar Supabase menganggapnya sebagai INSERT baru (menghindari error RLS Update)
+        const editPath = `${sessionFolderPath}/edit/hasil_${Date.now()}.jpg`;
+        showOverlay("Mengupload foto hasil edit...");setProgress(0,1);
+        const hasilBlob=dataURLtoBlob(finalDataURL);
+        const{error:hasilErr}=await supabase.storage.from("photos").upload(editPath,hasilBlob,{contentType:"image/jpeg",upsert:true});
+        if(hasilErr)throw new Error("Gagal upload: "+hasilErr.message);
+        setProgress(1,1);
+
+        try {
+          showOverlay("Membuat animasi GIF...");
+          const gifDataURL = await generateGIF();
+          if (gifDataURL) {
+            showOverlay("Mengupload animasi GIF...");
+            const gifBlob = dataURLtoBlob(gifDataURL);
+            const gifPath = `${sessionFolderPath}/edit/hasil_${Date.now()}.gif`;
+            const { error: gifErr } = await supabase.storage
+              .from("photos")
+              .upload(gifPath, gifBlob, { contentType: "image/gif", upsert: true });
+            
+            if (gifErr) {
+              console.warn("Gagal upload GIF:", gifErr.message);
+            }
+          }
+        } catch (gifErr) {
+          console.warn("Gagal membuat GIF:", gifErr);
+        }
+
+        const{data:signedData,error:signErr}=await supabase.storage.from("photos").createSignedUrl(editPath,3600);
+        if(signErr)throw new Error("Gagal buat signed URL: "+signErr.message);
+        const finalUrl=signedData.signedUrl;
+        hideOverlay();
+        sessionStorage.setItem("cetakData",JSON.stringify({
+          finalUrl,editPath,sessionFolderPath,guestNama:guestInfo.nama,
+          layout:{id:currentLayout.id,nama:currentLayout.nama,orientasi:currentOrientasi,rows:currentLayout.rows,cols:currentLayout.cols,isStrip:currentLayout.isStrip??false},
+          frame:currentFrame??null,
+          filter:currentFilter,
+          filterName:currentFilterName,
+          stiker:activeStiker,
+          slotPhotos:slotPhotos,
+        }));
+        msg.style.color="green";msg.textContent="✅ Upload selesai!";
+        setTimeout(()=>{window.location.href="cetak.html";},800);
+      }catch(e){hideOverlay();msg.style.color="red";msg.textContent="❌ "+e.message;btn.disabled=false;}
+    };
+  </script>
+</body>
+
+</html>

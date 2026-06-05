@@ -1,38 +1,267 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Superadmin Dashboard</title>
-  <link rel="stylesheet" href="../assets/css/stylesupers.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Full-Viewport Monochrome Gradient Reset */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    /* Centered Premium Container Card */
+    .admin-container {
+      background-color: #ffffff;
+      max-width: 480px;
+      width: 90%;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+      border: 1px solid #e4e4e7;
+      padding: 3.5rem 2.5rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Logo Brand Header */
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #000000;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .brand-logo .camera-icon {
+      width: 26px;
+      height: 26px;
+    }
+
+    /* Heading Title without crown emoji */
+    .dashboard-heading {
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-heading h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #000000;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin: 0;
+      text-shadow: none;
+    }
+
+    /* Admin List Container */
+    #adminList {
+      border: 1.5px solid #000000;
+      border-radius: 16px;
+      padding: 1.2rem;
+      background: #ffffff;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 1.5rem;
+    }
+
+    #adminList::-webkit-scrollbar {
+      width: 6px;
+    }
+    #adminList::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #adminList::-webkit-scrollbar-thumb {
+      background: #e4e4e7;
+      border-radius: 9999px;
+    }
+    #adminList::-webkit-scrollbar-thumb:hover {
+      background: #a1a1aa;
+    }
+
+    .user-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1.5px dashed #e4e4e7;
+      gap: 10px;
+    }
+    .user-row:last-child {
+      border-bottom: none;
+    }
+    .user-row strong {
+      font-size: 0.95rem;
+      color: #000000;
+      font-weight: 700;
+      word-break: break-all;
+      text-align: left;
+    }
+    .user-row button {
+      background: transparent !important;
+      color: #ef4444 !important;
+      border: 1.5px solid #fee2e2 !important;
+      padding: 0.4rem 0.9rem !important;
+      border-radius: 9999px !important;
+      font-size: 0.8rem !important;
+      font-weight: 800 !important;
+      cursor: pointer;
+      box-shadow: none !important;
+      transform: none !important;
+      transition: all 0.2s ease !important;
+      width: auto !important;
+      margin: 0 !important;
+    }
+    .user-row button:hover {
+      background: #ef4444 !important;
+      color: #ffffff !important;
+      border-color: #ef4444 !important;
+    }
+    .user-row button:active {
+      transform: scale(0.95) !important;
+    }
+
+    /* Vertical Action Buttons Stack */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      width: 100%;
+    }
+
+    .btn-primary-monochrome {
+      width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 1.1rem 1.8rem;
+      border: 2px solid #000000 !important;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      background: #000000 !important;
+      color: #ffffff !important;
+    }
+    .btn-primary-monochrome:hover {
+      background: transparent !important;
+      color: #000000 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05) !important;
+    }
+    .btn-primary-monochrome:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary-monochrome {
+      width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 1.1rem 1.8rem;
+      border: 2px solid #000000 !important;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      background: transparent !important;
+      color: #000000 !important;
+    }
+    .btn-secondary-monochrome:hover {
+      background: #000000 !important;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05) !important;
+    }
+    .btn-secondary-monochrome:active {
+      transform: translateY(1px);
+    }
+
+    @media (max-width: 480px) {
+      .admin-container {
+        padding: 2.5rem 1.5rem;
+      }
+      .dashboard-heading h1 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <div class="admin-container">
-  <h1>Superadmin Dashboard 👑</h1>
+  
+  <!-- Logo Brand Header -->
+  <div class="brand-logo">
+    <img class="camera-icon" src="../img/Logo_photobooth_LTI.png" alt="Logo Photobooth" style="object-fit: contain; border-radius: 4px;" />
+    <span class="brand-name">PHOTOBOOTH</span>
+  </div>
 
-  <div id="adminList"></div>
+  <!-- Main Heading without crown emoji -->
+  <div class="dashboard-heading">
+    <h1>Superadmin Dashboard</h1>
+  </div>
 
-  <button onclick="goCreate()">Buat Admin</button>
-  <button onclick="goStat()">Lihat Statistik</button>
+  <!-- Dynamic Admin List (hidden if empty) -->
+  <div id="adminList">
+    <!-- Injected by JavaScript -->
+  </div>
+
+  <!-- Action Buttons Stack -->
+  <div class="action-buttons">
+    <button onclick="goCreate()" class="btn-primary-monochrome">Buat Admin Baru</button>
+    <button onclick="goStat()" class="btn-secondary-monochrome">Lihat Statistik Cabang</button>
+  </div>
+
 </div>
 
 <script>
 let admins = JSON.parse(localStorage.getItem("adminAccounts")) || [];
 const container = document.getElementById("adminList");
 
-admins.forEach(admin => {
-  container.innerHTML += `
-    <div class="user-row">
-      <strong>${admin.username}</strong>
-      <button onclick="deleteAdmin(${admin.id})">Hapus</button>
-    </div>
-  `;
-});
+if (admins.length === 0) {
+  // Hide empty container box automatically
+  container.style.display = "none";
+} else {
+  container.style.display = "block";
+  admins.forEach(admin => {
+    container.innerHTML += `
+      <div class="user-row">
+        <strong>${admin.username}</strong>
+        <button onclick="deleteAdmin(${admin.id})">Hapus</button>
+      </div>
+    `;
+  });
+}
 
 function deleteAdmin(id){
-  admins = admins.filter(a => a.id !== id);
-  localStorage.setItem("adminAccounts", JSON.stringify(admins));
-  location.reload();
+  if (confirm("Apakah Anda yakin ingin menghapus admin ini?")) {
+    admins = admins.filter(a => a.id !== id);
+    localStorage.setItem("adminAccounts", JSON.stringify(admins));
+    location.reload();
+  }
 }
 
 function goCreate(){

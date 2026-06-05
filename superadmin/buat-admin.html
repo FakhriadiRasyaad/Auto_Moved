@@ -4,8 +4,449 @@
   <meta charset="UTF-8">
   <title>Buat Admin Baru</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/stylesupers.css">
-  
+  <link rel="stylesheet" href="../assets/css/stylesupers.css?v=original">
+  <style>
+    /* Resolve Body Flex Layout Collision */
+    body {
+      display: block !important;
+      background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%) !important;
+      min-height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Premium Horizontal Header Bar */
+    .page-header {
+      background: #ffffff !important;
+      padding: 0.75rem 2rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      position: relative !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+
+    .page-header::before {
+      display: none !important;
+    }
+
+    .page-header h1 {
+      color: #000000 !important;
+      font-size: 1.4rem !important;
+      font-weight: 800 !important;
+      text-shadow: none !important;
+      letter-spacing: -0.02em !important;
+      margin: 0 !important;
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+    }
+
+    /* Modern Minimalist Back Button */
+    .btn-back {
+      background: transparent !important;
+      color: #000000 !important;
+      border: 1.5px solid #000000 !important;
+      border-radius: 9999px !important;
+      padding: 0.6rem 1.4rem !important;
+      font-weight: 800 !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      box-shadow: none !important;
+      transition: all 0.2s ease-in-out !important;
+    }
+
+    .btn-back:hover {
+      background: #000000 !important;
+      color: #ffffff !important;
+      transform: translateY(-2px) !important;
+    }
+
+    .btn-back:active {
+      transform: translateY(1px) !important;
+    }
+
+    /* Center Page Body Wrapper */
+    .page-body {
+      max-width: 880px !important;
+      width: 90% !important;
+      margin: 1.8rem auto !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Premium Centered Card Container */
+    .form-card {
+      background: #ffffff !important;
+      border-radius: 24px !important;
+      border: 1px solid #e4e4e7 !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+      padding: 1.4rem 2.2rem !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+    }
+
+    .form-card h2 {
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      color: #000000 !important;
+      margin-bottom: 0.75rem !important;
+      padding-bottom: 0.35rem !important;
+      border-bottom: 1px dashed #e4e4e7 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+    }
+
+    .form-card h2::before {
+      display: none !important;
+    }
+
+    /* Modern Crisp Inputs & Labels */
+    .form-row {
+      display: flex !important;
+      gap: 1.5rem !important;
+    }
+
+    .form-row .field {
+      flex: 1 !important;
+    }
+
+    .field {
+      margin-bottom: 0.75rem !important;
+    }
+
+    .field label {
+      display: block !important;
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      color: #000000 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      margin-bottom: 0.3rem !important;
+    }
+
+    .field label .req {
+      color: #ef4444 !important;
+    }
+
+    .field input, .field select, #branchSelect {
+      width: 100% !important;
+      padding: 0.65rem 1rem !important;
+      border: 1.5px solid #e4e4e7 !important;
+      border-radius: 8px !important;
+      background: #ffffff !important;
+      font-size: 0.9rem !important;
+      outline: none !important;
+      color: #000000 !important;
+      box-sizing: border-box !important;
+      transition: all 0.2s ease !important;
+      box-shadow: none !important;
+    }
+
+    .field input:focus, .field select:focus, #branchSelect:focus {
+      border-color: #000000 !important;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .field .hint {
+      font-size: 0.7rem !important;
+      color: #71717a !important;
+      margin-top: 0.3rem !important;
+    }
+
+    /* Role selection cards */
+    .role-grid {
+      display: flex !important;
+      gap: 1.25rem !important;
+      width: 100% !important;
+    }
+
+    .role-option {
+      flex: 1 !important;
+      background: #ffffff !important;
+      border: 1.5px solid #e4e4e7 !important;
+      border-radius: 16px !important;
+      padding: 0.85rem 1rem !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      text-align: center !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .role-option input[type=radio] {
+      display: none !important;
+    }
+
+    .role-option:has(input:checked) {
+      border-color: #000000 !important;
+      background: #f4f4f5 !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .role-icon {
+      font-size: 1.6rem !important;
+      margin-bottom: 0.2rem !important;
+    }
+
+    .role-label {
+      font-size: 0.95rem !important;
+      font-weight: 800 !important;
+      color: #000000 !important;
+    }
+
+    .role-desc {
+      font-size: 0.75rem !important;
+      color: #71717a !important;
+      margin-top: 0.2rem !important;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px !important;
+      background: #e4e4e7 !important;
+      margin: 0.8rem 0 !important;
+    }
+
+    /* Outlined Button for Branch Creation */
+    .branch-row {
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 0.8rem !important;
+      align-items: center !important;
+    }
+
+    .btn-new-branch {
+      background: transparent !important;
+      color: #000000 !important;
+      border: 2px solid #000000 !important;
+      border-radius: 9999px !important;
+      padding: 0.85rem 1.4rem !important;
+      font-weight: 800 !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      width: auto !important;
+      white-space: nowrap !important;
+      box-sizing: border-box !important;
+      text-align: center !important;
+      box-shadow: none !important;
+    }
+
+    .btn-new-branch:hover {
+      background: #000000 !important;
+      color: #ffffff !important;
+      transform: translateY(-2px) !important;
+    }
+
+    /* New Branch Panel */
+    .new-branch-panel {
+      background: #f4f4f5 !important;
+      border: 1.5px solid #e4e4e7 !important;
+      border-radius: 16px !important;
+      padding: 1.5rem !important;
+      margin-top: 1.25rem !important;
+      box-shadow: none !important;
+    }
+
+    .panel-title {
+      font-size: 1rem !important;
+      font-weight: 800 !important;
+      color: #000000 !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .panel-row {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 1rem !important;
+    }
+
+    .panel-field label {
+      font-size: 0.7rem !important;
+      font-weight: 800 !important;
+      color: #000000 !important;
+      margin-bottom: 0.3rem !important;
+      text-transform: uppercase !important;
+    }
+
+    .panel-field input {
+      width: 100% !important;
+      padding: 0.7rem 1rem !important;
+      border: 1.5px solid #e4e4e7 !important;
+      border-radius: 8px !important;
+      background: #ffffff !important;
+      font-size: 0.85rem !important;
+    }
+
+    .btn-create-branch {
+      margin-top: 1.2rem !important;
+      background: #000000 !important;
+      color: #ffffff !important;
+      border: 2px solid #000000 !important;
+      border-radius: 9999px !important;
+      padding: 0.9rem !important;
+      font-weight: 800 !important;
+      font-size: 0.95rem !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      width: 100% !important;
+    }
+
+    .btn-create-branch:hover:not(:disabled) {
+      background: transparent !important;
+      color: #000000 !important;
+    }
+
+    /* Primary Submit Action Buttons */
+    .btn-submit {
+      width: 100% !important;
+      background: #000000 !important;
+      color: #ffffff !important;
+      font-size: 1rem !important;
+      font-weight: 800 !important;
+      padding: 0.75rem !important;
+      border: 2px solid #000000 !important;
+      border-radius: 9999px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease-in-out !important;
+      box-shadow: none !important;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: transparent !important;
+      color: #000000 !important;
+      transform: translateY(-2px) !important;
+    }
+
+    .btn-submit:active:not(:disabled) {
+      transform: translateY(1px) !important;
+    }
+
+    .btn-submit:disabled {
+      background: #f4f4f5 !important;
+      border-color: #e4e4e7 !important;
+      color: #a1a1aa !important;
+      cursor: not-allowed !important;
+    }
+
+    /* Premium Alert Box */
+    .alert {
+      border: 1px solid #e4e4e7 !important;
+      border-radius: 12px !important;
+      padding: 1rem 1.25rem !important;
+      font-size: 0.9rem !important;
+      font-weight: 600 !important;
+      margin-bottom: 1.5rem !important;
+      box-shadow: none !important;
+    }
+
+    .alert.success {
+      background: #f0fdf4 !important;
+      color: #166534 !important;
+      border-color: #bbf7d0 !important;
+    }
+
+    .alert.error {
+      background: #fef2f2 !important;
+      color: #991b1b !important;
+      border-color: #fca5a5 !important;
+    }
+
+    /* Premium Success Banner */
+    .success-banner {
+      background: #f0fdf4 !important;
+      border: 1px solid #bbf7d0 !important;
+      border-radius: 24px !important;
+      padding: 2.5rem !important;
+      text-align: center !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
+      margin-bottom: 2rem !important;
+    }
+
+    .success-banner h3 {
+      font-size: 1.5rem !important;
+      font-weight: 800 !important;
+      color: #166534 !important;
+      text-shadow: none !important;
+    }
+
+    .success-banner p {
+      color: #166534 !important;
+    }
+
+    .success-banner .sb-info {
+      background: #ffffff !important;
+      border: 1px solid #bbf7d0 !important;
+      border-radius: 16px !important;
+      padding: 1.25rem !important;
+      box-shadow: none !important;
+    }
+
+    .info-row {
+      border-bottom: 1px dashed #e4e4e7 !important;
+    }
+
+    .info-row .v {
+      color: #000000 !important;
+    }
+
+    .btn-another {
+      background: #000000 !important;
+      color: #ffffff !important;
+      border: 2px solid #000000 !important;
+      border-radius: 9999px !important;
+      padding: 1rem 2rem !important;
+      font-weight: 800 !important;
+      box-shadow: none !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-another:hover {
+      background: transparent !important;
+      color: #000000 !important;
+      transform: translateY(-2px) !important;
+    }
+
+    @media (max-width: 600px) {
+      .page-header {
+        padding: 1rem 1.25rem !important;
+      }
+      .page-body {
+        margin: 2rem auto !important;
+      }
+      .form-card {
+        padding: 2.2rem 1.5rem !important;
+      }
+      .form-row {
+        flex-direction: column !important;
+        gap: 0 !important;
+      }
+      .role-grid {
+        flex-direction: column !important;
+      }
+      .branch-row {
+        flex-direction: column !important;
+      }
+      .btn-new-branch {
+        width: 100% !important;
+      }
+      .panel-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -18,7 +459,7 @@
 <!-- ── Header ── -->
 <div class="page-header">
   <button class="btn-back" onclick="goBack()">← Dashboard</button>
-  <h1>➕ Buat Admin Baru</h1>
+  <h1>Buat Admin Baru</h1>
 </div>
 
 <!-- ── Body ── -->
@@ -65,83 +506,90 @@ USING (true);</div>
   <!-- Form -->
   <div class="form-card" id="formCard">
 
-    <!-- Identitas Admin -->
-    <h2>👤 Identitas Admin</h2>
+    <div class="form-row" style="align-items: flex-start !important; gap: 2.5rem !important;">
+      
+      <!-- Left Column: Identitas Admin -->
+      <div style="flex: 1.15; min-width: 0;">
+        <h2>👤 Identitas Admin</h2>
 
-    <div class="field">
-      <label>Nama Tampilan <span class="req">*</span></label>
-      <input type="text" id="displayName" placeholder="cth: Admin Jakarta Pusat">
-    </div>
-
-    <div class="field">
-      <label>Email <span class="req">*</span></label>
-      <input type="email" id="email" placeholder="cth: jakarta@photobooth.com">
-    </div>
-
-    <div class="field">
-      <label>Password <span class="req">*</span></label>
-      <input type="password" id="password" placeholder="Minimal 8 karakter">
-      <div class="hint">Minimal 8 karakter. Akan diberikan ke admin cabang.</div>
-    </div>
-
-    <div class="field">
-      <label>Konfirmasi Password <span class="req">*</span></label>
-      <input type="password" id="passwordConfirm" placeholder="Ulangi password">
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Role -->
-    <h2>🔑 Role</h2>
-    <div class="field">
-      <div class="role-grid">
-        <label class="role-option">
-          <input type="radio" name="role" value="admin" checked>
-          <div class="role-icon">🏪</div>
-          <div class="role-label">Admin</div>
-          <div class="role-desc">Kelola 1 cabang</div>
-        </label>
-        <label class="role-option">
-          <input type="radio" name="role" value="superadmin">
-          <div class="role-icon">👑</div>
-          <div class="role-label">Superadmin</div>
-          <div class="role-desc">Akses semua cabang</div>
-        </label>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Cabang -->
-    <h2>🏢 Cabang</h2>
-
-    <div class="field">
-      <label>Pilih Cabang <span class="req">*</span></label>
-      <div class="branch-row">
-        <select id="branchSelect">
-          <option value="">⏳ Loading cabang...</option>
-        </select>
-        <button class="btn-new-branch" onclick="toggleNewBranch()">+ Cabang Baru</button>
-      </div>
-    </div>
-
-    <!-- Panel buat cabang baru -->
-    <div class="new-branch-panel" id="newBranchPanel">
-      <div class="panel-title">🏗️ Buat Cabang Baru</div>
-      <div class="panel-row">
-        <div class="panel-field">
-          <label>Nama Cabang</label>
-          <input type="text" id="branchName" placeholder="cth: Jakarta Pusat">
+        <div class="field">
+          <label>Nama Tampilan <span class="req">*</span></label>
+          <input type="text" id="displayName" placeholder="cth: Admin Jakarta Pusat">
         </div>
-        <div class="panel-field">
-          <label>Kode Cabang</label>
-          <input type="text" id="branchCode" placeholder="cth: JKT-01" maxlength="20"
-            oninput="this.value=this.value.toUpperCase()">
+
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="cth: jakarta@photobooth.com">
+        </div>
+
+        <div class="field">
+          <label>Password <span class="req">*</span></label>
+          <input type="password" id="password" placeholder="Minimal 8 karakter">
+          <div class="hint">Minimal 8 karakter. Akan diberikan ke admin cabang.</div>
+        </div>
+
+        <div class="field">
+          <label>Konfirmasi Password <span class="req">*</span></label>
+          <input type="password" id="passwordConfirm" placeholder="Ulangi password">
         </div>
       </div>
-      <button class="btn-create-branch" id="btnCreateBranch" onclick="createBranch()">
-        🏢 Simpan Cabang Baru
-      </button>
+
+      <!-- Right Column: Role & Cabang -->
+      <div style="flex: 1; min-width: 0;">
+        <!-- Role -->
+        <h2>🔑 Role</h2>
+        <div class="field">
+          <div class="role-grid">
+            <label class="role-option">
+              <input type="radio" name="role" value="admin" checked>
+              <div class="role-icon">🏪</div>
+              <div class="role-label">Admin</div>
+              <div class="role-desc">Kelola 1 cabang</div>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="role" value="superadmin">
+              <div class="role-icon">👑</div>
+              <div class="role-label">Superadmin</div>
+              <div class="role-desc">Akses semua cabang</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="divider" style="margin: 1rem 0 !important; background: linear-gradient(90deg, transparent, #e4e4e7, transparent) !important;"></div>
+
+        <!-- Cabang -->
+        <h2>🏢 Cabang</h2>
+
+        <div class="field">
+          <label>Pilih Cabang <span class="req">*</span></label>
+          <div class="branch-row">
+            <select id="branchSelect">
+              <option value="">⏳ Loading cabang...</option>
+            </select>
+            <button class="btn-new-branch" onclick="toggleNewBranch()">+ Cabang Baru</button>
+          </div>
+        </div>
+
+        <!-- Panel buat cabang baru -->
+        <div class="new-branch-panel" id="newBranchPanel">
+          <div class="panel-title">🏗️ Buat Cabang Baru</div>
+          <div class="panel-row">
+            <div class="panel-field">
+              <label>Nama Cabang</label>
+              <input type="text" id="branchName" placeholder="cth: Jakarta Pusat">
+            </div>
+            <div class="panel-field">
+              <label>Kode Cabang</label>
+              <input type="text" id="branchCode" placeholder="cth: JKT-01" maxlength="20"
+                oninput="this.value=this.value.toUpperCase()">
+            </div>
+          </div>
+          <button class="btn-create-branch" id="btnCreateBranch" onclick="createBranch()">
+            🏢 Simpan Cabang Baru
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <div class="divider"></div>

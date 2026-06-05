@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <title>Pilih Paket Foto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #e7e7e7 50%, #ffffff 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 960px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3vh 40px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #000;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── STEP INDICATOR WITH BOUNCE EFFECT ── */
+    .steps {
+      display: flex;
+      align-items: center;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 700;
+      border: 1.5px solid #000;
+      color: #000;
+      background: #fff;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .step:hover {
+      transform: translateY(-4px) scale(1.15);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes bouncePop {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.4);
+      }
+
+      100% {
+        transform: scale(1.3);
+      }
+    }
+
+    .step.active {
+      background: #000;
+      color: #fff;
+      animation: bouncePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .step-line {
+      width: 50px;
+      border-top: 1.5px dashed #000;
+    }
+
+    /* ── TITLE SECTION ── */
+    .title-section {
+      flex-shrink: 0;
+      margin-top: 0.5vh;
+    }
+
+    .title-section h1 {
+      font-size: 38px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1.1;
+    }
+
+    .title-section p {
+      font-size: 15px;
+      font-weight: 500;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    /* ── FILTER TABS (LAYOUT KIRI TANPA GARIS) ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-shrink: 0;
+      margin: 0.5vh 0;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .filter-tab {
+      padding: 6px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid #000;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.25s ease,
+        color 0.25s ease;
+    }
+
+    .filter-tab:hover {
+      transform: translateY(-2px);
+    }
+
+    .filter-tab.active {
+      background: #000;
+      color: #fff;
+    }
+
+    .filter-tab:not(.active) {
+      background: #fff;
+      color: #000;
+    }
+
+    /* ── KOTAK HITAM UTAMA ── */
+    .package-container {
+      background: #181818;
+      border-radius: 20px;
+      padding: 2.5vh 32px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+      width: 100%;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      /* Paskan layout, tdk perlu terscroll */
+    }
+
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      /* 2 baris pas untuk 8 paket */
+      gap: 16px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .package-card {
+      background: #444444;
+      border-radius: 16px;
+      padding: 1.5vh 12px;
+      text-align: center;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      /* Paskan tinggi grid */
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .package-card:hover {
+      background: #555555;
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .package-card.selected {
+      border-color: #fff;
+      background: #2a2a2a;
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+    }
+
+    .package-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+
+    .package-card .desc {
+      font-size: 13px;
+      font-weight: 500;
+      color: #ccc;
+      margin: 0;
+    }
+
+    .price-tag {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 8px;
+      align-self: center;
+      transition: transform 0.3s ease;
+    }
+
+    .package-card:hover .price-tag {
+      transform: scale(1.05);
+    }
+
+    /* ── BUTTON SELANJUTNYA ── */
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      flex-shrink: 0;
+      margin-top: 1vh;
+    }
+
+    .btn-next {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 360px;
+      height: 52px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.3s ease,
+        box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-next:hover {
+      transform: translateY(-4px) scale(1.03);
+      background: #222;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .custom-alert {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: white;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 2px solid #fff;
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+    }
+
+    .custom-alert.show {
+      top: 30px;
+    }
+
+    /* ── FLUID SCALING (ALWAYS KEEPS 4-COLUMN DESKTOP TATA LETAK) ── */
+    @media (max-width: 900px) {
+      .page-wrapper {
+        padding: 2vh 20px;
+      }
+
+      .logo img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .logo-text {
+        font-size: 18px;
+      }
+
+      .step {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .step-line {
+        width: 35px;
+      }
+
+      .title-section h1 {
+        font-size: 30px;
+      }
+
+      .title-section p {
+        font-size: 13px;
+      }
+
+      .package-container {
+        padding: 16px 20px;
+        /* Hapus max-height agar flex-grow: 1 bekerja sempurna tanpa scroll */
+      }
+
+      .package-grid {
+        gap: 10px;
+      }
+
+      .package-card {
+        padding: 1vh 8px;
+        gap: 6px;
+      }
+
+      .package-card h3 {
+        font-size: 14px;
+      }
+
+      .package-card .desc {
+        font-size: 11px;
+      }
+
+      .price-tag {
+        font-size: 11px;
+        padding: 4px 10px;
+      }
+
+      .btn-next {
+        width: 280px;
+        height: 44px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page-wrapper {
+        padding: 1vh 10px;
+      }
+
+      .logo img {
+        width: 28px;
+        height: 28px;
+      }
+
+      .logo-text {
+        font-size: 15px;
+      }
+
+      .step {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+      }
+
+      .step-line {
+        width: 20px;
+      }
+
+      .title-section h1 {
+        font-size: 22px;
+      }
+
+      .title-section p {
+        font-size: 11px;
+      }
+
+      .package-container {
+        padding: 10px;
+        border-radius: 12px;
+        /* Hapus max-height */
+      }
+
+      .package-grid {
+        gap: 6px;
+      }
+
+      .package-card {
+        padding: 0.8vh 4px;
+        border-radius: 10px;
+        gap: 4px;
+      }
+
+      .package-card h3 {
+        font-size: 12px;
+      }
+
+      .package-card .desc {
+        font-size: 9.5px;
+      }
+
+      .price-tag {
+        font-size: 9.5px;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      .btn-next {
+        width: 200px;
+        height: 38px;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+    }
+
+    /* Height-based scaling for short viewport heights */
+    @media (max-height: 680px) {
+      .page-wrapper {
+        padding: 1.5vh 30px;
+      }
+
+      .logo img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .logo-text {
+        font-size: 18px;
+      }
+
+      .step {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+      }
+
+      .step-line {
+        width: 35px;
+      }
+
+      .title-section h1 {
+        font-size: 26px;
+      }
+
+      .title-section p {
+        font-size: 13px;
+      }
+
+      .filter-bar {
+        margin: 2px 0;
+      }
+
+      .filter-tab {
+        padding: 4px 16px;
+        font-size: 12px;
+      }
+
+      .package-container {
+        padding: 12px 20px;
+        /* Hapus max-height */
+      }
+
+      .package-grid {
+        gap: 10px;
+      }
+
+      .package-card {
+        padding: 1vh 8px;
+        gap: 6px;
+      }
+
+      .package-card h3 {
+        font-size: 14px;
+      }
+
+      .package-card .desc {
+        font-size: 11px;
+      }
+
+      .price-tag {
+        font-size: 11px;
+        padding: 4px 10px;
+      }
+
+      .btn-container {
+        margin-top: 6px;
+      }
+
+      .btn-next {
+        height: 38px;
+        font-size: 13px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
+      window.location.href = "../login-admin.html";
+    }
+  </script>
+</head>
+
+<body>
+  <div class="custom-alert" id="alert-banner">Silakan pilih paket foto terlebih dahulu!</div>
+
+  <div class="page-wrapper">
+    <div class="header">
+      <div class="logo">
+        <img src="../img/Logo_photobooth_LTI.png" alt="Logo" />
+        <span class="logo-text">PHOTOBOOTH</span>
+      </div>
+      <div class="steps">
+        <div class="step active">1</div>
+        <div class="step-line"></div>
+        <div class="step">2</div>
+        <div class="step-line"></div>
+        <div class="step">3</div>
+        <div class="step-line"></div>
+        <div class="step">4</div>
+      </div>
+    </div>
+
+    <div class="title-section">
+      <h1>Pilih Paket Foto 🌟</h1>
+      <p>Silakan pilih jenis paket foto yang Anda inginkan</p>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="location.href='pilih-paket.html'">Semua</button>
+        <button class="filter-tab" onclick="location.href='best-seller-paket.html'">Best Seller 🔥</button>
+      </div>
+    </div>
+
+    <div class="package-container">
+      <div class="package-grid">
+        <div class="package-card" id="pkg-1" onclick="selectPackage(this)">
+          <h3>Paket 1</h3>
+          <p class="desc">5 Foto, 5 Frame</p>
+          <span class="price-tag">Rp5</span>
+        </div>
+        <div class="package-card" id="pkg-2" onclick="selectPackage(this)">
+          <h3>Paket 2</h3>
+          <p class="desc">6 Foto, 6 Frame</p>
+          <span class="price-tag">Rp35.000</span>
+        </div>
+        <div class="package-card" id="pkg-3" onclick="selectPackage(this)">
+          <h3>Paket 3</h3>
+          <p class="desc">7 Foto, 7 Frame</p>
+          <span class="price-tag">Rp40.000</span>
+        </div>
+        <div class="package-card" id="pkg-4" onclick="selectPackage(this)">
+          <h3>Paket 4</h3>
+          <p class="desc">8 Foto, 8 Frame</p>
+          <span class="price-tag">Rp45.000</span>
+        </div>
+        <div class="package-card" id="pkg-5" onclick="selectPackage(this)">
+          <h3>Paket 5</h3>
+          <p class="desc">9 Foto, 9 Frame</p>
+          <span class="price-tag">Rp50.000</span>
+        </div>
+        <div class="package-card" id="pkg-6" onclick="selectPackage(this)">
+          <h3>Paket 6</h3>
+          <p class="desc">10 Foto, 10 Frame</p>
+          <span class="price-tag">Rp55.000</span>
+        </div>
+        <div class="package-card" id="pkg-7" onclick="selectPackage(this)">
+          <h3>Paket 7</h3>
+          <p class="desc">11 Foto, 11 Frame</p>
+          <span class="price-tag">Rp60.000</span>
+        </div>
+        <div class="package-card" id="pkg-8" onclick="selectPackage(this)">
+          <h3>Paket 8</h3>
+          <p class="desc">12 Foto, 12 Frame</p>
+          <span class="price-tag">Rp65.000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button class="btn-next" id="btn-next-step">Selanjutnya</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedPackageId = localStorage.getItem('selectedPackage') || null;
+
+    function showAlert() {
+      const banner = document.getElementById('alert-banner');
+      banner.classList.add('show');
+      setTimeout(() => { banner.classList.remove('show'); }, 3000);
+    }
+
+    function selectPackage(card) {
+      // 1. Ambil data harga dan nama paket dari elemen kartu
+      const nama = card.querySelector('h3').textContent;
+      const priceText = card.querySelector('.price-tag').textContent;
+      const descText = card.querySelector('.desc')?.textContent || '';
+
+      // 2. Bersihkan string harga jadi angka (contoh: "Rp50.000" -> 50000)
+      const hargaNumeric = parseInt(priceText.replace(/[^0-9]/g, ''));
+
+      // Parse limits dynamically from description to maintain consistent logic
+      let fotoLimit = 5;
+      let frameLimit = 5;
+      const fotoMatch = descText.match(/(\d+)\s*Foto/i);
+      const frameMatch = descText.match(/(\d+)\s*Frame/i);
+      if (fotoMatch) fotoLimit = parseInt(fotoMatch[1], 10);
+      if (frameMatch) frameLimit = parseInt(frameMatch[1], 10);
+      const stikerGratis = descText.toLowerCase().includes('stiker gratis') || descText.toLowerCase().includes('sticker gratis');
+
+      // 3. Ambil data currentUser dari localStorage atau buat objek baru
+      const registeredUser = JSON.parse(localStorage.getItem('registeredUser')) || {};
+      const currentAdmin = JSON.parse(localStorage.getItem('currentAdmin')) || {};
+      const selectedBranch = JSON.parse(sessionStorage.getItem('selectedBranch')) || {};
+      let currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
+        id: 'guest_' + Date.now(),
+        nama: registeredUser.username || 'Guest',
+        nohp: registeredUser.phone || '',
+        email: registeredUser.email || '',
+        branch_id: currentAdmin.branch_id || selectedBranch.id || 'b149999f-33ec-4342-95bb-4f4961956c0b'
+      };
+
+      // Sinkronisasi ulang jika field kosong atau masih menggunakan default
+      if (!currentUser.nama || currentUser.nama === 'Guest') {
+        currentUser.nama = registeredUser.username || 'Guest';
+      }
+      if (!currentUser.nohp) currentUser.nohp = registeredUser.phone || '';
+      if (!currentUser.email) currentUser.email = registeredUser.email || '';
+      if (!currentUser.branch_id || currentUser.branch_id === 'test_branch' || currentUser.branch_id === 'b149999f-33ec-4342-95bb-4f4961956c0b') {
+        currentUser.branch_id = currentAdmin.branch_id || selectedBranch.id || 'b149999f-33ec-4342-95bb-4f4961956c0b';
+      }
+
+      // 4. Masukkan paket ke dalam objek user agar dibaca oleh pembayaran.html, sesi-foto.html, dan pilih-foto.html
+      currentUser.paket = {
+        id: card.id,
+        nama: nama,
+        harga: hargaNumeric,
+        foto_limit: fotoLimit,
+        frame_limit: frameLimit,
+        stiker_gratis: stikerGratis
+      };
+
+      currentUser.sudahBayar = false;
+
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      localStorage.setItem('selectedPackage', card.id);
+      localStorage.setItem('selectedPackageName', nama);
+      localStorage.setItem('selectedPackagePrice', String(hargaNumeric));
+      selectedPackageId = card.id;
+
+      // Styling UI
+      document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    }
+
+    window.onload = function () {
+      if (selectedPackageId && document.getElementById(selectedPackageId)) {
+        document.getElementById(selectedPackageId).classList.add('selected');
+      }
+    };
+
+    document.getElementById('btn-next-step').addEventListener('click', function () {
+      if (!selectedPackageId) { showAlert(); return; }
+      window.location.href = 'pembayaran.html';
+    });
+  </script>
+</body>
+
+</html>

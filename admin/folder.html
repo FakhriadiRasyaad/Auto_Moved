@@ -4,7 +4,67 @@
   <meta charset="UTF-8">
   <title>Setting Folder</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styleadmins.css">
+  <link rel="stylesheet" href="../assets/css/styleadmins.css?v=monochrome-v13">
+  <style>
+    body {
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      margin: 0 !important;
+      padding: 40px 20px !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+      min-height: 100vh !important;
+    }
+    .page-wrap {
+      width: 100% !important;
+      max-width: 700px !important;
+      margin: 0 auto !important;
+    }
+    .btn-back-floating {
+      position: absolute !important;
+      left: 2.5rem !important;
+      top: 2.5rem !important;
+      margin: 0 !important;
+      background: transparent !important;
+      color: #71717a !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 0.5rem 0.8rem !important;
+      font-family: Poppins, sans-serif !important;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.3rem !important;
+      box-shadow: none !important;
+      transition: all 0.2s ease !important;
+      z-index: 1000 !important;
+    }
+    .btn-back-floating:hover {
+      background: rgba(24, 24, 27, 0.05) !important;
+      color: #18181b !important;
+      transform: translateX(-2px) !important;
+    }
+    .btn-back-floating:active {
+      transform: translateX(0) !important;
+    }
+    @media (max-width: 768px) {
+      .btn-back-floating {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        margin: 0 0 1.5rem 0 !important;
+        width: fit-content !important;
+        display: inline-flex !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
 </head>
@@ -17,7 +77,7 @@
 <!-- Progress overlay -->
 <div id="progressOverlay">
   <div class="progress-box">
-    <h3 id="progTitle">⏳ Menyiapkan ZIP...</h3>
+    <h3 id="progTitle">Menyiapkan ZIP...</h3>
     <p id="progDesc">Mengambil foto dari server</p>
     <div class="pbar"><div class="pfill" id="pfill"></div></div>
     <p class="pstatus" id="pstatus">0%</p>
@@ -30,19 +90,20 @@
   <img id="modalImg" src="" alt="Preview">
 </div>
 
+<button onclick="window.location.href='dashboard.html'" class="btn-back-floating">← Back</button>
+
 <div class="page-wrap">
-  <h1>📁 Setting Folder</h1>
+  <h1>Setting Folder</h1>
   <p class="subtitle">Atur folder tujuan dan kelola foto tersimpan</p>
 
   <!-- Folder Tujuan -->
   <div class="card">
-    <p class="card-title">🗂️ Folder Tujuan (Download 2)</p>
+    <p class="card-title">Folder Tujuan (Download 2)</p>
     <p class="card-desc">
       Download 2 akan menyimpan ZIP langsung ke folder ini di PC kamu. Klik <b>Pilih Folder</b> lalu izinkan akses. Hanya Chrome/Edge yang support fitur ini.
     </p>
 
     <div class="folder-status" id="folderStatus">
-      <span class="folder-status-icon">📁</span>
       <div class="folder-status-text">
         <div class="folder-status-name empty" id="folderName">Belum dipilih</div>
         <div class="folder-status-hint" id="folderHint">Pilih folder untuk Download 2</div>
@@ -51,10 +112,10 @@
 
     <div class="folder-btns">
       <button class="btn-pick" onclick="pickFolder()" id="btnPick">
-        📂 Pilih Folder
+        Pilih Folder
       </button>
       <button class="btn-clear" id="btnClear" onclick="clearFolder()" style="display:none;">
-        ✕ Hapus
+        Hapus
       </button>
     </div>
 
@@ -66,19 +127,18 @@
 
   <!-- Foto Tersimpan -->
   <div class="card">
-    <p class="card-title">📸 Foto Tersimpan</p>
+    <p class="card-title">Foto Tersimpan</p>
     <p class="card-desc">
       Setiap sesi tersimpan dalam folder <b>NamaGuest / Tanggal / edit</b> (hasil edit) dan <b>noedit</b> (foto asli terpilih).
       Download sebagai satu ZIP per sesi. Download 2 sesuai yang anda cantumkan.
     </p>
 
-    <button class="btn-load" onclick="loadSessions()">🔄 Muat Sesi Foto</button>
+    <button class="btn-load" onclick="loadSessions()">Muat Sesi Foto</button>
     <div id="sessionList"><p class="empty-state">Klik tombol di atas untuk memuat.</p></div>
   </div>
 
   <div class="actions">
-    <button class="btn-back" onclick="window.location.href='dashboard.html'">← Kembali</button>
-    <button class="btn-save" onclick="saveSettings()">💾 Simpan</button>
+    <button class="btn-save" onclick="saveSettings()">Simpan</button>
   </div>
   <p id="msgSave"></p>
 </div>
@@ -190,19 +250,18 @@
       card.className = "session-card";
       card.innerHTML = `
         <div class="session-header" onclick="toggleSession(this, '${raw}')">
-          <div class="session-avatar">👤</div>
           <div class="session-meta">
             <div class="session-guest">${guest}</div>
-            <div class="session-info">📅 ${dt}</div>
+            <div class="session-info">Tanggal: ${dt}</div>
           </div>
           <div class="session-actions">
             <button class="btn-dl btn-dl1" id="dl1_${raw}"
               onclick="event.stopPropagation(); downloadZip('${raw}', '${guest}', 1)">
-              ⬇️ Download 1
+              Download 1
             </button>
             <button class="btn-dl btn-dl2 ${folderHandle ? '' : 'needs-folder'}" id="dl2_${raw}"
               onclick="event.stopPropagation(); downloadZip('${raw}', '${guest}', 2)">
-              📥 Download 2
+              Download 2
             </button>
           </div>
           <span class="session-toggle">▼</span>

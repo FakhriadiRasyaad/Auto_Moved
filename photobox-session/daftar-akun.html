@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photobooth Daftar Akun</title>
+  <meta name="description" content="Daftar akun Photobooth baru. Isi data diri Anda untuk memulai sesi foto premium." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Face-API untuk deteksi wajah idle di halaman welcome -->
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4f4f5, #e4e4e7, #d4d4d8);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden; /* Lock viewport height completely */
+    }
+
+    .landing-page {
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .left-side,
+    .right-side {
+      width: 50%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 36px; /* Highly optimized padding for short viewports */
+    }
+
+    .left-side {
+      background: rgba(244, 244, 245, 0.4);
+    }
+
+    @keyframes entryBounce {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(25px);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.03) translateY(-3px);
+      }
+      80% {
+        transform: scale(0.99) translateY(1px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .login-card-wrapper {
+      width: 100%;
+      max-width: 410px;
+      display: flex;
+      justify-content: center;
+      animation: entryBounce 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .login-form-container {
+      width: 100%;
+      padding: 22px 30px; /* Super compact card padding to fit all screens without scroll */
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      
+      /* Buttery smooth interactive spring transition on hover */
+      transition: transform 0.6s cubic-bezier(0.25, 1.25, 0.45, 1), 
+                  box-shadow 0.6s cubic-bezier(0.25, 1.25, 0.45, 1), 
+                  border-color 0.4s ease;
+    }
+
+    .login-form-container:hover {
+      transform: scale(1.05); /* Perfect visual pop */
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.14);
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px; /* Very compact */
+    }
+
+    .iconex-light-camera {
+      width: 40px; /* Slimmer logo */
+      height: 40px;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .text-wrapper {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #000000;
+    }
+
+    .text-wrapper-2 {
+      margin-bottom: 2px;
+      font-size: 28px; /* Slimmer title */
+      line-height: 1.05;
+      font-weight: 800;
+      color: #000000;
+    }
+
+    .sub-title-desc {
+      font-size: 12px;
+      color: #71717a;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 8px; /* Tighter gaps for zero-scroll */
+    }
+
+    .input-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #000000;
+      margin-bottom: 2px;
+    }
+
+    .input-label svg {
+      color: #000000;
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+    }
+
+    .input-box {
+      width: 100%;
+      height: 38px; /* Shorter inputs for space saving */
+      padding: 0 14px;
+      border: 1.5px solid #d4d4d8;
+      border-radius: 10px;
+      outline: none;
+      background: #ffffff;
+      font-size: 12px;
+      color: #000000;
+      transition: 0.25s ease;
+    }
+
+    .input-box::placeholder {
+      color: #a1a1aa;
+    }
+
+    .input-box:focus {
+      border-color: #000000;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .terms-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 10px; /* Slightly smaller text */
+      font-weight: 500;
+      color: #000000;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      line-height: 1.3;
+      user-select: none;
+    }
+
+    .terms-container input {
+      width: 12px;
+      height: 12px;
+      margin-top: 2px;
+      accent-color: #000000;
+      cursor: pointer;
+    }
+
+    .terms-container strong {
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    .rectangle-2 {
+      width: 100%;
+      height: 42px; /* Slimmer button */
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      background: #000000;
+      color: #ffffff;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: 0.25s ease;
+    }
+
+    .rectangle-2:hover {
+      transform: translateY(-2px);
+      background: #222222;
+      box-shadow: 0 14px 26px rgba(0, 0, 0, 0.22);
+    }
+
+    .btn-icon {
+      margin-left: 4px;
+      transition: transform 0.3s ease;
+    }
+
+    .rectangle-2:hover .btn-icon {
+      transform: translateX(4px);
+    }
+
+    .register-footer {
+      font-size: 10.5px;
+      color: #71717a;
+      margin-top: 10px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .register-footer a {
+      color: #000000;
+      font-weight: 700;
+      text-decoration: underline;
+      transition: opacity 0.2s ease;
+    }
+
+    .register-footer a:hover {
+      opacity: 0.7;
+    }
+
+    .right-side {
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(161, 161, 170, 0.3), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(24, 24, 27, 0.15), transparent 35%);
+    }
+
+    .right-side::before {
+      content: "";
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      filter: blur(8px);
+    }
+
+    .strip-photo {
+      position: relative;
+      z-index: 1;
+      width: min(76%, 380px); /* Fit perfectly */
+      max-height: 82vh;
+      object-fit: contain;
+      transform: rotate(4deg);
+      filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.2));
+      animation: floatPhoto 4s ease-in-out infinite;
+    }
+
+    @keyframes floatPhoto {
+      0%,
+      100% {
+        transform: rotate(4deg) translateY(0);
+      }
+
+      50% {
+        transform: rotate(4deg) translateY(-12px);
+      }
+    }
+
+    /* ── FLUID SCALING (KEEPS DESKTOP STRUCTURE ALWAYS ON RESIZE/MINIMIZE) ── */
+    @media (max-width: 1024px) {
+      .left-side, .right-side {
+        padding: 2vh 2vw;
+      }
+      .login-card-wrapper {
+        max-width: 350px;
+      }
+      .login-form-container {
+        padding: 16px 20px;
+        border-radius: 20px;
+      }
+      .logo {
+        margin-bottom: 8px;
+      }
+      .logo img {
+        width: 32px;
+        height: 32px;
+      }
+      .logo-text {
+        font-size: 13px;
+      }
+      .text-wrapper-2 {
+        font-size: 24px;
+        margin-bottom: 2px;
+      }
+      .sub-title-desc {
+        font-size: 11px;
+        margin-bottom: 8px;
+      }
+      .form-group {
+        margin-bottom: 6px;
+      }
+      .input-box {
+        height: 34px;
+        font-size: 11px;
+        padding: 0 10px;
+      }
+      .terms-container {
+        margin-top: 2px;
+        margin-bottom: 8px;
+        font-size: 10px;
+      }
+      .rectangle-2 {
+        height: 36px;
+        font-size: 12px;
+        margin-top: 8px;
+      }
+      .strip-photo {
+        max-height: 75vh;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .left-side, .right-side {
+        padding: 1.5vh 1.5vw;
+      }
+      .login-card-wrapper {
+        max-width: 310px;
+      }
+      .login-form-container {
+        padding: 12px 16px;
+        border-radius: 16px;
+      }
+      .logo {
+        margin-bottom: 6px;
+      }
+      .logo img {
+        width: 28px;
+        height: 28px;
+      }
+      .text-wrapper-2 {
+        font-size: 20px;
+      }
+      .sub-title-desc {
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+      .form-group {
+        margin-bottom: 4px;
+      }
+      .input-label {
+        font-size: 10.5px;
+        margin-bottom: 1px;
+      }
+      .input-box {
+        height: 30px;
+        font-size: 10.5px;
+      }
+      .terms-container {
+        font-size: 9px;
+        margin-bottom: 6px;
+      }
+      .rectangle-2 {
+        height: 32px;
+        font-size: 11.5px;
+        margin-top: 6px;
+      }
+      .strip-photo {
+        max-height: 70vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .left-side, .right-side {
+        padding: 1vh 1vw;
+      }
+      .login-card-wrapper {
+        max-width: 240px;
+      }
+      .login-form-container {
+        padding: 10px 12px;
+        border-radius: 12px;
+      }
+      .logo img {
+        width: 24px;
+        height: 24px;
+      }
+      .text-wrapper-2 {
+        font-size: 16px;
+      }
+      .sub-title-desc {
+        font-size: 9px;
+        margin-bottom: 4px;
+      }
+      .input-box {
+        height: 26px;
+        font-size: 9.5px;
+      }
+      .terms-container {
+        font-size: 8px;
+        margin-bottom: 4px;
+      }
+      .rectangle-2 {
+        height: 28px;
+        font-size: 10.5px;
+      }
+      .strip-photo {
+        max-height: 60vh;
+      }
+    }
+
+    /* Height-based scaling for short viewport heights */
+    @media (max-height: 680px) {
+      .left-side, .right-side {
+        padding: 1vh 2vw;
+      }
+      .login-form-container {
+        padding: 12px 18px;
+      }
+      .logo {
+        margin-bottom: 4px;
+      }
+      .text-wrapper-2 {
+        font-size: 20px;
+      }
+      .sub-title-desc {
+        margin-bottom: 4px;
+      }
+      .form-group {
+        margin-bottom: 4px;
+      }
+      .input-box {
+        height: 30px;
+        font-size: 11px;
+      }
+      .terms-container {
+        margin-top: 1px;
+        margin-bottom: 6px;
+      }
+      .rectangle-2 {
+        height: 32px;
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .strip-photo {
+        max-height: 65vh;
+      }
+    }
+
+    /* ── Face-API & Video Overlay styles preserved ── */
+    #faceVideo {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 120px;
+      height: 90px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0.85;
+      z-index: 999;
+    }
+
+    #faceStatus {
+      position: fixed;
+      bottom: 112px;
+      right: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 30px;
+      color: white;
+      z-index: 999;
+      transition: all 0.4s;
+    }
+    #faceStatus.active { background: rgba(34, 197, 94, 0.9); }
+    #faceStatus.idle   { background: rgba(234, 179, 8, 0.9);  }
+
+    #welcomeToast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #000000, #222222);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 60px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      z-index: 1000;
+      display: none;
+      text-align: center;
+      max-width: 90vw;
+      animation: toastPop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes toastPop {
+      from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Guard: cek admin login -->
+  <script>
+    if (!localStorage.getItem("currentAdmin")) {
+      window.location.href = "../login-admin.html";
+    }
+  </script>
+
+  <!-- Toast sambutan ketika wajah terdeteksi -->
+  <div id="welcomeToast">🎉 Selamat datang! Silakan isi data di bawah ini.</div>
+
+  <!-- Preview kamera kecil untuk face detection -->
+  <video id="faceVideo" autoplay playsinline muted></video>
+  <div id="faceStatus" class="idle">😴 Menunggu tamu</div>
+
+  <div class="landing-page">
+    <div class="left-side">
+      <div class="login-card-wrapper">
+        <div class="login-form-container">
+          <div class="logo">
+            <img class="iconex-light-camera" src="../img/Logo_photobooth_LTI.png" alt="Logo Photobooth" />
+            <div class="text-wrapper">PHOTOBOOTH</div>
+          </div>
+
+          <h1 class="text-wrapper-2">
+            Daftar Akun
+          </h1>
+          <p class="sub-title-desc">
+            Isi data diri anda untuk melanjutkan
+          </p>
+
+          <form id="userForm">
+            <div class="form-group">
+              <div class="input-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Username
+              </div>
+              <input type="text" id="username" placeholder="Masukkan Username" class="input-box" required autocomplete="name" />
+            </div>
+
+            <div class="form-group">
+              <div class="input-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Gmail
+              </div>
+              <input type="email" id="email" placeholder="Masukkan alamat Email (opsional)" class="input-box" autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+              <div class="input-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                  </path>
+                </svg>
+                No. HP
+              </div>
+              <input type="tel" id="phone" placeholder="08XXXXXXXXXX" class="input-box" required autocomplete="tel" />
+            </div>
+
+            <label class="terms-container">
+              <input type="checkbox" id="agreement" required />
+              <span>
+                Saya setuju dengan <strong>Syarat &amp; Ketentuan</strong> dan <strong>Kebijakan Privasi</strong>
+              </span>
+            </label>
+
+            <button type="submit" class="rectangle-2" id="btn-submit-register">
+              <span>Selanjutnya</span>
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </form>
+
+          <div class="register-footer">
+            Sudah punya akun? <a href="../login-admin.html">Masuk di sini</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-side">
+      <img class="strip-photo" src="../img/strip-photo.png" alt="Photo strip" />
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
+
+    // ══════════════════════════════════════════════
+    //  FACE DETECTION & SAMBUTAN SUARA
+    //  Jika tidak ada wajah 5 detik → idle
+    //  Ketika wajah terdeteksi lagi → putar sambutan
+    // ══════════════════════════════════════════════
+    const faceVideo   = document.getElementById("faceVideo");
+    const faceStatus  = document.getElementById("faceStatus");
+    const welcomeToast= document.getElementById("welcomeToast");
+
+    let faceStream  = null;
+    let faceLoaded  = false;
+    let lastFaceTs  = Date.now();
+    let isIdle      = false;
+    const IDLE_MS   = 5000; // 5 detik tanpa wajah → idle
+
+    // Mulai kamera kecil untuk face detection
+    async function startFaceCam() {
+      try {
+        faceStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        faceVideo.srcObject = faceStream;
+        await faceVideo.play();
+      } catch(err) {
+        console.warn("Kamera face detection tidak bisa dibuka:", err);
+        faceVideo.style.display = "none";
+      }
+    }
+
+    // Load model face-api (TinyFaceDetector — ringan)
+    async function loadFaceModel() {
+      await new Promise(res => {
+        const t = setInterval(() => {
+          if (window.faceapi) { clearInterval(t); res(); }
+        }, 300);
+        setTimeout(() => { clearInterval(t); res(); }, 10000); // timeout 10 detik
+      });
+      if (!window.faceapi) return;
+
+      try {
+        const MODEL = "https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights";
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL);
+        faceLoaded = true;
+        faceLoop();
+      } catch(e) { console.warn("face-api gagal:", e); }
+    }
+
+    // Loop deteksi setiap 1.5 detik
+    function faceLoop() {
+      async function tick() {
+        if (faceVideo.readyState >= 2 && faceLoaded) {
+          try {
+            const dets = await faceapi.detectAllFaces(
+              faceVideo,
+              new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.4 })
+            );
+            const now    = Date.now();
+            const hasFace= dets.length > 0;
+
+            if (hasFace) {
+              if (isIdle) {
+                // Wajah kembali terdeteksi setelah idle → putar sambutan
+                isIdle = false;
+                faceStatus.className  = "active";
+                faceStatus.textContent= "👤 Tamu Terdeteksi";
+                playWelcome();
+              }
+              lastFaceTs = now;
+            } else {
+              if (!isIdle && (now - lastFaceTs) >= IDLE_MS) {
+                isIdle = true;
+                faceStatus.className  = "idle";
+                faceStatus.textContent= "😴 Menunggu tamu";
+              }
+            }
+          } catch(e) { /* abaikan error deteksi */ }
+        }
+        setTimeout(tick, 1500);
+      }
+      // Inisialisasi: anggap tidak ada wajah dulu sampai dibuktikan
+      lastFaceTs = Date.now() - IDLE_MS - 100;
+      tick();
+    }
+
+    // Putar sambutan suara + tampilkan toast
+    function playWelcome() {
+      // Tampilkan toast
+      welcomeToast.style.display = "block";
+      setTimeout(() => {
+        welcomeToast.style.opacity    = "0";
+        welcomeToast.style.transition = "opacity 0.4s";
+        setTimeout(() => {
+          welcomeToast.style.display  = "";
+          welcomeToast.style.opacity  = "";
+        }, 450);
+      }, 5000);
+
+      // TTS sambutan
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utt  = new SpeechSynthesisUtterance(
+        "Selamat datang di Photobooth! " +
+        "Silakan isi nama dan nomor HP kamu, " +
+        "lalu pilih paket foto yang sesuai. " +
+        "Kami siap mengabadikan momen indahmu!"
+      );
+      utt.lang   = "id-ID";
+      utt.rate   = 1.05;
+      utt.volume = 1;
+      window.speechSynthesis.speak(utt);
+    }
+
+    // Jalankan face detection
+    startFaceCam().then(() => loadFaceModel());
+
+    // ══════════════════════════════════════════════
+    //  FORM SUBMIT — simpan user ke Supabase
+    // ══════════════════════════════════════════════
+    document.getElementById("userForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+      if (!admin) {
+        alert("Sesi admin tidak valid. Silakan login kembali.");
+        window.location.href = "../login-admin.html";
+        return;
+      }
+
+      const nama  = document.getElementById("username").value.trim();
+      const nohp  = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim() || null;
+      const agreement = document.getElementById("agreement").checked;
+
+      if (!nama || !nohp) {
+        alert("Nama dan nomor HP wajib diisi!");
+        return;
+      }
+
+      if (!agreement) {
+        alert("Anda harus menyetujui Syarat & Ketentuan yang berlaku.");
+        return;
+      }
+
+      let branchId = admin.branch_id || null;
+
+      if (!branchId) {
+        const { data: pd } = await supabase.rpc("get_my_profile");
+        branchId = pd?.[0]?.branch_id ?? null;
+      }
+
+      if (!branchId) {
+        alert("Akun ini tidak terhubung ke cabang. Hubungi superadmin.");
+        return;
+      }
+
+      // Cek apakah user dengan nohp + nama + branch sudah ada
+      const { data: existing, error: searchErr } = await supabase
+        .from("guests")
+        .select("*")
+        .eq("nohp", nohp)
+        .eq("branch_id", branchId)
+        .eq("nama", nama);
+
+      if (searchErr) {
+        alert(`Error: ${searchErr.message}`);
+        return;
+      }
+
+      const existingUser = existing?.[0] ?? null;
+
+      if (existingUser) {
+        // Validasi email jika diisi
+        const emailMatch = email === null || existingUser.email === null
+          ? true
+          : existingUser.email.toLowerCase() === email.toLowerCase();
+
+        if (!emailMatch) {
+          alert("Nomor HP sudah terdaftar, tapi email tidak cocok.");
+          return;
+        }
+
+        // Login langsung
+        localStorage.setItem("currentUser", JSON.stringify({
+          id:        existingUser.id,
+          nama:      existingUser.nama,
+          nohp:      existingUser.nohp,
+          email:     existingUser.email ?? "",
+          branch_id: existingUser.branch_id,
+          admin_id:  admin.id,
+          foto:      []
+        }));
+        if (faceStream) faceStream.getTracks().forEach(t => t.stop());
+        window.location.href = "pilih-paket.html";
+        return;
+      }
+
+      // Insert user baru
+      const { data, error } = await supabase
+        .from("guests")
+        .insert([{ nama, nohp, email, branch_id: branchId }])
+        .select().single();
+
+      if (error) {
+        if (error.code === "23505") {
+          alert("Data sudah terdaftar dengan konflik. Hubungi admin.");
+        } else {
+          alert("Terjadi kesalahan sistem. Coba lagi.");
+          console.error(error);
+        }
+        return;
+      }
+
+      localStorage.setItem("currentUser", JSON.stringify({
+        id:        data.id,
+        nama:      data.nama,
+        nohp:      data.nohp,
+        email:     data.email ?? "",
+        branch_id: data.branch_id,
+        admin_id:  admin.id,
+        foto:      []
+      }));
+
+      if (faceStream) faceStream.getTracks().forEach(t => t.stop());
+      window.location.href = "pilih-paket.html";
+    });
+  </script>
+</body>
+
+</html>

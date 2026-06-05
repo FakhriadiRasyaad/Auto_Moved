@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cetak Foto — Photobooth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Library QR Code -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <style>
+    /* ── BASE RESET & MODERN MONOCHROME THEME ── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4f4f5, #e4e4e7, #d4d4d8);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      color: #18181b;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── GLOBAL HEADER ── */
+    .global-header {
+      height: 65px;
+      background: #ffffff;
+      border-bottom: 2px solid #e4e4e7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .global-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .global-header .logo img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .global-header .logo-text {
+      font-size: 19px;
+      font-weight: 800;
+      color: #18181b;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── STEPS PROGRESS ── */
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      border: 2px solid #18181b;
+      color: #18181b;
+      background: transparent;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    .step:hover,
+    .step.active {
+      transform: scale(1.1);
+      background: #18181b;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(24, 24, 27, 0.2);
+    }
+
+    .step-line {
+      width: 35px;
+      border-top: 2px dashed #a1a1aa;
+    }
+
+    /* ── SPLIT COLUMN EDITOR PAGE ── */
+    .editor-page {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 65px);
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(24, 24, 27, 0.08);
+      overflow: hidden;
+    }
+
+    .preview-col {
+      width: 50%;
+      min-width: 380px;
+    }
+
+    .slot-col {
+      width: 50%;
+      min-width: 380px;
+    }
+
+    .col-header {
+      height: 55px;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: #18181b;
+      color: #ffffff;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .col-body {
+      padding: 24px;
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    /* Custom Scrollbar */
+    .col-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .col-body::-webkit-scrollbar-thumb {
+      background: rgba(24, 24, 27, 0.15);
+      border-radius: 99px;
+    }
+
+    /* ── CANVAS PREVIEW SECTION ── */
+    .canvas-wrapper {
+      position: relative;
+      background: #09090b;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.4), 0 10px 25px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      aspect-ratio: 1.33; /* 4:3 style aspect ratio */
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* ── Panel QR Code ── */
+    .qr-section {
+      background: #f4f4f5;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .qr-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(24, 24, 27, 0.1);
+      border-top-color: #18181b;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .qr-link {
+      font-size: 11px;
+      color: #18181b;
+      word-break: break-all;
+      margin-top: 8px;
+      display: block;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .qr-link:hover { text-decoration: underline; }
+
+    /* Status upload Google Drive */
+    .drive-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .drive-status.uploading { background: #ffe4e6; color: #9f1239; }
+    .drive-status.done      { background: #dcfce7; color: #166534; }
+    .drive-status.error     { background: #fee2e2; color: #991b1b; }
+
+    /* Buttons */
+    .btn-cetak:hover {
+      background: #27272a !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(24, 24, 27, 0.25) !important;
+    }
+
+    .btn-cetak:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-outline:hover {
+      background: #18181b !important;
+      color: #ffffff !important;
+    }
+
+    .btn-outline:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-back-small {
+      height: 44px;
+      background: transparent;
+      color: #71717a;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-back-small:hover {
+      background: #f4f4f5;
+      color: #18181b;
+      border-color: #d4d4d8;
+    }
+
+    .qty-control button:hover {
+      background: #f4f4f5 !important;
+      border-color: #a1a1aa !important;
+      transform: scale(1.05);
+    }
+
+    /* Print styles */
+    @media print {
+      body > *:not(#printArea) { display: none !important; }
+      #printArea {
+        display: block !important;
+        position: fixed; inset: 0;
+        background: white;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .editor-page {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+      }
+      .preview-col, .slot-col {
+        width: 100%;
+        height: auto;
+      }
+      body {
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="global-header">
+    <div class="logo">
+      <img src="../assets/img/logo.png" alt="Logo" onerror="this.src='../img/logo.png'">
+      <span class="logo-text">PHOTOBOOTH</span>
+    </div>
+    <div class="steps">
+      <div class="step" onclick="window.location.href='guest-gallery.html'">1</div>
+      <div class="step-line"></div>
+      <div class="step" onclick="window.location.href='pilih-frame.html'">2</div>
+      <div class="step-line"></div>
+      <div class="step active">3</div>
+      <div class="step-line"></div>
+      <div class="step">4</div>
+    </div>
+  </div>
+
+  <div class="editor-page">
+    <!-- Left Column: Preview Foto -->
+    <div class="col preview-col">
+      <div class="col-header">👁️ Preview Foto</div>
+      <div class="col-body" style="justify-content: center; align-items: center;">
+        <div class="canvas-wrapper">
+          <p class="no-preview" id="noPreview" style="color: #71717a; font-size: 13px; font-weight: 500;">⏳ Memuat preview...</p>
+          <img id="previewImg" alt="Preview" style="display:none; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+        </div>
+        <p id="infoLayout" style="font-size:11px;color:#71717a;text-align:center;margin-top: 4px; font-weight: 500;"></p>
+      </div>
+    </div>
+
+    <!-- Right Column: Info, QR & Actions -->
+    <div class="col slot-col" style="flex-grow: 1; border-right: none;">
+      <div class="col-header">⚙️ Pengaturan Cetak</div>
+      <div class="col-body" style="gap: 16px;">
+        <!-- Info Sesi Card -->
+        <div class="cetak-card" style="background:#ffffff; border:1.5px solid #e4e4e7; border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:8px;">
+          <h2 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.75px; color:#71717a; border-bottom:1.5px solid #f4f4f5; padding-bottom:6px; margin-bottom:4px;">Info Sesi</h2>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Nama</span><strong id="infoNama" style="color:#18181b;">-</strong></div>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Paket</span><strong id="infoPaket" style="color:#18181b;">-</strong></div>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Jumlah Cetak</span><strong id="infoJumlahCetak" style="color:#18181b;">1 lembar</strong></div>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Layout</span><strong id="infoLayoutName" style="color:#18181b;">-</strong></div>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Filter</span><strong id="infoFilter" style="color:#18181b;">-</strong></div>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Frame</span><strong id="infoFrame" style="color:#18181b;">-</strong></div>
+          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Stiker</span><strong id="infoStiker" style="color:#18181b;">-</strong></div>
+        </div>
+
+        <!-- Cetak Actions -->
+        <div class="cetak-actions" style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
+          <button id="btnCetak" onclick="doCetak()" class="btn-cetak" style="width:100%; height:46px; background:#18181b; color:#ffffff; border:none; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(24, 24, 27, 0.15); transition:all 0.2s ease;" disabled>🖨️ Cetak Sekarang</button>
+          
+          <!-- Download Button that opens the QR Code Modal -->
+          <button id="btnDownload" onclick="openQrModal()" class="btn-outline" style="width:100%; height:46px; background:transparent; color:#18181b; border:1.5px solid #18181b; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s ease;" disabled>⬇️ Download File Disini</button>
+          <span id="qtyDisplay" style="display:none;">1</span>
+          
+          <div style="display:flex; gap:10px; width:100%;">
+            <button onclick="window.location.href='pilih-frame.html'" class="btn-back-small" style="flex:1;">← Edit Ulang</button>
+            <button onclick="selesaiSesi()" style="flex:1; height:44px; background:#22c55e; color:white; border:none; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s ease; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);">Selesai Sesi ✅</button>
+          </div>
+        </div>
+        <p id="msgCetak" style="font-size:12.5px; text-align:center; font-weight:600; margin-top:2px; min-height:18px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal QR Code -->
+  <div class="modal-bg" id="qrModalBg" onclick="bgQrClick(event)" style="position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div class="modal-content" style="background: #ffffff; border-radius: 24px; padding: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); border: 1px solid rgba(0, 0, 0, 0.08); text-align: center; position: relative; animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <button onclick="closeQrModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 18px; cursor: pointer; color: #a1a1aa; font-weight: bold;">✕</button>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:4px; color: #18181b;">📱 Download via QR Code</h3>
+      <p style="font-size:12px; color:#71717a; margin-bottom:16px;">Scan pakai HP untuk download fotomu langsung</p>
+      
+      <div class="qr-wrap" id="qrWrap" style="display:flex; justify-content:center; margin-bottom:12px; min-height: 200px; align-items: center;">
+        <div class="qr-loading" id="qrLoading" style="display:flex; flex-direction:column; align-items:center; gap:6px; color:#71717a; font-size:11px;">
+          <div class="qr-spinner"></div>
+          <span id="qrLoadingMsg">Mengunggah foto...</span>
+        </div>
+        <canvas id="qrCanvas" style="display:none; margin: 0 auto;"></canvas>
+      </div>
+      
+      <div id="driveStatus" class="drive-status uploading" style="display:none; font-size: 11px;"></div>
+      <a id="qrLink" class="qr-link" href="#" target="_blank" style="display:none; font-size: 12px; color: #18181b; font-weight: 600; text-decoration: underline; margin-top: 8px;">🔗 Buka link foto</a>
+    </div>
+  </div>
+
+  <!-- Keyframes for modal animation -->
+  <style>
+    @keyframes modalPop {
+      from { transform: scale(0.9) translateY(10px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+  </style>
+
+  <!-- Print area -->
+  <div id="printArea" style="display:none;"></div>
+
+  <script type="module">
+    // Add QR Code modal functions to global window scope
+    window.openQrModal = function() {
+      document.getElementById("qrModalBg").style.display = "flex";
+    };
+    window.closeQrModal = function() {
+      document.getElementById("qrModalBg").style.display = "none";
+    };
+    window.bgQrClick = function(e) {
+      if (e.target.id === "qrModalBg") window.closeQrModal();
+    };
+    import { supabase } from "../assets/js/supabase.js";
+
+    // ──────────────────────────────────────────────
+    //  AMBIL DATA SESI
+    // ──────────────────────────────────────────────
+    let cetakData = null;
+    try {
+      const raw = sessionStorage.getItem("cetakData");
+      const gd  = sessionStorage.getItem("guestData");
+      if (!raw || !gd) { window.location.href = "guest-login.html"; }
+      cetakData = JSON.parse(raw);
+    } catch(e) { window.location.href = "guest-login.html"; }
+
+    let finalUrl  = cetakData.finalUrl;
+    let blobUrl   = null;
+    let driveLink = null; // link Google Drive setelah upload
+    let qty       = 1;
+
+    // ──────────────────────────────────────────────
+    //  ISI INFO SESI
+    // ──────────────────────────────────────────────
+    function fillInfoSesi() {
+      document.getElementById("infoNama").textContent       = cetakData.guestNama    ?? "-";
+      document.getElementById("infoLayoutName").textContent = cetakData.layout?.nama  ?? "-";
+      document.getElementById("infoFilter").textContent     =
+        cetakData.filterName ?? ((!cetakData.filter || cetakData.filter === "none") ? "Original" : "Aktif");
+      document.getElementById("infoFrame").textContent      = cetakData.frame?.name   ?? "Tanpa Frame";
+      document.getElementById("infoStiker").textContent     =
+        (cetakData.stiker?.length > 0) ? `${cetakData.stiker.length} stiker` : "Tidak ada";
+      document.getElementById("infoLayout").textContent     =
+        `${cetakData.layout?.orientasi ?? ""} · ${cetakData.layout?.rows ?? "-"}×${cetakData.layout?.cols ?? "-"}`;
+    }
+
+    // ──────────────────────────────────────────────
+    //  REFRESH SIGNED URL (jika expired)
+    // ──────────────────────────────────────────────
+    async function refreshSignedUrl() {
+      try {
+        const { data, error } = await supabase.storage
+          .from("photos").createSignedUrl(cetakData.editPath, 3600);
+        if (error || !data?.signedUrl) throw new Error(error?.message ?? "Gagal buat signed URL");
+        finalUrl           = data.signedUrl;
+        cetakData.finalUrl = finalUrl;
+        sessionStorage.setItem("cetakData", JSON.stringify(cetakData));
+        return true;
+      } catch(e) {
+        setPreviewError("❌ Gagal akses foto: " + e.message);
+        return false;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    //  LOAD PREVIEW
+    // ──────────────────────────────────────────────
+    async function loadPreview() {
+      setPreviewMsg("⏳ Memuat preview...");
+      try {
+        let res = await fetch(finalUrl);
+        if (!res.ok) {
+          const ok = await refreshSignedUrl();
+          if (!ok) return;
+          res = await fetch(finalUrl);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+        }
+        const blob = await res.blob();
+        blobUrl = URL.createObjectURL(blob);
+
+        const img = document.getElementById("previewImg");
+        img.onload = () => {
+          document.getElementById("noPreview").style.display = "none";
+          img.style.display = "block";
+        };
+        img.src = blobUrl;
+
+        document.getElementById("btnCetak").disabled    = false;
+        document.getElementById("btnDownload").disabled = false;
+
+        // Setelah preview berhasil load, langsung upload ke Google Drive
+        uploadToDrive(blob);
+      } catch(e) {
+        setPreviewError("❌ Gagal load gambar: " + e.message);
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    //  UPLOAD KE GOOGLE DRIVE & GENERATE QR CODE
+    // ──────────────────────────────────────────────
+    async function uploadToDrive(blob) {
+      const driveStatus = document.getElementById("driveStatus");
+      const qrLoading   = document.getElementById("qrLoading");
+      const qrLoadMsg   = document.getElementById("qrLoadingMsg");
+
+      driveStatus.style.display = "inline-block";
+      driveStatus.className     = "drive-status uploading";
+      driveStatus.textContent   = "⬆️ Mengunggah ke Google Drive...";
+
+      // ── COBA UPLOAD KE BACKEND NODE.JS ──
+      let uploadedLink = null;
+
+      try {
+        const pingRes = await fetch("http://localhost:3000/api/ping", { signal: AbortSignal.timeout(2000) });
+
+        if (pingRes.ok) {
+          qrLoadMsg.textContent = "Mengunggah ke Google Drive via server...";
+
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(",")[1]);
+            reader.readAsDataURL(blob);
+          });
+
+          const guestData  = JSON.parse(sessionStorage.getItem("guestData"));
+          const uploadResp = await fetch("http://localhost:3000/api/upload-photo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              imageBase64: base64,
+              sessionId:   guestData?.guest?.id ?? "unknown",
+              guestNama:   cetakData.guestNama ?? "guest"
+            })
+          });
+
+          if (uploadResp.ok) {
+            const result = await uploadResp.json();
+            uploadedLink = result.driveLink ?? result.webViewLink ?? null;
+          }
+        }
+      } catch(err) {
+        console.info("Backend Node.js tidak aktif, pakai Supabase link sebagai fallback.");
+      }
+
+      // ── FALLBACK: Pakai Supabase public URL / signed URL ──
+      if (!uploadedLink) {
+        try {
+          const guestData = JSON.parse(sessionStorage.getItem("guestData"));
+          const guestId   = guestData?.guest?.id ?? "guest";
+          const tgl       = new Date().toISOString().split("T")[0];
+          const filePath  = `finals/${guestId}_${tgl}_${Date.now()}.jpg`;
+
+          qrLoadMsg.textContent = "Menyimpan foto final...";
+
+          const { error: upErr } = await supabase.storage
+            .from("photos")
+            .upload(filePath, blob, { contentType: "image/jpeg", upsert: true });
+
+          if (!upErr) {
+            const { data: urlData } = await supabase.storage
+              .from("photos")
+              .createSignedUrl(filePath, 7 * 24 * 3600);
+
+            uploadedLink = urlData?.signedUrl ?? null;
+          }
+        } catch(fbErr) {
+          console.error("Fallback upload error:", fbErr);
+        }
+      }
+
+      // ── GENERATE QR CODE dari link ──
+      qrLoading.style.display = "none";
+
+      if (uploadedLink) {
+        driveLink = uploadedLink;
+        driveStatus.className  = "drive-status done";
+        driveStatus.textContent= "✅ Foto tersimpan! Scan QR untuk download.";
+
+        const qrCanvas = document.getElementById("qrCanvas");
+        qrCanvas.style.display = "block";
+
+        const baseUrl = window.location.origin + window.location.pathname.replace("cetak.html", "download.html");
+        const guestData = JSON.parse(sessionStorage.getItem("guestData") || "{}");
+        const guestId = guestData?.guest?.id ?? "unknown";
+        const sessionPath = cetakData?.sessionFolderPath ?? "";
+        const guestName = cetakData?.guestNama ?? "";
+        
+        const downloadUrl = `${baseUrl}?session=${encodeURIComponent(sessionPath)}&name=${encodeURIComponent(guestName)}&sessionId=${encodeURIComponent(guestId)}`;
+
+        try {
+          await QRCode.toCanvas(qrCanvas, downloadUrl, {
+            width:  200,
+            margin: 2,
+            color: {
+              dark:  "#18181b",
+              light: "#ffffff"
+            }
+          });
+        } catch(qrErr) {
+          console.error("QR code error:", qrErr);
+        }
+
+        const qrLink = document.getElementById("qrLink");
+        qrLink.href           = downloadUrl;
+        qrLink.style.display  = "block";
+        qrLink.textContent    = "🔗 " + downloadUrl.substring(0, 50) + "...";
+
+      } else {
+        driveStatus.className  = "drive-status error";
+        driveStatus.textContent= "⚠️ QR tidak tersedia. Gunakan tombol Download.";
+        document.getElementById("qrLoading").innerHTML =
+          "<p style='color:#71717a;font-size:0.78rem'>Tidak bisa membuat QR Code. Pakai tombol Download.</p>";
+        document.getElementById("qrLoading").style.display = "flex";
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    //  QTY CONTROL
+    // ──────────────────────────────────────────────
+    window.changeQty = function(delta) {
+      qty = Math.max(1, Math.min(3, qty + delta));
+      document.getElementById("qtyDisplay").textContent = qty;
+    };
+
+    // ──────────────────────────────────────────────
+    //  CETAK
+    // ──────────────────────────────────────────────
+    window.doCetak = function() {
+      if (!blobUrl) { showMsg("❌ Gambar belum siap.", "red"); return; }
+      showMsg("⏳ Menyiapkan cetak...", "#666");
+
+      const printArea = document.getElementById("printArea");
+      let pages = "";
+      for (let i = 0; i < qty; i++) {
+        pages += `<div style="page-break-after:${i < qty-1 ? 'always':'avoid'};
+          width:100vw;height:100vh;display:flex;align-items:center;
+          justify-content:center;background:white;">
+          <img src="${blobUrl}" style="max-width:100%;max-height:100vh;object-fit:contain;">
+        </div>`;
+      }
+      printArea.innerHTML      = pages;
+      printArea.style.display  = "flex";
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => {
+          printArea.style.display = "none";
+          printArea.innerHTML = "";
+          showMsg(`✅ ${qty}x halaman dikirim ke printer!`, "green");
+          
+          // Auto redirect to terima-kasih.html after 1.5 seconds to show success msg
+          setTimeout(() => {
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
+            sessionStorage.removeItem("cetakData");
+            sessionStorage.removeItem("guestData");
+            sessionStorage.removeItem("selectedBranch");
+            window.location.href = "terima-kasih.html";
+          }, 1500);
+        }, 500);
+      }, 200);
+    };
+
+    // ──────────────────────────────────────────────
+    //  DOWNLOAD LANGSUNG
+    // ──────────────────────────────────────────────
+    window.doDownload = function() {
+      if (!blobUrl) { showMsg("❌ Gambar belum siap.", "red"); return; }
+      const nama = (cetakData.guestNama ?? "foto").replace(/[^a-zA-Z0-9]/g, "_");
+      const tgl  = new Date().toISOString().slice(0, 10);
+      const link = document.createElement("a");
+      link.href     = blobUrl;
+      link.download = `photobooth_${nama}_${tgl}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showMsg("✅ Foto berhasil didownload!", "green");
+    };
+
+    // ──────────────────────────────────────────────
+    //  SELESAI SESI
+    // ──────────────────────────────────────────────
+    window.selesaiSesi = function() {
+      if (!confirm("Sesi selesai? Kamu akan kembali ke halaman login.")) return;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+      sessionStorage.removeItem("cetakData");
+      sessionStorage.removeItem("guestData");
+      sessionStorage.removeItem("selectedBranch");
+      window.location.href = "terima-kasih.html";
+    };
+
+    // ──────────────────────────────────────────────
+    //  HELPERS
+    // ──────────────────────────────────────────────
+    function setPreviewMsg(text) {
+      const el = document.getElementById("noPreview");
+      el.textContent = text; el.style.display = "block";
+      document.getElementById("previewImg").style.display = "none";
+    }
+    function setPreviewError(text) {
+      setPreviewMsg(text);
+      document.getElementById("qrLoading").innerHTML =
+        "<p style='color:#71717a;font-size:0.78rem'>QR tidak tersedia karena foto gagal dimuat.</p>";
+    }
+    function showMsg(text, color) {
+      const el = document.getElementById("msgCetak");
+      el.textContent = text; el.style.color = color;
+    }
+
+    async function loadPackagePrintLimit() {
+      try {
+        let guestId = null;
+        let branchId = null;
+        let packageName = null;
+
+        // 1. Try retrieving from currentUser in localStorage
+        const cu = localStorage.getItem("currentUser");
+        if (cu) {
+          try {
+            const currentUser = JSON.parse(cu);
+            if (currentUser.paket) {
+              packageName = currentUser.paket.nama;
+              if (currentUser.paket.frame_limit && currentUser.paket.frame_limit < 999) {
+                qty = currentUser.paket.frame_limit;
+              }
+              guestId = currentUser.id;
+              branchId = currentUser.branch_id;
+            }
+          } catch(e) {}
+        }
+
+        // 2. Fallback to guestData in sessionStorage + query database
+        if (!packageName) {
+          const gd = sessionStorage.getItem("guestData");
+          if (gd) {
+            const guestData = JSON.parse(gd);
+            guestId = guestData?.guest?.id;
+            branchId = guestData?.guest?.branch_id;
+          }
+        }
+
+        if (!packageName && guestId) {
+          const { data: sessionData } = await supabase
+            .from("sessions")
+            .select("paket")
+            .eq("guest_id", guestId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (sessionData) {
+            packageName = sessionData.paket;
+          }
+        }
+
+        if (packageName) {
+          document.getElementById("infoPaket").textContent = packageName;
+
+          // Fetch package info if qty hasn't been set from localStorage
+          let foundLimit = false;
+          if (qty === 1 && branchId) {
+            const { data: packageData } = await supabase
+              .from("packages")
+              .select("frame_limit")
+              .eq("nama", packageName)
+              .eq("branch_id", branchId)
+              .maybeSingle();
+
+            if (packageData) {
+              const limit = (packageData.frame_limit && packageData.frame_limit < 999) ? packageData.frame_limit : 1;
+              qty = limit;
+              foundLimit = true;
+            }
+          }
+
+          // Fallback mapping if not found in database or local storage limit is default/missing
+          if (!foundLimit && qty === 1) {
+            const name = String(packageName).trim().toLowerCase();
+            if (name.startsWith("paket")) {
+              const match = name.match(/paket\s*(\d+)/i);
+              if (match) {
+                const num = parseInt(match[1], 10);
+                if (num >= 1 && num <= 8) {
+                  qty = num + 4; // Paket 1 = 5, Paket 2 = 6, ..., Paket 8 = 12
+                }
+              }
+            } else if (name.startsWith("bs")) {
+              qty = 5;
+            }
+          }
+        }
+
+        // Update UI displays
+        document.getElementById("infoJumlahCetak").textContent = qty + " lembar";
+        document.getElementById("qtyDisplay").textContent = qty;
+      } catch (e) {
+        console.error("Gagal load limit cetak paket:", e);
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    //  START
+    // ──────────────────────────────────────────────
+    fillInfoSesi();
+    loadPackagePrintLimit();
+    if (!finalUrl && cetakData.editPath) {
+      refreshSignedUrl().then(ok => { if (ok) loadPreview(); });
+    } else if (finalUrl) {
+      loadPreview();
+    } else {
+      setPreviewError("❌ Data foto tidak ditemukan. Kembali ke edit.");
+    }
+  </script>
+</body>
+
+</html>
