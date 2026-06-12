@@ -1495,7 +1495,12 @@
         const m = String(Math.floor(sessionSec / 60)).padStart(2, "0"), s = String(sessionSec % 60).padStart(2, "0");
         timerPill.textContent = `⏱️ ${m}:${s}`;
         if (sessionSec <= 60) timerPill.classList.add("warn");
-        if (sessionSec <= 0) { clearInterval(sessionTmr); btnSnap.disabled = true; showToast("⏰ Waktu habis!", 5000); setTimeout(finishSession, 2500); }
+        if (sessionSec <= 0) { 
+          clearInterval(sessionTmr); 
+          btnSnap.disabled = true; 
+          showToast("⏰ Waktu habis!", 5000); 
+          setTimeout(() => finishSession(true), 2500); 
+        }
       }, 1000);
     }
 
@@ -1581,8 +1586,25 @@
       return new Blob([buf], { type: mime });
     }
 
-    window.finishSession = async function () {
-      if (user.foto.length === 0) { showToast("⚠️ Ambil minimal 1 foto dulu!"); return; }
+    window.finishSession = async function (isTimeout = false) {
+      if (user.foto.length === 0) {
+        if (isTimeout) {
+          // Jika timeout dan belum ada foto, langsung bersihkan sesi & redirect ke halaman terakhir
+          if (recognition) { try { recognition.stop(); } catch (e) { } }
+          if (faceTimer) { clearTimeout(faceTimer); }
+          clearInterval(sessionTmr);
+          if (curStream) curStream.getTracks().forEach(t => t.stop());
+          sessionStorage.removeItem("cetakData");
+          sessionStorage.removeItem("sessionFolderPath");
+          user.foto = [];
+          user.selectedFoto = [];
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          window.location.href = "halaman-terakhir-foto.html";
+          return;
+        }
+        showToast("⚠️ Ambil minimal 1 foto dulu!"); 
+        return; 
+      }
       if (recognition) { try { recognition.stop(); } catch (e) { } }
       if (faceTimer) { clearTimeout(faceTimer); }
       clearInterval(sessionTmr);
