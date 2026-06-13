@@ -644,52 +644,6 @@
           console.error("QR code error:", qrErr);
         }
 
-        // Helper function to shorten URL via AllOrigins proxy and TinyURL API with a timeout
-        async function shortenUrlWithTimeout(longUrl, timeoutMs = 2500) {
-          const controller = new AbortController();
-          const id = setTimeout(() => controller.abort(), timeoutMs);
-          
-          try {
-            const target = "https://tinyurl.com/api-create.php?url=" + encodeURIComponent(longUrl);
-            const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(target), {
-              signal: controller.signal
-            });
-            clearTimeout(id);
-            if (res.ok) {
-              const data = await res.json();
-              if (data && data.contents) {
-                return data.contents.trim();
-              }
-            }
-          } catch (e) {
-            console.warn("Gagal mempersingkat URL (timeout/error):", e.message);
-          } finally {
-            clearTimeout(id);
-          }
-          return null;
-        }
-
-        // Shorten URL in the background without blocking the UI
-        shortenUrlWithTimeout(downloadUrl, 2500).then(async (shortUrl) => {
-          if (shortUrl) {
-            console.log("URL shortened to:", shortUrl);
-            try {
-              await QRCode.toCanvas(qrCanvas, shortUrl, {
-                width:  200,
-                margin: 2,
-                errorCorrectionLevel: 'L',
-                color: {
-                  dark:  "#18181b",
-                  light: "#ffffff"
-                }
-              });
-              qrLink.textContent = "🔗 " + shortUrl;
-            } catch (qrErr) {
-              console.error("Gagal update QR code dengan URL pendek:", qrErr);
-            }
-          }
-        });
-
       } else {
         driveStatus.className  = "drive-status error";
         driveStatus.textContent= "⚠️ QR tidak tersedia. Gunakan tombol Download.";
