@@ -621,8 +621,37 @@
           }
         }
 
+        // Helper function to shorten URL via AllOrigins proxy and TinyURL API
+        async function shortenUrl(longUrl) {
+          try {
+            const target = "https://tinyurl.com/api-create.php?url=" + encodeURIComponent(longUrl);
+            const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(target));
+            if (res.ok) {
+              const data = await res.json();
+              if (data && data.contents) {
+                return data.contents.trim();
+              }
+            }
+          } catch (e) {
+            console.error("Gagal mempersingkat URL:", e);
+          }
+          return null;
+        }
+
+        let qrUrl = downloadUrl;
         try {
-          await QRCode.toCanvas(qrCanvas, downloadUrl, {
+          qrLoadMsg.textContent = "Membuat QR Code mudah scan...";
+          const shortUrl = await shortenUrl(downloadUrl);
+          if (shortUrl) {
+            qrUrl = shortUrl;
+            console.log("URL shortened to:", qrUrl);
+          }
+        } catch(err) {
+          console.warn("Menggunakan URL panjang karena gagal mempersingkat:", err);
+        }
+
+        try {
+          await QRCode.toCanvas(qrCanvas, qrUrl, {
             width:  200,
             margin: 2,
             errorCorrectionLevel: 'L',
@@ -638,7 +667,7 @@
         const qrLink = document.getElementById("qrLink");
         qrLink.href           = downloadUrl;
         qrLink.style.display  = "block";
-        qrLink.textContent    = "🔗 " + downloadUrl.substring(0, 50) + "...";
+        qrLink.textContent    = "🔗 " + (qrUrl.startsWith("https://tinyurl.com") ? qrUrl : (downloadUrl.substring(0, 50) + "..."));
 
       } else {
         driveStatus.className  = "drive-status error";

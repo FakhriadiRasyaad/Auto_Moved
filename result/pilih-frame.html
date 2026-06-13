@@ -1443,7 +1443,7 @@
           gifPath: uploadedGifPath,
         }));
         msg.style.color="green";msg.textContent="✅ Upload selesai!";
-        setTimeout(()=>{window.location.href="cetak.html";},800);
+        setTimeout(()=>{window.location.href="cetak.html?v=" + Date.now();},800);
       }catch(e){hideOverlay();msg.style.color="red";msg.textContent="❌ "+e.message;btn.disabled=false;}
     };
   </script>
