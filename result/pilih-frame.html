@@ -1414,9 +1414,26 @@
         const{data:signedData,error:signErr}=await supabase.storage.from("photos").createSignedUrl(editPath,3600);
         if(signErr)throw new Error("Gagal buat signed URL: "+signErr.message);
         const finalUrl=signedData.signedUrl;
+
+        let gifSignedUrl = null;
+        if (uploadedGifPath) {
+          try {
+            const { data: gifSignData } = await supabase.storage
+              .from("photos")
+              .createSignedUrl(uploadedGifPath, 3600);
+            gifSignedUrl = gifSignData?.signedUrl ?? null;
+          } catch (e) {
+            console.warn("Gagal buat signed URL untuk GIF:", e);
+          }
+        }
+
         hideOverlay();
         sessionStorage.setItem("cetakData",JSON.stringify({
-          finalUrl,editPath,sessionFolderPath,guestNama:guestInfo.nama,
+          finalUrl,
+          editPath,
+          gifSignedUrl,
+          sessionFolderPath,
+          guestNama:guestInfo.nama,
           layout:{id:currentLayout.id,nama:currentLayout.nama,orientasi:currentOrientasi,rows:currentLayout.rows,cols:currentLayout.cols,isStrip:currentLayout.isStrip??false},
           frame:currentFrame??null,
           filter:currentFilter,

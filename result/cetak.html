@@ -596,12 +596,29 @@
           gifFileName = cetakData.gifPath.substring(cetakData.gifPath.lastIndexOf("/") + 1);
         }
 
+        // Extract tokens from signed URLs to pass them securely to the anonymous phone browser
+        let tokenJpg = "";
+        if (finalUrl && finalUrl.includes("token=")) {
+          tokenJpg = finalUrl.split("token=")[1];
+        }
+        let tokenGif = "";
+        const gifSignedUrl = cetakData?.gifSignedUrl ?? "";
+        if (gifSignedUrl && gifSignedUrl.includes("token=")) {
+          tokenGif = gifSignedUrl.split("token=")[1];
+        }
+
         let downloadUrl = `${baseUrl}?session=${encodeURIComponent(sessionPath)}&name=${encodeURIComponent(guestName)}&sessionId=${encodeURIComponent(guestId)}`;
         if (framedFileName) {
           downloadUrl += `&framed=${encodeURIComponent(framedFileName)}`;
+          if (tokenJpg) {
+            downloadUrl += `&tJpg=${encodeURIComponent(tokenJpg)}`;
+          }
         }
         if (gifFileName) {
           downloadUrl += `&gif=${encodeURIComponent(gifFileName)}`;
+          if (tokenGif) {
+            downloadUrl += `&tGif=${encodeURIComponent(tokenGif)}`;
+          }
         }
 
         try {
