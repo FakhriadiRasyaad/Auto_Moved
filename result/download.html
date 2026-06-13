@@ -447,13 +447,13 @@
 
     // Parse parameters from query string
     const params = new URLSearchParams(window.location.search);
-    const sessionPath = params.get("session");
+    const sessionPath = params.get("s") || params.get("session");
     const guestName = params.get("name");
     const sessionId = params.get("sessionId");
-    const paramFramed = params.get("framed");
-    const paramGif = params.get("gif");
-    const paramTJpg = params.get("tJpg");
-    const paramTGif = params.get("tGif");
+    const paramFramed = params.get("f") || params.get("framed");
+    const paramGif = params.get("g") || params.get("gif");
+    const paramTJpg = params.get("j") || params.get("tJpg");
+    const paramTGif = params.get("i") || params.get("tGif");
 
     // Setup UI texts
     document.getElementById("year").textContent = new Date().getFullYear();
