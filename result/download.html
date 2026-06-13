@@ -536,49 +536,81 @@
         // 2. Memuat foto-foto mentah (raw asli)
         try {
           const asliFolder = `${sessionPath}/asli`;
-          const { data: files, error: listErr } = await supabase.storage
-            .from("photos")
-            .list(asliFolder, { limit: 20 });
+          let imageFiles = [];
+          let useFallback = false;
 
-          if (listErr) throw listErr;
+          try {
+            const { data: files, error: listErr } = await supabase.storage
+              .from("photos")
+              .list(asliFolder, { limit: 20 });
 
-          // Filter file gambar saja
-          const imageFiles = (files || []).filter(f => f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png"));
+            if (listErr) throw listErr;
+            imageFiles = (files || []).filter(f => f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png"));
+            if (imageFiles.length === 0) {
+              useFallback = true;
+            }
+          } catch (listErr) {
+            console.warn("Gagal listing folder asli via Supabase API. Menggunakan deteksi langsung...", listErr);
+            useFallback = true;
+          }
+
+          if (useFallback) {
+            // Karena client anonim (HP) tidak memiliki hak list/select, 
+            // kita buat 12 slot tebakan nama file foto_1.jpg sampai foto_12.jpg
+            imageFiles = Array.from({ length: 12 }, (_, i) => ({ name: `foto_${i + 1}.jpg` }));
+          }
 
           if (imageFiles.length > 0) {
-            document.getElementById("rawCard").style.display = "flex";
             const grid = document.getElementById("rawGrid");
             grid.innerHTML = "";
 
-            // Ambil public URLs
-            const paths = imageFiles.map(f => `${asliFolder}/${f.name}`);
-            const signedUrls = paths.map(p => supabase.storage.from("photos").getPublicUrl(p).data.publicUrl);
-
             imageFiles.forEach((file, idx) => {
-              const url = signedUrls[idx];
-              const item = document.createElement("div");
-              item.className = "raw-item";
-              item.innerHTML = `
-              <div class="raw-img-wrap">
-                <img src="${url}" alt="Foto Mentah ${idx + 1}" loading="lazy">
-              </div>
-              <div class="raw-actions">
-                <button class="btn-download-sm" id="btnRaw-${idx}">
-                  Unduh Foto ⬇️
-                </button>
-              </div>
-            `;
-              grid.appendChild(item);
+              const fileName = file.name;
+              const url = supabase.storage.from("photos").getPublicUrl(`${asliFolder}/${fileName}`).data.publicUrl;
 
-              // Pasang handler download
-              document.getElementById(`btnRaw-${idx}`).onclick = () => {
-                downloadFile(url, `photobox_${guestName || "foto"}_asli_${idx + 1}.jpg`);
-              };
+              if (useFallback) {
+                // Di alur fallback, pastikan file gambar benar-benar ada (tidak 404) sebelum ditampilkan
+                const checker = new Image();
+                checker.onload = () => {
+                  renderRawItem(url, fileName, grid, idx);
+                };
+                checker.src = url;
+              } else {
+                // Alur normal: langsung tampilkan
+                renderRawItem(url, fileName, grid, idx);
+              }
             });
           }
         } catch (rawErr) {
           console.warn("Gagal memuat foto mentah:", rawErr);
           document.getElementById("rawCard").style.display = "none";
+        }
+
+        // Fungsi pembantu untuk render item foto raw asli
+        function renderRawItem(url, fileName, grid, idx) {
+          // Tampilkan card foto mentah jika tersembunyi
+          document.getElementById("rawCard").style.display = "flex";
+
+          const item = document.createElement("div");
+          item.className = "raw-item";
+          // Buat ID tombol unik berdasarkan fileName
+          const btnId = `btnRaw-${fileName.replace(/[^a-zA-Z0-9]/g, "_")}`;
+          item.innerHTML = `
+            <div class="raw-img-wrap">
+              <img src="${url}" alt="Foto Mentah" loading="lazy">
+            </div>
+            <div class="raw-actions">
+              <button class="btn-download-sm" id="${btnId}">
+                Unduh Foto ⬇️
+              </button>
+            </div>
+          `;
+          grid.appendChild(item);
+
+          // Pasang handler download
+          document.getElementById(btnId).onclick = () => {
+            downloadFile(url, `photobox_${guestName || "foto"}_asli_${idx + 1}.jpg`);
+          };
         }
       } catch (err) {
         console.error(err);
