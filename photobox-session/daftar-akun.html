@@ -618,7 +618,7 @@
           </form>
 
           <div class="register-footer">
-            Sudah punya akun? <a href="../login-admin.html">Masuk di sini</a>
+            Sudah punya akun? <a href="login-akun.html">Masuk di sini</a>
           </div>
         </div>
       </div>
@@ -631,6 +631,22 @@
 
   <script type="module">
     import { supabase } from "../assets/js/supabase.js";
+
+    // Auto-authenticate in background if using testing account bypass
+    (async function autoAuth() {
+      const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+      if (admin && admin.username === "1@admin.com") {
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (!data.session) {
+            console.log("Bypass mode detected: logging in to Supabase Auth...");
+            await supabase.auth.signInWithPassword({ email: "1@admin.com", password: "1" });
+          }
+        } catch (e) {
+          console.error("Gagal auto-auth:", e);
+        }
+      }
+    })();
 
     // ══════════════════════════════════════════════
     //  FACE DETECTION & SAMBUTAN SUARA
