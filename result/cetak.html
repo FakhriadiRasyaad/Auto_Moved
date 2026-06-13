@@ -621,10 +621,6 @@
           }
         }
 
-        // Render QR Code immediately using long URL so the modal is never empty
-        const qrCanvas = document.getElementById("qrCanvas");
-        qrCanvas.style.display = "block";
-
         const qrLink = document.getElementById("qrLink");
         qrLink.href           = downloadUrl;
         qrLink.style.display  = "block";
