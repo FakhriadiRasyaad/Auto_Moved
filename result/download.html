@@ -447,13 +447,11 @@
 
     // Parse parameters from query string
     const params = new URLSearchParams(window.location.search);
-    const sessionPath = params.get("s") || params.get("session");
+    const sessionPath = params.get("session");
     const guestName = params.get("name");
     const sessionId = params.get("sessionId");
-    const paramFramed = params.get("f") || params.get("framed");
-    const paramGif = params.get("g") || params.get("gif");
-    const paramTJpg = params.get("j") || params.get("tJpg");
-    const paramTGif = params.get("i") || params.get("tGif");
+    const paramFramed = params.get("framed");
+    const paramGif = params.get("gif");
 
     // Setup UI texts
     document.getElementById("year").textContent = new Date().getFullYear();
@@ -494,22 +492,16 @@
         // 1. Memuat foto berframe
         const editPath = `${sessionPath}/edit/${framedFileName}`;
 
-        let mainSignedUrl = "";
-        if (paramTJpg) {
-          const publicUrl = supabase.storage.from("photos").getPublicUrl(editPath).data.publicUrl;
-          mainSignedUrl = publicUrl.replace("/object/public/", "/object/sign/") + `?token=${paramTJpg}`;
-        } else {
-          // Ambil signed URL untuk hasil cetak
-          const { data: mainUrlData, error: mainErr } = await supabase.storage
-            .from("photos")
-            .createSignedUrl(editPath, 7 * 24 * 3600); // Valid 7 hari
+        // Ambil signed URL untuk hasil cetak
+        const { data: mainUrlData, error: mainErr } = await supabase.storage
+          .from("photos")
+          .createSignedUrl(editPath, 7 * 24 * 3600); // Valid 7 hari
 
-          mainSignedUrl = mainUrlData?.signedUrl;
+        let mainSignedUrl = mainUrlData?.signedUrl;
 
-          // Fallback ke public URL jika signed URL gagal
-          if (mainErr || !mainSignedUrl) {
-            mainSignedUrl = supabase.storage.from("photos").getPublicUrl(editPath).data.publicUrl;
-          }
+        // Fallback ke public URL jika signed URL gagal
+        if (mainErr || !mainSignedUrl) {
+          mainSignedUrl = supabase.storage.from("photos").getPublicUrl(editPath).data.publicUrl;
         }
 
         // Tampilkan foto utama
@@ -532,19 +524,13 @@
         // 1b. Memuat Animasi GIF
         try {
           const gifPath = `${sessionPath}/edit/${gifFileName}`;
-          let gifSignedUrl = "";
-          if (paramTGif) {
-            const publicUrl = supabase.storage.from("photos").getPublicUrl(gifPath).data.publicUrl;
-            gifSignedUrl = publicUrl.replace("/object/public/", "/object/sign/") + `?token=${paramTGif}`;
-          } else {
-            const { data: gifUrlData, error: gifErr } = await supabase.storage
-              .from("photos")
-              .createSignedUrl(gifPath, 7 * 24 * 3600); // Valid 7 hari
+          const { data: gifUrlData, error: gifErr } = await supabase.storage
+            .from("photos")
+            .createSignedUrl(gifPath, 7 * 24 * 3600); // Valid 7 hari
 
-            gifSignedUrl = gifUrlData?.signedUrl;
-            if (gifErr || !gifSignedUrl) {
-              gifSignedUrl = supabase.storage.from("photos").getPublicUrl(gifPath).data.publicUrl;
-            }
+          let gifSignedUrl = gifUrlData?.signedUrl;
+          if (gifErr || !gifSignedUrl) {
+            gifSignedUrl = supabase.storage.from("photos").getPublicUrl(gifPath).data.publicUrl;
           }
 
           const gifImg = document.getElementById("gifPhoto");
