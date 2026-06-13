@@ -502,9 +502,7 @@
         console.warn("Gagal membuat GIF:", gifErr);
       }
 
-      const{data:signedData,error:signErr}=await supabase.storage.from("photos").createSignedUrl(editPath,3600);
-      if(signErr)throw new Error("Gagal buat signed URL: "+signErr.message);
-      const finalUrl=signedData.signedUrl;
+      const finalUrl = supabase.storage.from("photos").getPublicUrl(editPath).data.publicUrl;
       hideOverlay();
       sessionStorage.setItem("cetakData",JSON.stringify({
         finalUrl,editPath,sessionFolderPath,guestNama:guestInfo.nama,
