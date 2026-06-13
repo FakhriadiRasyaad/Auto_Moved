@@ -785,18 +785,55 @@
         return;
       }
 
-      const { data: setting, error } = await supabase
-        .from("payment_settings")
-        .select("*")
-        .eq("branch_id", branchId)
-        .single();
-
-      if (error || !setting) {
-        console.error("Supabase Error:", error);
-        document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Setting QRIS tidak ditemukan di database untuk Branch ID ini.</p>";
-        return;
+      // 1. Coba ambil dari cache localStorage terlebih dahulu agar instan tanpa loading
+      const cached = localStorage.getItem("paymentSettings_" + branchId);
+      let hasCache = false;
+      if (cached) {
+        try {
+          const setting = JSON.parse(cached);
+          applyPaymentSettings(setting);
+          hasCache = true;
+        } catch (e) {
+          console.warn("Gagal load cached settings:", e);
+        }
       }
 
+      // 2. Tetap fetch versi terbarunya di background untuk memperbarui cache
+      try {
+        const { data: setting, error } = await supabase
+          .from("payment_settings")
+          .select("*")
+          .eq("branch_id", branchId)
+          .single();
+
+        if (!error && setting) {
+          localStorage.setItem("paymentSettings_" + branchId, JSON.stringify(setting));
+          
+          // Jika belum ada cache atau payload berubah, terapkan yang baru
+          if (!hasCache) {
+            applyPaymentSettings(setting);
+          } else {
+            const cachedObj = JSON.parse(cached);
+            if (cachedObj.qris_payload !== setting.qris_payload || 
+                JSON.stringify(cachedObj.gateway_config) !== JSON.stringify(setting.gateway_config) ||
+                cachedObj.enable_qris !== setting.enable_qris ||
+                cachedObj.enable_cash !== setting.enable_cash) {
+              applyPaymentSettings(setting);
+            }
+          }
+        } else if (error && !hasCache) {
+          console.error("Supabase Error:", error);
+          document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Setting QRIS tidak ditemukan di database untuk Branch ID ini.</p>";
+        }
+      } catch (err) {
+        console.error("Fetch settings error:", err);
+        if (!hasCache) {
+          document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Gagal menghubungkan ke server pembayaran.</p>";
+        }
+      }
+    }
+
+    function applyPaymentSettings(setting) {
       try {
         if (setting.gateway_config) {
           gatewayConfig = typeof setting.gateway_config === "string"
