@@ -552,60 +552,65 @@
         }
 
         // 2. Memuat foto-foto mentah (raw asli)
-        const asliFolder = `${sessionPath}/asli`;
-        const { data: files, error: listErr } = await supabase.storage
-          .from("photos")
-          .list(asliFolder, { limit: 20 });
+        try {
+          const asliFolder = `${sessionPath}/asli`;
+          const { data: files, error: listErr } = await supabase.storage
+            .from("photos")
+            .list(asliFolder, { limit: 20 });
 
-        if (listErr) throw listErr;
+          if (listErr) throw listErr;
 
-        // Filter file gambar saja
-        const imageFiles = (files || []).filter(f => f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png"));
+          // Filter file gambar saja
+          const imageFiles = (files || []).filter(f => f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png"));
 
-        if (imageFiles.length > 0) {
-          document.getElementById("rawCard").style.display = "flex";
-          const grid = document.getElementById("rawGrid");
-          grid.innerHTML = "";
+          if (imageFiles.length > 0) {
+            document.getElementById("rawCard").style.display = "flex";
+            const grid = document.getElementById("rawGrid");
+            grid.innerHTML = "";
 
-          // Buat signed URLs secara massal untuk efisiensi
-          const paths = imageFiles.map(f => `${asliFolder}/${f.name}`);
-          let signedUrls = [];
-          try {
-            const { data: signedData, error: signErr } = await supabase.storage
-              .from("photos")
-              .createSignedUrls(paths, 7 * 24 * 3600);
+            // Buat signed URLs secara massal untuk efisiensi
+            const paths = imageFiles.map(f => `${asliFolder}/${f.name}`);
+            let signedUrls = [];
+            try {
+              const { data: signedData, error: signErr } = await supabase.storage
+                .from("photos")
+                .createSignedUrls(paths, 7 * 24 * 3600);
 
-            if (!signErr && signedData) {
-              signedUrls = signedData.map(s => s.signedUrl);
+              if (!signErr && signedData) {
+                signedUrls = signedData.map(s => s.signedUrl);
+              }
+            } catch (e) { }
+
+            // Fallback jika bulk signed URL gagal
+            if (signedUrls.length === 0) {
+              signedUrls = paths.map(p => supabase.storage.from("photos").getPublicUrl(p).data.publicUrl);
             }
-          } catch (e) { }
 
-          // Fallback jika bulk signed URL gagal
-          if (signedUrls.length === 0) {
-            signedUrls = paths.map(p => supabase.storage.from("photos").getPublicUrl(p).data.publicUrl);
+            imageFiles.forEach((file, idx) => {
+              const url = signedUrls[idx];
+              const item = document.createElement("div");
+              item.className = "raw-item";
+              item.innerHTML = `
+              <div class="raw-img-wrap">
+                <img src="${url}" alt="Foto Mentah ${idx + 1}" loading="lazy">
+              </div>
+              <div class="raw-actions">
+                <button class="btn-download-sm" id="btnRaw-${idx}">
+                  Unduh Foto ⬇️
+                </button>
+              </div>
+            `;
+              grid.appendChild(item);
+
+              // Pasang handler download
+              document.getElementById(`btnRaw-${idx}`).onclick = () => {
+                downloadFile(url, `photobox_${guestName || "foto"}_asli_${idx + 1}.jpg`);
+              };
+            });
           }
-
-          imageFiles.forEach((file, idx) => {
-            const url = signedUrls[idx];
-            const item = document.createElement("div");
-            item.className = "raw-item";
-            item.innerHTML = `
-            <div class="raw-img-wrap">
-              <img src="${url}" alt="Foto Mentah ${idx + 1}" loading="lazy">
-            </div>
-            <div class="raw-actions">
-              <button class="btn-download-sm" id="btnRaw-${idx}">
-                Unduh Foto ⬇️
-              </button>
-            </div>
-          `;
-            grid.appendChild(item);
-
-            // Pasang handler download
-            document.getElementById(`btnRaw-${idx}`).onclick = () => {
-              downloadFile(url, `photobox_${guestName || "foto"}_asli_${idx + 1}.jpg`);
-            };
-          });
+        } catch (rawErr) {
+          console.warn("Gagal memuat foto mentah:", rawErr);
+          document.getElementById("rawCard").style.display = "none";
         }
       } catch (err) {
         console.error(err);
