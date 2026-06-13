@@ -653,7 +653,7 @@
 <body>
   <script>
     if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
-      window.location.href = "../login-admin.html";
+      window.location.href = "../index.html";
     }
 
     function kembali() {
@@ -913,9 +913,7 @@
       document.getElementById("qrisSection").classList.remove("hidden");
       document.getElementById('txt-metode').innerText = "QRIS";
 
-      sessionId = await buatSession("qris");
-      if (!sessionId) return;
-
+      // 1. Generate & Tampilkan QR Code DULUAN secara instan agar tidak loading lama
       try {
         const dynamic = makeQrisDynamic(window.qrisPayload, harga);
         const canvas = document.createElement("canvas");
@@ -925,11 +923,19 @@
         box.innerHTML = "";
         box.appendChild(canvas);
 
-        startPolling(sessionId);
         startCountdown(5 * 60);
       } catch (e) {
         document.getElementById("msgQris").innerHTML = `<span style="color:#ff3b30;">Gagal generate QRIS: ${e.message}</span>`;
+        return;
       }
+
+      // 2. Buat session database di background agar tidak memblokir render QR Code
+      buatSession("qris").then(sId => {
+        if (sId) {
+          sessionId = sId;
+          startPolling(sessionId);
+        }
+      });
     }
 
     // 8. AKSI METODE: TUNAI / CASH

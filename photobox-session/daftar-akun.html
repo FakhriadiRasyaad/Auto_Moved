@@ -535,7 +535,7 @@
   <!-- Guard: cek admin login -->
   <script>
     if (!localStorage.getItem("currentAdmin")) {
-      window.location.href = "../login-admin.html";
+      window.location.href = "../index.html";
     }
   </script>
 
@@ -770,7 +770,7 @@
       const admin = JSON.parse(localStorage.getItem("currentAdmin"));
       if (!admin) {
         alert("Sesi admin tidak valid. Silakan login kembali.");
-        window.location.href = "../login-admin.html";
+        window.location.href = "../index.html";
         return;
       }
 

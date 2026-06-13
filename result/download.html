@@ -450,6 +450,8 @@
     const sessionPath = params.get("session");
     const guestName = params.get("name");
     const sessionId = params.get("sessionId");
+    const paramFramed = params.get("framed");
+    const paramGif = params.get("gif");
 
     // Setup UI texts
     document.getElementById("year").textContent = new Date().getFullYear();
@@ -467,21 +469,24 @@
     async function loadPhotos() {
       try {
         // Cek file di folder edit untuk mencari hasil foto berframe (baik hasil.jpg maupun hasil_timestamp.jpg)
-        let framedFileName = "hasil.jpg";
-        let gifFileName = "hasil.gif";
-        try {
-          const { data: editFiles } = await supabase.storage
-            .from("photos")
-            .list(`${sessionPath}/edit`, { limit: 10 });
-          if (editFiles && editFiles.length > 0) {
-            const matchedImg = editFiles.find(f => f.name.startsWith("hasil") && (f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png")));
-            if (matchedImg) framedFileName = matchedImg.name;
+        let framedFileName = paramFramed || "hasil.jpg";
+        let gifFileName = paramGif || "hasil.gif";
+        
+        if (!paramFramed) {
+          try {
+            const { data: editFiles } = await supabase.storage
+              .from("photos")
+              .list(`${sessionPath}/edit`, { limit: 10 });
+            if (editFiles && editFiles.length > 0) {
+              const matchedImg = editFiles.find(f => f.name.startsWith("hasil") && (f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png")));
+              if (matchedImg) framedFileName = matchedImg.name;
 
-            const matchedGif = editFiles.find(f => f.name.startsWith("hasil") && f.name.endsWith(".gif"));
-            if (matchedGif) gifFileName = matchedGif.name;
+              const matchedGif = editFiles.find(f => f.name.startsWith("hasil") && f.name.endsWith(".gif"));
+              if (matchedGif) gifFileName = matchedGif.name;
+            }
+          } catch (listErr) {
+            console.warn("Gagal list folder edit, fallback ke default hasil.jpg/gif:", listErr);
           }
-        } catch (listErr) {
-          console.warn("Gagal list folder edit, fallback ke default hasil.jpg/gif:", listErr);
         }
 
         // 1. Memuat foto berframe

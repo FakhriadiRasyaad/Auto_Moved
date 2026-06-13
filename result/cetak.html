@@ -572,13 +572,37 @@
         const qrCanvas = document.getElementById("qrCanvas");
         qrCanvas.style.display = "block";
 
-        const baseUrl = window.location.origin + window.location.pathname.replace("cetak.html", "download.html");
+        let origin = window.location.origin;
+        let pathname = window.location.pathname;
+        if (!origin || origin === "null" || origin.includes("localhost") || origin.includes("127.0.0.1") || origin.startsWith("file:")) {
+          origin = "https://axionix-two.vercel.app";
+          pathname = "/result/download.html";
+        } else {
+          pathname = pathname.replace("cetak.html", "download.html");
+        }
+        const baseUrl = origin + (pathname.startsWith("/") ? "" : "/") + pathname;
+
         const guestData = JSON.parse(sessionStorage.getItem("guestData") || "{}");
         const guestId = guestData?.guest?.id ?? "unknown";
         const sessionPath = cetakData?.sessionFolderPath ?? "";
         const guestName = cetakData?.guestNama ?? "";
         
-        const downloadUrl = `${baseUrl}?session=${encodeURIComponent(sessionPath)}&name=${encodeURIComponent(guestName)}&sessionId=${encodeURIComponent(guestId)}`;
+        let framedFileName = "";
+        if (cetakData?.editPath) {
+          framedFileName = cetakData.editPath.substring(cetakData.editPath.lastIndexOf("/") + 1);
+        }
+        let gifFileName = "";
+        if (cetakData?.gifPath) {
+          gifFileName = cetakData.gifPath.substring(cetakData.gifPath.lastIndexOf("/") + 1);
+        }
+
+        let downloadUrl = `${baseUrl}?session=${encodeURIComponent(sessionPath)}&name=${encodeURIComponent(guestName)}&sessionId=${encodeURIComponent(guestId)}`;
+        if (framedFileName) {
+          downloadUrl += `&framed=${encodeURIComponent(framedFileName)}`;
+        }
+        if (gifFileName) {
+          downloadUrl += `&gif=${encodeURIComponent(gifFileName)}`;
+        }
 
         try {
           await QRCode.toCanvas(qrCanvas, downloadUrl, {

@@ -1389,6 +1389,7 @@
         if(hasilErr)throw new Error("Gagal upload: "+hasilErr.message);
         setProgress(1,1);
 
+        let uploadedGifPath = null;
         try {
           showOverlay("Membuat animasi GIF...");
           const gifDataURL = await generateGIF();
@@ -1402,6 +1403,8 @@
             
             if (gifErr) {
               console.warn("Gagal upload GIF:", gifErr.message);
+            } else {
+              uploadedGifPath = gifPath;
             }
           }
         } catch (gifErr) {
@@ -1420,6 +1423,7 @@
           filterName:currentFilterName,
           stiker:activeStiker,
           slotPhotos:slotPhotos,
+          gifPath: uploadedGifPath,
         }));
         msg.style.color="green";msg.textContent="✅ Upload selesai!";
         setTimeout(()=>{window.location.href="cetak.html";},800);

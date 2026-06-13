@@ -38,7 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
         profile = profileData?.[0] ?? null;
 
         if (profileError || !profile) {
-          alert("Gagal mengambil data profil! Hubungi administrator.");
+          console.error("Profile fetch error:", profileError);
+          const detail = profileError ? profileError.message : "Data user tidak ditemukan di tabel 'profiles'.";
+          alert(`Gagal mengambil data profil! Hubungi administrator.\n\nDetail Error: ${detail}`);
           await supabase.auth.signOut();
           return;
         }
