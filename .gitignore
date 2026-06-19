@@ -1,8 +1,3 @@
-# Python wrapper files
-app.py
-permissions.py
-LTI_Photobooth.spec
-
 # PyInstaller build files
 build/
 dist/
