@@ -178,21 +178,12 @@
   </div>
 
   <div class="setting-card">
-    <h2>Metode Pembayaran</h2>
-    <div class="checkbox-row">
-      <label><input type="checkbox" id="enableQris"> Aktifkan QRIS</label>
-      <label><input type="checkbox" id="enableCash"> Aktifkan Cash</label>
-    </div>
-  </div>
-
-  <div class="setting-card">
-    <h2>Mode QRIS</h2>
-    <p>Pilih cara QRIS bekerja:</p>
+    <h2>Mode Pembayaran Aktif</h2>
+    <p>Pilih metode yang akan otomatis aktif di layar pembayaran:</p>
 
     <div class="mode-tabs">
-      <button class="tab-btn active" id="tabManual"    onclick="switchMode('manual')">QRIS String</button>
-      <button class="tab-btn"        id="tabMidtrans"  onclick="switchMode('midtrans')">Midtrans</button>
-      <button class="tab-btn"        id="tabXendit"    onclick="switchMode('xendit')">Xendit</button>
+      <button class="tab-btn"        id="tabManual"    onclick="switchMode('manual')">QRIS String Sendiri</button>
+      <button class="tab-btn active" id="tabDuitku"    onclick="switchMode('duitku')">Duitku (Otomatis)</button>
     </div>
 
     <div id="modeManual" class="mode-panel">
@@ -202,32 +193,25 @@
       <div class="info-box">Buka aplikasi bank → menu QRIS → Salin string → paste di sini.</div>
     </div>
 
-    <div id="modeMidtrans" class="mode-panel hidden">
-      <h3>Midtrans Payment Gateway</h3>
-      <p>Pembayaran otomatis terdeteksi tanpa konfirmasi admin.</p>
-      <div class="setting-form-grid">
-        <input type="text" id="midtransServerKey" placeholder="Server Key (SB-Mid-server-xxx)">
-        <input type="text" id="midtransClientKey" placeholder="Client Key (SB-Mid-client-xxx)">
-      </div>
-      <div class="radio-group">
-        <label><input type="radio" name="midtransEnv" value="sandbox" checked> Sandbox</label>
-        <label><input type="radio" name="midtransEnv" value="production"> Production</label>
-      </div>
-      <div class="info-box">Daftar di <a href="https://midtrans.com" target="_blank">midtrans.com</a> → Settings → Access Keys</div>
-    </div>
 
-    <div id="modeXendit" class="mode-panel hidden">
-      <h3>Xendit Payment Gateway</h3>
-      <p>Pembayaran otomatis terdeteksi tanpa konfirmasi admin.</p>
+
+
+
+    <div id="modeDuitku" class="mode-panel hidden">
+      <h3>Duitku Payment Gateway</h3>
+      <p>Pembayaran otomatis via Duitku (QRIS, VA, e-wallet, dll). Terdeteksi tanpa konfirmasi admin.</p>
       <div class="setting-form-grid">
-        <input type="text" id="xenditApiKey"        placeholder="API Key (xnd_development_xxx)">
-        <input type="text" id="xenditCallbackToken" placeholder="Callback Token">
+        <input type="text" id="duitkuMerchantCode" placeholder="Merchant Code (contoh: DXXXX)">
+        <input type="text" id="duitkuApiKey"        placeholder="API Key dari dashboard Duitku">
       </div>
       <div class="radio-group">
-        <label><input type="radio" name="xenditEnv" value="development" checked> Development</label>
-        <label><input type="radio" name="xenditEnv" value="production"> Production</label>
+        <label><input type="radio" name="duitkuEnv" value="sandbox" checked> Sandbox</label>
+        <label><input type="radio" name="duitkuEnv" value="production"> Production</label>
       </div>
-      <div class="info-box">Daftar di <a href="https://xendit.co" target="_blank">xendit.co</a> → Settings → API Keys</div>
+      <div class="info-box">
+        Daftar di <a href="https://sandbox.duitku.com" target="_blank">sandbox.duitku.com</a> → Project → salin <strong>Merchant Code</strong> &amp; <strong>API Key</strong>.<br>
+        Pastikan <strong>Callback URL</strong> di dashboard Duitku sudah diisi dengan endpoint Edge Function kamu.
+      </div>
     </div>
   </div>
 
@@ -243,7 +227,7 @@
 
   function switchMode(mode) {
     currentMode = mode;
-    ["manual", "midtrans", "xendit"].forEach(m => {
+    ["manual", "duitku"].forEach(m => {
       const panel = document.getElementById("mode" + m.charAt(0).toUpperCase() + m.slice(1));
       const tab   = document.getElementById("tab"  + m.charAt(0).toUpperCase() + m.slice(1));
       if (panel) panel.classList.toggle("hidden", m !== mode);
@@ -269,8 +253,6 @@
     .single();
 
   if (data) {
-    document.getElementById("enableQris").checked = data.enable_qris  ?? false;
-    document.getElementById("enableCash").checked = data.enable_cash  ?? false;
     document.getElementById("qrisInput").value    = data.qris_payload ?? "";
 
     if (data.gateway_config) {
@@ -279,71 +261,54 @@
           ? JSON.parse(data.gateway_config)
           : data.gateway_config;
 
-        switchMode(cfg.mode ?? "manual");
+        switchMode(cfg.mode ?? "duitku");
 
-        if (cfg.mode === "midtrans") {
-          document.getElementById("midtransServerKey").value = cfg.server_key ?? "";
-          document.getElementById("midtransClientKey").value = cfg.client_key ?? "";
-          document.querySelectorAll('input[name="midtransEnv"]').forEach(r => {
+        if (cfg.mode === "duitku") {
+          document.getElementById("duitkuMerchantCode").value = cfg.merchant_code ?? "";
+          document.getElementById("duitkuApiKey").value       = cfg.api_key       ?? "";
+          document.querySelectorAll('input[name="duitkuEnv"]').forEach(r => {
             r.checked = r.value === (cfg.env ?? "sandbox");
           });
         }
-
-        if (cfg.mode === "xendit") {
-          document.getElementById("xenditApiKey").value        = cfg.api_key        ?? "";
-          document.getElementById("xenditCallbackToken").value = cfg.callback_token ?? "";
-          document.querySelectorAll('input[name="xenditEnv"]').forEach(r => {
-            r.checked = r.value === (cfg.env ?? "development");
-          });
-        }
       } catch(e) {
-        switchMode("manual");
+        switchMode("duitku");
       }
+    } else {
+      // Belum ada setting — default ke Duitku
+      switchMode("duitku");
     }
   }
 
   // ── Simpan ────────────────────────────────────────────────────────────
   window.simpanSetting = async function() {
-    const enable_qris = document.getElementById("enableQris").checked;
-    const enable_cash = document.getElementById("enableCash").checked;
-    const msg         = document.getElementById("msgSetting");
-    msg.textContent   = "";
+    const msg = document.getElementById("msgSetting");
+    msg.textContent = "";
 
     let qris_payload   = null;
     let gateway_config = null;
 
     if (currentMode === "manual") {
-      qris_payload   = document.getElementById("qrisInput").value.trim();
+      qris_payload = document.getElementById("qrisInput").value.trim();
       gateway_config = JSON.stringify({ mode: "manual" });
-      if (enable_qris && !qris_payload) {
+      if (!qris_payload) {
         msg.textContent = "❌ QRIS string wajib diisi!"; return;
       }
 
-    } else if (currentMode === "midtrans") {
-      const server_key = document.getElementById("midtransServerKey").value.trim();
-      const client_key = document.getElementById("midtransClientKey").value.trim();
-      const env        = document.querySelector('input[name="midtransEnv"]:checked').value;
-      if (!server_key || !client_key) {
-        msg.textContent = "❌ Server Key dan Client Key wajib diisi!"; return;
+    } else if (currentMode === "duitku") {
+      const merchant_code = document.getElementById("duitkuMerchantCode").value.trim();
+      const api_key       = document.getElementById("duitkuApiKey").value.trim();
+      const env           = document.querySelector('input[name="duitkuEnv"]:checked').value;
+      if (!merchant_code || !api_key) {
+        msg.textContent = "❌ Merchant Code dan API Key wajib diisi!"; return;
       }
-      gateway_config = JSON.stringify({ mode: "midtrans", server_key, client_key, env });
-
-    } else if (currentMode === "xendit") {
-      const api_key        = document.getElementById("xenditApiKey").value.trim();
-      const callback_token = document.getElementById("xenditCallbackToken").value.trim();
-      const env            = document.querySelector('input[name="xenditEnv"]:checked').value;
-      if (!api_key) {
-        msg.textContent = "❌ API Key wajib diisi!"; return;
-      }
-      gateway_config = JSON.stringify({ mode: "xendit", api_key, callback_token, env });
+      gateway_config = JSON.stringify({ mode: "duitku", merchant_code, api_key, env });
     }
 
     const { error } = await supabase
       .from("payment_settings")
       .upsert({
         branch_id: branchId,
-        enable_qris,
-        enable_cash,
+        enable_qris: currentMode === "manual",
         qris_payload,
         gateway_config
       }, { onConflict: "branch_id" });

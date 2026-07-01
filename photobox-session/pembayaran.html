@@ -724,16 +724,12 @@
           <p id="msgQris" style="margin-top: 4px;">Menunggu konfirmasi pembayaran dari admin...</p>
         </div>
 
-        <div id="cashSection" class="hidden" style="text-align: center;">
-          <h3 style="color:#ffcc00; margin-bottom:8px;">Bayar Tunai / Cash 💵</h3>
-          <p style="color:#fff; margin-bottom:6px;">Silakan berikan uang tunai kepada Kasir/Admin.</p>
-          <p id="msgCash" style="color:#aaa;">Menunggu persetujuan aktivasi sesi dari admin...</p>
-        </div>
+
 
         <div id="gatewaySection" class="hidden" style="width: 100%; text-align: center;">
-          <p style="color:#fff; margin-bottom:8px; font-weight:600;">Pembayaran Online Gateway</p>
+          <p style="color:#fff; margin-bottom:8px; font-weight:600;">Pembayaran via Duitku 💳</p>
           <div id="gatewayContainer"></div>
-          <p id="msgGateway" style="margin-top:8px; color:#aaa;">Selesaikan pembayaran pada portal yang disediakan...
+          <p id="msgGateway" style="margin-top:8px; color:#aaa;">Menghubungi server Duitku...
           </p>
         </div>
       </div>
@@ -778,10 +774,10 @@
       // Tampilkan data paket dan harga yang diambil dari local storage ke layar UI
       document.getElementById('txt-paket').innerText = namaPaket;
       document.getElementById('txt-harga').innerText = "Rp " + harga.toLocaleString("id-ID");
-      document.getElementById('txt-metode').innerText = "QRIS";
 
       if (!branchId) {
-        document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Error: Data Admin / Branch ID tidak ditemukan di Local Storage.</p>";
+        document.getElementById("gatewaySection").classList.remove("hidden");
+        document.getElementById("msgGateway").innerText = "❌ Error: Data Admin / Branch ID tidak ditemukan.";
         return;
       }
 
@@ -822,13 +818,15 @@
             }
           }
         } else if (error && !hasCache) {
-          console.error("Supabase Error:", error);
-          document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Setting QRIS tidak ditemukan di database untuk Branch ID ini.</p>";
+          console.warn("Supabase Error:", error);
+          // Default ke Duitku jika tidak ada setting
+          pakeGateway('duitku');
         }
       } catch (err) {
         console.error("Fetch settings error:", err);
         if (!hasCache) {
-          document.getElementById("qrisSection").innerHTML = "<p style='color:red;font-size:12px;text-align:center;'>Gagal menghubungkan ke server pembayaran.</p>";
+          // Default ke Duitku jika fetch gagal
+          pakeGateway('duitku');
         }
       }
     }
@@ -841,57 +839,24 @@
             : setting.gateway_config;
         }
       } catch (e) {
-        gatewayConfig = { mode: "manual" };
+        gatewayConfig = { mode: "duitku" };
       }
 
-      // Amankan qris_payload ke level window agar global dan tidak undefined
       window.qrisPayload = setting.qris_payload || "";
-      
-      // Langsung jalankan pembayaran QRIS secara otomatis
-      pakeQRIS();
+
+      // Auto-launch: QRIS String jika admin set mode manual & ada payload, selain itu Duitku
+      const mode = gatewayConfig?.mode ?? "duitku";
+      if (mode === "manual" && window.qrisPayload.trim() !== "") {
+        document.getElementById('txt-metode').innerText = "QRIS";
+        pakeQRIS();
+      } else {
+        document.getElementById('txt-metode').innerText = "Duitku";
+        pakeGateway('duitku');
+      }
     }
 
-    // 4. RENDER ELEMENT LIST PILIHAN TOMBOL METODE
-    function renderMetode(setting) {
-      const div = document.getElementById("metodePembayaran");
-      const mode = gatewayConfig?.mode ?? "manual";
-      let html = `<p style="color:#fff; font-weight:600; text-align:center; margin-bottom:10px;">PILIH METODE BAYAR</p><div class="metode-grid">`;
+    // Metode pembayaran ditentukan otomatis via applyPaymentSettings
 
-      if (setting.enable_qris) {
-        if (mode === "midtrans") {
-          html += `<button id="opt-midtrans" class="metode-btn">📱 QRIS (Midtrans)</button>`;
-        } else if (mode === "xendit") {
-          html += `<button id="opt-xendit" class="metode-btn">📱 QRIS (Xendit)</button>`;
-        } else {
-          html += `<button id="opt-qris" class="metode-btn">📱 Scan QRIS</button>`;
-        }
-      }
-
-      if (setting.enable_cash) {
-        html += `<button id="opt-cash" class="metode-btn">💵 Bayar Cash</button>`;
-      }
-
-      if (!setting.enable_qris && !setting.enable_cash) {
-        html = "<p style='color:red; text-align:center;'>Tidak ada metode pembayaran aktif.</p>";
-      }
-
-      html += "</div>";
-      div.innerHTML = html;
-
-      // ATTACH EVENT LISTENER SECARA AMAN
-      if (document.getElementById("opt-midtrans")) {
-        document.getElementById("opt-midtrans").addEventListener("click", () => pakeGateway('midtrans'));
-      }
-      if (document.getElementById("opt-xendit")) {
-        document.getElementById("opt-xendit").addEventListener("click", () => pakeGateway('xendit'));
-      }
-      if (document.getElementById("opt-qris")) {
-        document.getElementById("opt-qris").addEventListener("click", () => pakeQRIS());
-      }
-      if (document.getElementById("opt-cash")) {
-        document.getElementById("opt-cash").addEventListener("click", () => pakeCash());
-      }
-    }
 
     // 5. MEMBUAT DATA SESI TRANSAKSI BARU DI DATABASE
     async function buatSession(metode) {
@@ -975,89 +940,61 @@
       });
     }
 
-    // 8. AKSI METODE: TUNAI / CASH
-    async function pakeCash() {
-      document.getElementById("metodePembayaran").classList.add("hidden");
-      document.getElementById("cashSection").classList.remove("hidden");
-      document.getElementById('txt-metode').innerText = "Uang Tunai (Cash)";
+    // Cash payment dihapus — hanya QRIS String atau Duitku
 
-      sessionId = await buatSession("cash");
-      if (!sessionId) return;
-      startPolling(sessionId);
-    }
 
-    // 9. AKSI METODE: ONLINE GATEWAY (MIDTRANS / XENDIT)
+    // 9. AKSI METODE: DUITKU GATEWAY (satu-satunya gateway aktif)
     async function pakeGateway(provider) {
-      document.getElementById("metodePembayaran").classList.add("hidden");
       document.getElementById("gatewaySection").classList.remove("hidden");
-      document.getElementById('txt-metode').innerText = `QRIS (${provider.toUpperCase()})`;
-
-      sessionId = await buatSession(provider);
-      if (!sessionId) return;
+      document.getElementById('txt-metode').innerText = "Duitku";
 
       const msg = document.getElementById("msgGateway");
-      if (provider === "midtrans") {
-        const env = gatewayConfig.env ?? "sandbox";
-        const script = document.createElement("script");
-        script.src = env === "production"
-          ? "https://app.midtrans.com/snap/snap.js"
-          : "https://app.sandbox.midtrans.com/snap/snap.js";
-        script.setAttribute("data-client-key", gatewayConfig.client_key || "");
-        document.head.appendChild(script);
+      msg.textContent = "⏳ Menghubungi Duitku...";
 
-        script.onload = async () => {
-          const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
-          const { data: txData, error: txError } = await supabase.functions.invoke("create-midtrans-token", {
-            body: {
-              session_id: sessionId,
-              amount: harga,
-              customer: {
-                name: localUser.nama || "Guest",
-                phone: localUser.nohp || "",
-                email: localUser.email || "guest@photobooth.com"
-              }
-            }
-          });
+      sessionId = await buatSession("duitku");
+      if (!sessionId) return;
 
-          if (txError || !txData?.token) {
-            msg.textContent = "❌ Gagal koneksi Midtrans.";
-            return;
-          }
+      const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
 
-          window.snap.pay(txData.token, {
-            onSuccess: () => lanjutSetelahBayar(),
-            onPending: () => { msg.textContent = "⏳ Menunggu penyelesaian payment..."; },
-            onError: () => { msg.textContent = "❌ Pembayaran gateway gagal."; },
-            onClose: () => { msg.textContent = "⚠️ Popup ditutup. Hubungi admin jika sudah bayar."; }
-          });
-        };
-      } else if (provider === "xendit") {
-        const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
-        const { data: invoiceData, error: invoiceError } = await supabase.functions.invoke("create-xendit-invoice", {
-          body: {
-            session_id: sessionId,
-            amount: harga,
-            customer_name: localUser.nama || "Guest",
-            customer_phone: localUser.nohp || "",
-            email: localUser.email || "guest@photobooth.com",
-            description: `Photobooth - ${namaPaket}`
-          }
-        });
-
-        if (invoiceError || !invoiceData?.invoice_url) {
-          msg.textContent = "❌ Gagal membuat link Xendit.";
-          return;
+      const { data: duitkuData, error: duitkuError } = await supabase.functions.invoke("create-duitku-transaction", {
+        body: {
+          session_id:    sessionId,
+          amount:        harga,
+          customer_name: localUser.nama  || "Guest",
+          phone:         localUser.nohp  || "",
+          email:         localUser.email || "guest@photobooth.com",
+          description:   `Photobooth - ${namaPaket}`,
+          return_url:    window.location.origin + "/photobox-session/sesi-foto.html"
         }
+      });
 
-        document.getElementById("gatewayContainer").innerHTML = `
-        <a href="${invoiceData.invoice_url}" target="_blank" class="metode-btn" style="background:#ffcc00; color:#000; display:inline-block; margin-top:16px;">
-          KLIK UNTUK BAYAR VIA XENDIT
-        </a>
-        <p style="margin-top:8px;font-size:13px;color:#aaa;">Setelah bayar, halaman akan otomatis lanjut.</p>
-      `;
+      if (duitkuError || !duitkuData?.paymentUrl) {
+        msg.textContent = "❌ Gagal membuat transaksi Duitku: " + (duitkuError?.message || "paymentUrl tidak tersedia");
+        return;
       }
+
+      // Simpan reference Duitku ke localStorage
+      const ud = JSON.parse(localStorage.getItem("currentUser")) || {};
+      ud.duitku_reference = duitkuData.reference;
+      localStorage.setItem("currentUser", JSON.stringify(ud));
+
+      document.getElementById("gatewayContainer").innerHTML = `
+        <a href="${duitkuData.paymentUrl}"
+           class="metode-btn"
+           style="background:#ffcc00; color:#000; display:inline-block; margin-top:16px; font-size:15px; font-weight:700;">
+          💳 KLIK UNTUK BUKA HALAMAN PEMBAYARAN DUITKU
+        </a>
+        <p style="margin-top:8px;font-size:12px;color:#aaa;">
+          Tersedia: Transfer Bank, Virtual Account, QRIS, E-Wallet, dan lainnya.
+        </p>
+        <p style="margin-top:4px;font-size:11px;color:#666;">
+          Referensi: <code style="color:#ffcc00;">${duitkuData.reference}</code>
+        </p>
+      `;
+      msg.textContent = "Selesaikan pembayaran pada portal Duitku yang sudah dibuka...";
       startPolling(sessionId);
     }
+
 
     // 10. TIMER HITUNG MUNDUR QRIS
     function startCountdown(seconds) {
