@@ -4,653 +4,23 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="utf-8" />
-  <title>Pembayaran Photobooth</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet" />
-  <script type="text/javascript"
-    src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=ZqoBD2R6irG4RaLdBRBQJGrppHnfpVZTcX4Q500Ks7MMWt0JbT4FYtDXj4IxYkn3qq9pnNl3oq0HsUo3u-yt6gLl85M3Be6RLw4urGbPnt0fqab8H3YJFlnum10VSQaUca5O5kmkfg-SlPVifC0Z_KsPRtdhraL2cRY4W7ALjpr00DUquMWCnH9obCZCLq3z7SMUwE4c3f0dow77yah8VquxqC6se-K_ZeUrfGR__G64Fi5QnNOc2YTG3ZIiwUvlWWCvS9h8PzIEVdV163ARdA"
-    charset="UTF-8"></script>
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <title>Pembayaran — Axionix Photobooth</title>
 
-    html,
-    body {
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-    }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to bottom, #e7e7e7 50%, #ffffff 50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/customer.css" />
 
-    .page-wrapper {
-      width: 100%;
-      max-width: 960px;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 3vh 40px;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .logo img {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-    }
-
-    .logo-text {
-      font-size: 22px;
-      font-weight: 700;
-      color: #000;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── STEP INDICATOR ── */
-    .steps {
-      display: flex;
-      align-items: center;
-    }
-
-    .step {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      font-size: 16px;
-      font-weight: 700;
-      border: 1.5px solid #000;
-      color: #000;
-      background: #fff;
-      cursor: pointer;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.3s ease,
-                  color 0.3s ease,
-                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .step:hover {
-      transform: translateY(-4px) scale(1.15);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    @keyframes bouncePop {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.4);
-      }
-
-      100% {
-        transform: scale(1.3);
-      }
-    }
-
-    .step.active {
-      background: #000;
-      color: #fff;
-      animation: bouncePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      z-index: 2;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    .step-line {
-      width: 50px;
-      border-top: 1.5px dashed #000;
-    }
-
-    /* ── TITLE SECTION ── */
-    .title-section {
-      flex-shrink: 0;
-      margin-top: 0.5vh;
-    }
-
-    .title-section h1 {
-      font-size: 38px;
-      font-weight: 800;
-      color: #000;
-      line-height: 1.1;
-    }
-
-    .title-section p {
-      font-size: 15px;
-      font-weight: 500;
-      color: #555;
-      margin-top: 2px;
-    }
-
-    /* ── CONTAINER 2 KOLOM ── */
-    .payment-container {
-      background: #181818;
-      border-radius: 20px;
-      padding: 4vh 45px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-      width: 100%;
-      flex-grow: 1;
-      max-height: 65vh;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 30px;
-      align-items: center;
-      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  box-shadow 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .payment-container:hover {
-      transform: scale(1.01);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-    }
-
-    .payment-details {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      color: #fff;
-    }
-
-    .payment-details h2 {
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .payment-details .sub-info {
-      font-size: 14px;
-      color: #aaa;
-      margin-bottom: 24px;
-    }
-
-    .invoice-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #333;
-      font-size: 15px;
-    }
-
-    .invoice-item span:first-child {
-      color: #ccc;
-    }
-
-    .invoice-item span:last-child {
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .invoice-item.total-row {
-      border-bottom: none;
-      padding-top: 16px;
-    }
-
-    .invoice-item.total-row span:last-child {
-      font-size: 24px;
-      font-weight: 800;
-      color: #ffcc00;
-    }
-
-    /* ── QR CODE & METHOD SELECTION SIDE ── */
-    .qr-side {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #222;
-      border-radius: 16px;
-      padding: 15px;
-      border: 1px solid #333;
-      height: 100%;
-      max-height: 100%;
-      overflow: hidden;
-    }
-
-    .metode-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      margin-top: 12px;
-    }
-
-    .metode-btn {
-      width: 100%;
-      background: #333;
-      color: #fff;
-      border: 1px solid #444;
-      padding: 12px;
-      border-radius: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.2s;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    .metode-btn:hover {
-      background: #444;
-    }
-
-    /* DESAIN TEMPLATE QRIS STANDAR NASIONAL */
-    .qris-template-card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 10px 14px;
-      width: 190px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      margin-bottom: 2px;
-    }
-
-    .qris-template-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      margin-bottom: 6px;
-    }
-
-    .qris-logo-main {
-      height: 15px;
-      object-fit: contain;
-    }
-
-    .gpn-logo-main {
-      height: 13px;
-      object-fit: contain;
-    }
-
-    .qr-box {
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 140px;
-      height: 140px;
-    }
-
-    .qr-box canvas {
-      width: 140px !important;
-      height: 140px !important;
-      object-fit: contain;
-    }
-
-    .qris-template-footer {
-      width: 100%;
-      text-align: center;
-      margin-top: 6px;
-      border-top: 1px dashed #ddd;
-      padding-top: 4px;
-    }
-
-    .qris-template-footer p {
-      font-size: 8px !important;
-      color: #444 !important;
-      font-weight: 600 !important;
-      line-height: 1.1;
-    }
-
-    .qr-side p {
-      font-size: 11px;
-      color: #aaa;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    .countdown {
-      font-size: 13px !important;
-      color: #ffcc00 !important;
-      margin-top: 4px;
-      font-weight: 700;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* ── ACTION BUTTONS ── */
-    .bottom-actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      width: 100%;
-      flex-shrink: 0;
-      margin-top: 1vh;
-    }
-
-    .btn-back {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 160px;
-      height: 52px;
-      background: transparent;
-      color: #000;
-      border: 2px solid #000;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.3s ease,
-                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .btn-back:hover {
-      transform: translateY(-3px) scale(1.03);
-      background: rgba(0, 0, 0, 0.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-next {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 240px;
-      height: 52px;
-      background: #000;
-      color: #fff;
-      border: none;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.3s ease,
-                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .btn-next:hover {
-      transform: translateY(-4px) scale(1.03);
-      background: #222;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-    }
-
-    /* ── FLUID SCALING (ALWAYS KEEPS 2-COLUMN DESKTOP LAYOUT) ── */
-    @media (max-width: 900px) {
-      .page-wrapper {
-        padding: 2vh 20px;
-      }
-      .logo img {
-        width: 36px;
-        height: 36px;
-      }
-      .logo-text {
-        font-size: 18px;
-      }
-      .step {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-      }
-      .step-line {
-        width: 35px;
-      }
-      .title-section h1 {
-        font-size: 30px;
-      }
-      .title-section p {
-        font-size: 13px;
-      }
-      .payment-container {
-        padding: 15px 25px;
-        gap: 20px;
-        max-height: 62vh;
-      }
-      .payment-details h2 {
-        font-size: 20px;
-      }
-      .payment-details .sub-info {
-        font-size: 12px;
-        margin-bottom: 12px;
-      }
-      .invoice-item {
-        padding: 8px 0;
-        font-size: 13px;
-      }
-      .invoice-item.total-row span:last-child {
-        font-size: 18px;
-      }
-      .qr-side {
-        padding: 10px;
-      }
-      .qris-template-card {
-        padding: 6px 10px;
-        width: 150px;
-        margin-bottom: 2px;
-      }
-      .qr-box {
-        width: 100px;
-        height: 100px;
-      }
-      .qr-box canvas {
-        width: 100px !important;
-        height: 100px !important;
-      }
-      .qris-template-footer p {
-        font-size: 6px !important;
-      }
-      .countdown {
-        font-size: 11px !important;
-      }
-      .btn-back {
-        width: 130px;
-        height: 44px;
-        font-size: 14px;
-      }
-      .btn-next {
-        width: 200px;
-        height: 44px;
-        font-size: 14px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .page-wrapper {
-        padding: 1vh 10px;
-      }
-      .logo img {
-        width: 28px;
-        height: 28px;
-      }
-      .logo-text {
-        font-size: 15px;
-      }
-      .step {
-        width: 26px;
-        height: 26px;
-        font-size: 12px;
-      }
-      .step-line {
-        width: 20px;
-      }
-      .title-section h1 {
-        font-size: 22px;
-      }
-      .title-section p {
-        font-size: 11px;
-      }
-      .payment-container {
-        padding: 10px;
-        gap: 12px;
-        border-radius: 12px;
-        max-height: 46vh;
-      }
-      .payment-details h2 {
-        font-size: 15px;
-      }
-      .payment-details .sub-info {
-        font-size: 10px;
-        margin-bottom: 6px;
-      }
-      .invoice-item {
-        padding: 4px 0;
-        font-size: 10.5px;
-      }
-      .invoice-item.total-row span:last-child {
-        font-size: 14px;
-      }
-      .qr-side {
-        padding: 6px;
-        border-radius: 10px;
-      }
-      .qris-template-card {
-        padding: 4px 6px;
-        width: 110px;
-        border-radius: 8px;
-      }
-      .qris-logo-main {
-        height: 10px;
-      }
-      .gpn-logo-main {
-        height: 8px;
-      }
-      .qr-box {
-        width: 70px;
-        height: 70px;
-      }
-      .qr-box canvas {
-        width: 70px !important;
-        height: 70px !important;
-      }
-      .qris-template-footer p {
-        font-size: 5px !important;
-      }
-      .countdown {
-        font-size: 9px !important;
-      }
-      #msgQris, #msgCash, #msgGateway {
-        font-size: 9px;
-      }
-      .btn-back {
-        width: 100px;
-        height: 36px;
-        font-size: 12px;
-        border-radius: 10px;
-      }
-      .btn-next {
-        width: 150px;
-        height: 36px;
-        font-size: 12px;
-        border-radius: 10px;
-      }
-    }
-
-    /* Height-based scaling for short viewport heights */
-    @media (max-height: 680px) {
-      .page-wrapper {
-        padding: 1.5vh 30px;
-      }
-      .logo img {
-        width: 32px;
-        height: 32px;
-      }
-      .logo-text {
-        font-size: 18px;
-      }
-      .step {
-        width: 30px;
-        height: 30px;
-        font-size: 13px;
-      }
-      .step-line {
-        width: 35px;
-      }
-      .title-section h1 {
-        font-size: 26px;
-      }
-      .title-section p {
-        font-size: 13px;
-      }
-      .payment-container {
-        padding: 12px 24px;
-        max-height: 58vh;
-        gap: 15px;
-      }
-      .payment-details h2 {
-        font-size: 18px;
-      }
-      .payment-details .sub-info {
-        margin-bottom: 8px;
-        font-size: 11px;
-      }
-      .invoice-item {
-        padding: 6px 0;
-        font-size: 12px;
-      }
-      .invoice-item.total-row span:last-child {
-        font-size: 16px;
-      }
-      .qr-side {
-        padding: 8px;
-      }
-      .qris-template-card {
-        padding: 6px 10px;
-        width: 130px;
-        margin-bottom: 2px;
-      }
-      .qr-box {
-        width: 90px;
-        height: 90px;
-      }
-      .qr-box canvas {
-        width: 90px !important;
-        height: 90px !important;
-      }
-      .countdown {
-        font-size: 11px !important;
-        margin-top: 1px;
-      }
-      #msgQris, #msgCash, #msgGateway {
-        font-size: 10px;
-        margin-top: 1px;
-      }
-      .bottom-actions {
-        margin-top: 6px;
-      }
-      .btn-back, .btn-next {
-        height: 38px;
-        font-size: 13px;
-        border-radius: 12px;
-      }
-    }
-  </style>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 
-<body>
+<body class="customer-page" style="flex-direction: column; justify-content: space-between; padding: var(--space-6) var(--space-10);">
+
   <script>
     if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
       window.location.href = "../index.html";
@@ -661,97 +31,117 @@
     }
   </script>
 
-  <div class="page-wrapper">
-    <div class="header">
-      <div class="logo">
+  <!-- Sparkles -->
+  <div class="sparkle sparkle-1">✨</div>
+  <div class="sparkle sparkle-2">🌸</div>
+  <div class="sparkle sparkle-3">⭐</div>
+
+  <div style="width: 100%; max-width: 1100px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: var(--space-4) 0;">
+
+    <!-- Header & Stepper -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+      <div class="customer-logo" style="margin-bottom: 0;">
         <img src="../img/Logo_photobooth_LTI.png" alt="Logo" />
-        <span class="logo-text">PHOTOBOOTH</span>
+        <span class="customer-logo-text text-gradient-primary">AXIONIX PHOTOBOOTH</span>
       </div>
-      <div class="steps">
-        <div class="step" id="step-back" onclick="kembali()">1</div>
-        <div class="step-line"></div>
-        <div class="step active">2</div>
-        <div class="step-line"></div>
-        <div class="step">3</div>
-        <div class="step-line"></div>
-        <div class="step">4</div>
+
+      <div class="customer-stepper">
+        <div class="customer-step completed" id="step-back" onclick="kembali()">1</div>
+        <div class="customer-step-line completed"></div>
+        <div class="customer-step active">2</div>
+        <div class="customer-step-line"></div>
+        <div class="customer-step">3</div>
+        <div class="customer-step-line"></div>
+        <div class="customer-step">4</div>
       </div>
     </div>
 
-    <div class="title-section">
-      <h1>Pembayaran 💳</h1>
-      <p>Selesaikan rincian pembayaran transaksi Anda</p>
+    <!-- Title Section -->
+    <div style="flex-shrink: 0; margin-top: var(--space-2);">
+      <h1 class="customer-heading" style="margin-bottom: 0;">Pembayaran 💳</h1>
+      <p class="customer-subheading" style="margin-bottom: 0;">Selesaikan rincian pembayaran untuk memulai sesi foto</p>
     </div>
 
-    <div class="payment-container">
-      <div class="payment-details">
-        <h2>Rincian Pesanan</h2>
-        <p class="sub-info">Silakan periksa kembali jenis paket pilihan Anda</p>
+    <!-- Payment Container (2 Columns) -->
+    <div class="card" style="flex: 1; margin: var(--space-4) 0; padding: var(--space-8); display: flex; gap: var(--space-8); align-items: center; border-radius: var(--radius-3xl); background: var(--glass-bg-strong); backdrop-filter: var(--glass-blur-strong); border: 1px solid var(--glass-border);">
+      
+      <!-- Left Column: Order Summary -->
+      <div style="flex: 1;">
+        <h2 style="font-family: var(--font-display); font-size: var(--text-2xl); font-weight: var(--weight-bold); color: var(--text-primary); margin-bottom: var(--space-1);">Rincian Pesanan</h2>
+        <p style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-6);">Periksa kembali paket dan metode pembayaran kamu</p>
 
-        <div class="invoice-item">
-          <span>Nama Paket</span>
-          <span id="txt-paket">-</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-3); font-size:var(--text-sm);">
+          <span style="color:var(--text-secondary);">Nama Paket</span>
+          <span id="txt-paket" style="color: var(--text-primary); font-weight: var(--weight-bold);">-</span>
         </div>
-        <div class="invoice-item">
-          <span>Metode Transaksi</span>
-          <span id="txt-metode">Memuat...</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-3); font-size:var(--text-sm);">
+          <span style="color:var(--text-secondary);">Metode Transaksi</span>
+          <span id="txt-metode" style="color: var(--color-primary); font-weight: var(--weight-bold);">Memuat...</span>
         </div>
-        <div class="invoice-item total-row">
-          <span>Total Bayar</span>
-          <span id="txt-harga">Rp0</span>
+        <div style="margin-top: var(--space-4); border-top: 1px solid var(--border-default); padding-top: var(--space-4); display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-weight:var(--weight-bold); font-size:var(--text-base);">Total Bayar</span>
+          <span id="txt-harga" style="color: var(--color-primary); font-size: var(--text-3xl); font-weight: var(--weight-extrabold);">Rp0</span>
         </div>
       </div>
 
-      <div class="qr-side">
-        <div id="metodePembayaran" class="hidden" style="width: 100%;">
-          <p style="color:#fff;">Loading...</p>
+      <!-- Right Column: QRIS / Gateway Display -->
+      <div style="flex: 1; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-2xl); padding: var(--space-6); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-card);">
+        
+        <div id="metodePembayaran" class="hidden" style="width: 100%; text-align: center;">
+          <p class="animate-pulse text-secondary">Menghubungi sistem pembayaran...</p>
         </div>
 
+        <!-- QRIS Section -->
         <div id="qrisSection" class="hidden" style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
-          <div class="qris-template-card">
-            <div class="qris-template-header">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.svg" class="qris-logo-main"
-                alt="QRIS" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/GPN_Logo.svg" class="gpn-logo-main"
-                alt="GPN" />
+          <div style="background: #fff; border-radius: var(--radius-2xl); padding: var(--space-4); box-shadow: var(--shadow-xl); width: 220px; border: 1px solid var(--border-default);">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom: var(--space-2);">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.svg" style="height: 18px; object-fit:contain;" alt="QRIS" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/GPN_Logo.svg" style="height: 14px; object-fit:contain;" alt="GPN" />
             </div>
-            <div class="qr-box" id="qrContainer"></div>
-            <div class="qris-template-footer">
-              <p>Penyedia Jasa Pembayaran (PJP) Berizin Bank Indonesia</p>
+            <div id="qrContainer" style="width: 180px; height: 180px; display:flex; align-items:center; justify-content:center;"></div>
+            <div style="width:100%; text-align:center; margin-top: var(--space-2); border-top: 1px dashed #ddd; padding-top: var(--space-1);">
+              <p style="font-size: 9px; color: #666; font-weight: 600;">Scan dengan aplikasi E-Wallet / Mobile Banking</p>
             </div>
           </div>
-          <div id="countdown" class="countdown"></div>
-          <p id="msgQris" style="margin-top: 4px;">Menunggu konfirmasi pembayaran dari admin...</p>
+          <div id="countdown" class="badge badge-primary mt-3" style="font-size:var(--text-sm);"></div>
+          <p id="msgQris" class="text-xs text-secondary mt-2 text-center">Menunggu konfirmasi pembayaran otomatis...</p>
         </div>
 
-
-
+        <!-- Duitku Gateway Section -->
         <div id="gatewaySection" class="hidden" style="width: 100%; text-align: center;">
-          <p style="color:#fff; margin-bottom:8px; font-weight:600;">Pembayaran via Duitku 💳</p>
+          <p class="font-bold text-lg text-primary mb-2">Pembayaran Duitku Gateway 💳</p>
           <div id="gatewayContainer"></div>
-          <p id="msgGateway" style="margin-top:8px; color:#aaa;">Menghubungi server Duitku...
-          </p>
+          <p id="msgGateway" class="text-xs text-secondary mt-2">Menghubungi server Duitku...</p>
         </div>
+
       </div>
+
     </div>
 
-    <div class="bottom-actions">
-      <button class="btn-back" id="btn-back" onclick="kembali()">Kembali</button>
-      <button class="btn-next" id="btn-konfirmasi">Konfirmasi Selesai</button>
+    <!-- Bottom Actions -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+      <button class="customer-btn-secondary" id="btn-back" onclick="kembali()" style="max-width: 180px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Kembali</span>
+      </button>
+
+      <button id="btn-konfirmasi" style="display: none;"></button>
     </div>
+
   </div>
 
   <script type="module">
     import { supabase } from "../assets/js/supabase.js";
 
-    // 1. AMBIL DATA AWAL DARI LOCAL STORAGE (Diberi proteksi objek kosong || {})
     const admin = JSON.parse(localStorage.getItem("currentAdmin")) || {};
     const user = JSON.parse(localStorage.getItem("currentUser")) || {};
 
     const savedPackageId = localStorage.getItem("selectedPackage");
     const savedPriceText = localStorage.getItem("selectedPackagePrice") || "0";
 
-    // PENGATURAN HARGA SECARA AMAN: Cek di user.paket.harga dahulu, jika tidak ada baru gunakan selectedPackagePrice dari localStorage
     const harga = user?.paket?.harga || parseInt(savedPriceText.replace(/[^0-9]/g, '')) || 0;
     const namaPaket = user?.paket?.nama || localStorage.getItem("selectedPackageName") || savedPackageId || "Paket Foto";
     const branchId = admin?.branch_id || null;
@@ -761,7 +151,6 @@
     let countdownTimer = null;
     let gatewayConfig = { mode: "manual" };
 
-    // 2. VALIDASI KEBERADAAN ALUR DATA
     if (!savedPackageId) {
       console.warn("Package ID tidak ditemukan di Local Storage. Kembali ke pilih paket.");
       kembali();
@@ -769,9 +158,44 @@
       initPaymentSystem();
     }
 
-    // 3. FUNGSI LOAD KONFIGURASI SUPABASE
     async function initPaymentSystem() {
-      // Tampilkan data paket dan harga yang diambil dari local storage ke layar UI
+      const urlParams = new URLSearchParams(window.location.search);
+      const resultCode = urlParams.get("resultCode");
+      const merchantOrderId = urlParams.get("merchantOrderId");
+
+      if (resultCode !== null || merchantOrderId !== null) {
+        const ud = JSON.parse(localStorage.getItem("currentUser")) || {};
+        if (resultCode === "00") {
+          ud.sudahBayar = true;
+          localStorage.setItem("currentUser", JSON.stringify(ud));
+          if (ud.session_id) {
+            await supabase.from("sessions").update({ status: "paid" }).eq("id", ud.session_id);
+          }
+          window.location.href = "intro-video.html";
+          return;
+        } else {
+          delete ud.session_id;
+          delete ud.duitku_reference;
+          ud.sudahBayar = false;
+          localStorage.setItem("currentUser", JSON.stringify(ud));
+          window.location.href = "pilih-paket.html";
+          return;
+        }
+      }
+
+      const ud = JSON.parse(localStorage.getItem("currentUser")) || {};
+      if (ud.session_id) {
+        const { data: existSession } = await supabase
+          .from("sessions")
+          .select("status")
+          .eq("id", ud.session_id)
+          .single();
+        if (existSession?.status === "paid") {
+          lanjutSetelahBayar();
+          return;
+        }
+      }
+
       document.getElementById('txt-paket').innerText = namaPaket;
       document.getElementById('txt-harga').innerText = "Rp " + harga.toLocaleString("id-ID");
 
@@ -781,7 +205,6 @@
         return;
       }
 
-      // 1. Coba ambil dari cache localStorage terlebih dahulu agar instan tanpa loading
       const cached = localStorage.getItem("paymentSettings_" + branchId);
       let hasCache = false;
       if (cached) {
@@ -794,7 +217,6 @@
         }
       }
 
-      // 2. Tetap fetch versi terbarunya di background untuk memperbarui cache
       try {
         const { data: setting, error } = await supabase
           .from("payment_settings")
@@ -804,8 +226,6 @@
 
         if (!error && setting) {
           localStorage.setItem("paymentSettings_" + branchId, JSON.stringify(setting));
-          
-          // Jika belum ada cache atau payload berubah, terapkan yang baru
           if (!hasCache) {
             applyPaymentSettings(setting);
           } else {
@@ -819,13 +239,11 @@
           }
         } else if (error && !hasCache) {
           console.warn("Supabase Error:", error);
-          // Default ke Duitku jika tidak ada setting
           pakeGateway('duitku');
         }
       } catch (err) {
         console.error("Fetch settings error:", err);
         if (!hasCache) {
-          // Default ke Duitku jika fetch gagal
           pakeGateway('duitku');
         }
       }
@@ -844,27 +262,22 @@
 
       window.qrisPayload = setting.qris_payload || "";
 
-      // Auto-launch: QRIS String jika admin set mode manual & ada payload, selain itu Duitku
       const mode = gatewayConfig?.mode ?? "duitku";
       if (mode === "manual" && window.qrisPayload.trim() !== "") {
-        document.getElementById('txt-metode').innerText = "QRIS";
+        document.getElementById('txt-metode').innerText = "QRIS Manual";
         pakeQRIS();
       } else {
-        document.getElementById('txt-metode').innerText = "Duitku";
+        document.getElementById('txt-metode').innerText = "Duitku Gateway";
         pakeGateway('duitku');
       }
     }
 
-    // Metode pembayaran ditentukan otomatis via applyPaymentSettings
-
-
-    // 5. MEMBUAT DATA SESI TRANSAKSI BARU DI DATABASE
     async function buatSession(metode) {
       const { data, error } = await supabase
         .from("sessions")
         .insert([{
           branch_id: branchId,
-          guest_id: user?.id || null, // AMAN: Menggunakan optional chaining jika user null
+          guest_id: user?.id || null,
           paket: namaPaket,
           harga: harga,
           pembayaran: metode,
@@ -878,7 +291,6 @@
         return null;
       }
 
-      // Update session_id ke local storage secara aman
       const currentUserData = JSON.parse(localStorage.getItem("currentUser")) || {};
       currentUserData.session_id = data.id;
       localStorage.setItem("currentUser", JSON.stringify(currentUserData));
@@ -886,7 +298,6 @@
       return data.id;
     }
 
-    // 6. DETEKSI STATUS PEMBAYARAN REALTIME (POLLING BERKALA)
     function startPolling(sId) {
       if (pollingTimer) clearInterval(pollingTimer);
       pollingTimer = setInterval(async () => {
@@ -904,7 +315,6 @@
       }, 3000);
     }
 
-    // 7. AKSI METODE: SCAN QRIS MANUAL
     async function pakeQRIS() {
       if (!window.qrisPayload || window.qrisPayload.trim() === "") {
         alert("Gagal memproses: Data QRIS dasar (qris_payload) di database kosong. Hubungi admin.");
@@ -913,13 +323,12 @@
 
       document.getElementById("metodePembayaran").classList.add("hidden");
       document.getElementById("qrisSection").classList.remove("hidden");
-      document.getElementById('txt-metode').innerText = "QRIS";
+      document.getElementById('txt-metode').innerText = "QRIS Manual";
 
-      // 1. Generate & Tampilkan QR Code DULUAN secara instan agar tidak loading lama
       try {
         const dynamic = makeQrisDynamic(window.qrisPayload, harga);
         const canvas = document.createElement("canvas");
-        await QRCode.toCanvas(canvas, dynamic, { width: 140, margin: 1 });
+        await QRCode.toCanvas(canvas, dynamic, { width: 180, margin: 1 });
 
         const box = document.getElementById("qrContainer");
         box.innerHTML = "";
@@ -927,11 +336,10 @@
 
         startCountdown(5 * 60);
       } catch (e) {
-        document.getElementById("msgQris").innerHTML = `<span style="color:#ff3b30;">Gagal generate QRIS: ${e.message}</span>`;
+        document.getElementById("msgQris").innerHTML = `<span style="color:var(--color-danger);">Gagal generate QRIS: ${e.message}</span>`;
         return;
       }
 
-      // 2. Buat session database di background agar tidak memblokir render QR Code
       buatSession("qris").then(sId => {
         if (sId) {
           sessionId = sId;
@@ -940,13 +348,9 @@
       });
     }
 
-    // Cash payment dihapus — hanya QRIS String atau Duitku
-
-
-    // 9. AKSI METODE: DUITKU GATEWAY (satu-satunya gateway aktif)
     async function pakeGateway(provider) {
       document.getElementById("gatewaySection").classList.remove("hidden");
-      document.getElementById('txt-metode').innerText = "Duitku";
+      document.getElementById('txt-metode').innerText = "Duitku Gateway";
 
       const msg = document.getElementById("msgGateway");
       msg.textContent = "⏳ Menghubungi Duitku...";
@@ -955,48 +359,61 @@
       if (!sessionId) return;
 
       const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+      const cleanPhone = (localUser.nohp || "").replace(/[^0-9]/g, "");
+      const validCustomerEmail = (localUser.email && localUser.email.trim().includes("@"))
+        ? localUser.email.trim()
+        : (cleanPhone ? `${cleanPhone}@photobooth.com` : `customer_${Date.now()}@photobooth.com`);
 
       const { data: duitkuData, error: duitkuError } = await supabase.functions.invoke("create-duitku-transaction", {
         body: {
           session_id:    sessionId,
           amount:        harga,
           customer_name: localUser.nama  || "Guest",
-          phone:         localUser.nohp  || "",
-          email:         localUser.email || "guest@photobooth.com",
+          phone:         localUser.nohp  || cleanPhone || "081234567890",
+          email:         validCustomerEmail,
           description:   `Photobooth - ${namaPaket}`,
-          return_url:    window.location.origin + "/photobox-session/sesi-foto.html"
+          return_url:    window.location.origin + "/photobox-session/pembayaran.html"
         }
       });
 
       if (duitkuError || !duitkuData?.paymentUrl) {
-        msg.textContent = "❌ Gagal membuat transaksi Duitku: " + (duitkuError?.message || "paymentUrl tidak tersedia");
+        let errorDetail = duitkuError?.message || "paymentUrl tidak tersedia";
+        try {
+          if (duitkuError?.context) {
+            const errBody = await duitkuError.context.json();
+            const detail = errBody?.detail ?? errBody?.error ?? errBody;
+            errorDetail = (typeof detail === "object") ? JSON.stringify(detail) : String(detail);
+          } else if (duitkuData?.error || duitkuData?.detail) {
+            const detail = duitkuData?.detail ?? duitkuData?.error;
+            errorDetail = (typeof detail === "object") ? JSON.stringify(detail) : String(detail);
+          }
+        } catch(e) { }
+        console.error("Duitku Error Detail:", errorDetail, duitkuError, duitkuData);
+        msg.textContent = "❌ Gagal: " + errorDetail;
         return;
       }
 
-      // Simpan reference Duitku ke localStorage
       const ud = JSON.parse(localStorage.getItem("currentUser")) || {};
       ud.duitku_reference = duitkuData.reference;
       localStorage.setItem("currentUser", JSON.stringify(ud));
 
       document.getElementById("gatewayContainer").innerHTML = `
         <a href="${duitkuData.paymentUrl}"
-           class="metode-btn"
-           style="background:#ffcc00; color:#000; display:inline-block; margin-top:16px; font-size:15px; font-weight:700;">
-          💳 KLIK UNTUK BUKA HALAMAN PEMBAYARAN DUITKU
+           class="customer-btn-primary"
+           style="display: inline-flex; margin-top: 16px; font-size: 15px; font-weight: 700; text-decoration: none;">
+          💳 KLIK UNTUK BAYAR VIA DUITKU
         </a>
-        <p style="margin-top:8px;font-size:12px;color:#aaa;">
-          Tersedia: Transfer Bank, Virtual Account, QRIS, E-Wallet, dan lainnya.
+        <p style="margin-top:12px; font-size:12px; color:var(--text-secondary);">
+          Mendukung Bank Transfer, QRIS, ShopeePay, OVO, Dana, & Virtual Account
         </p>
-        <p style="margin-top:4px;font-size:11px;color:#666;">
-          Referensi: <code style="color:#ffcc00;">${duitkuData.reference}</code>
+        <p style="margin-top:6px; font-size:11px; color:var(--text-tertiary);">
+          Ref: <code style="color:var(--color-primary);">${duitkuData.reference}</code>
         </p>
       `;
       msg.textContent = "Selesaikan pembayaran pada portal Duitku yang sudah dibuka...";
       startPolling(sessionId);
     }
 
-
-    // 10. TIMER HITUNG MUNDUR QRIS
     function startCountdown(seconds) {
       const el = document.getElementById("countdown");
       let sisa = seconds;
@@ -1006,12 +423,12 @@
         sisa--;
         const m = String(Math.floor(sisa / 60)).padStart(2, "0");
         const s = String(sisa % 60).padStart(2, "0");
-        el.textContent = `QR berlaku: ${m}:${s}`;
+        el.textContent = `⏱️ QR berlaku: ${m}:${s}`;
 
         if (sisa <= 0) {
           clearInterval(countdownTimer);
           clearInterval(pollingTimer);
-          document.getElementById("qrContainer").innerHTML = "<p style='color:#ff3b30; font-weight:700;'>KADALUARSA</p>";
+          document.getElementById("qrContainer").innerHTML = "<p style='color:var(--color-danger); font-weight:700;'>KADALUARSA</p>";
           el.textContent = "";
           alert("Waktu pembayaran habis. Sesi direset kembali ke halaman utama.");
           setTimeout(() => { kembali(); }, 1500);
@@ -1019,12 +436,11 @@
       }, 1000);
     }
 
-    // 11. REDIRECT HALAMAN KETIKA TRANSAKSI PAID
     function lanjutSetelahBayar() {
       const localUser = JSON.parse(localStorage.getItem("currentUser")) || {};
       localUser.sudahBayar = true;
       localStorage.setItem("currentUser", JSON.stringify(localUser));
-      window.location.href = "sesi-foto.html";
+      window.location.href = "intro-video.html";
     }
 
     document.getElementById('btn-konfirmasi').addEventListener('click', function () {
@@ -1036,7 +452,6 @@
       }
     });
 
-    // 12. LOGIC ENGINE QRIS DYNAMIC GENERATOR
     function makeQrisDynamic(qrisString, amountNumber) {
       const amount = String(Math.trunc(amountNumber));
       const items = parseTLV(qrisString).filter(x => x.tag !== "63");
@@ -1051,7 +466,7 @@
       const out = []; let i = 0;
       while (i < str.length) {
         const tag = str.slice(i, i + 2);
-        const len = Number(str.slice(i + 2, i + 4));
+        const len = Number(str.slice(i + 4, i + 4)); // Wait length extraction
         const val = str.slice(i + 4, i + 4 + len);
         if (Number.isNaN(len) || val.length !== len) throw new Error("Format TLV QRIS dasar tidak valid.");
         out.push({ tag, value: val });
@@ -1078,7 +493,6 @@
       return crc.toString(16).toUpperCase().padStart(4, "0");
     }
 
-    // Amankan TLV insertion logic
     function setOrInsert(items, tag, value, opt = {}) {
       const idx = items.findIndex(x => x.tag === tag);
       if (idx >= 0) { items[idx].value = value; return; }

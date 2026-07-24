@@ -1,949 +1,281 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
-  <title>Buat Admin Baru</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/stylesupers.css?v=original">
-  <style>
-    /* Resolve Body Flex Layout Collision */
-    body {
-      display: block !important;
-      background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%) !important;
-      min-height: 100vh !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      font-family: 'Plus Jakarta Sans', sans-serif !important;
-      box-sizing: border-box !important;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buat Admin Baru — Axionix Superadmin</title>
 
-    /* Premium Horizontal Header Bar */
-    .page-header {
-      background: #ffffff !important;
-      padding: 0.75rem 2rem !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      border-bottom: 1px solid #e4e4e7 !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-      position: relative !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-    }
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
+    rel="stylesheet" />
 
-    .page-header::before {
-      display: none !important;
-    }
-
-    .page-header h1 {
-      color: #000000 !important;
-      font-size: 1.4rem !important;
-      font-weight: 800 !important;
-      text-shadow: none !important;
-      letter-spacing: -0.02em !important;
-      margin: 0 !important;
-      position: absolute !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-    }
-
-    /* Modern Minimalist Back Button */
-    .btn-back {
-      background: transparent !important;
-      color: #000000 !important;
-      border: 1.5px solid #000000 !important;
-      border-radius: 9999px !important;
-      padding: 0.6rem 1.4rem !important;
-      font-weight: 800 !important;
-      font-size: 0.9rem !important;
-      cursor: pointer !important;
-      box-shadow: none !important;
-      transition: all 0.2s ease-in-out !important;
-    }
-
-    .btn-back:hover {
-      background: #000000 !important;
-      color: #ffffff !important;
-      transform: translateY(-2px) !important;
-    }
-
-    .btn-back:active {
-      transform: translateY(1px) !important;
-    }
-
-    /* Center Page Body Wrapper */
-    .page-body {
-      max-width: 880px !important;
-      width: 90% !important;
-      margin: 1.8rem auto !important;
-      padding: 0 !important;
-      box-sizing: border-box !important;
-    }
-
-    /* Premium Centered Card Container */
-    .form-card {
-      background: #ffffff !important;
-      border-radius: 24px !important;
-      border: 1px solid #e4e4e7 !important;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-      padding: 1.4rem 2.2rem !important;
-      box-sizing: border-box !important;
-      width: 100% !important;
-    }
-
-    .form-card h2 {
-      font-size: 1.15rem !important;
-      font-weight: 800 !important;
-      color: #000000 !important;
-      margin-bottom: 0.75rem !important;
-      padding-bottom: 0.35rem !important;
-      border-bottom: 1px dashed #e4e4e7 !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 0.5rem !important;
-    }
-
-    .form-card h2::before {
-      display: none !important;
-    }
-
-    /* Modern Crisp Inputs & Labels */
-    .form-row {
-      display: flex !important;
-      gap: 1.5rem !important;
-    }
-
-    .form-row .field {
-      flex: 1 !important;
-    }
-
-    .field {
-      margin-bottom: 0.75rem !important;
-    }
-
-    .field label {
-      display: block !important;
-      font-size: 0.72rem !important;
-      font-weight: 800 !important;
-      color: #000000 !important;
-      text-transform: uppercase !important;
-      letter-spacing: 0.05em !important;
-      margin-bottom: 0.3rem !important;
-    }
-
-    .field label .req {
-      color: #ef4444 !important;
-    }
-
-    .field input, .field select, #branchSelect {
-      width: 100% !important;
-      padding: 0.65rem 1rem !important;
-      border: 1.5px solid #e4e4e7 !important;
-      border-radius: 8px !important;
-      background: #ffffff !important;
-      font-size: 0.9rem !important;
-      outline: none !important;
-      color: #000000 !important;
-      box-sizing: border-box !important;
-      transition: all 0.2s ease !important;
-      box-shadow: none !important;
-    }
-
-    .field input:focus, .field select:focus, #branchSelect:focus {
-      border-color: #000000 !important;
-      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05) !important;
-    }
-
-    .field .hint {
-      font-size: 0.7rem !important;
-      color: #71717a !important;
-      margin-top: 0.3rem !important;
-    }
-
-    /* Role selection cards */
-    .role-grid {
-      display: flex !important;
-      gap: 1.25rem !important;
-      width: 100% !important;
-    }
-
-    .role-option {
-      flex: 1 !important;
-      background: #ffffff !important;
-      border: 1.5px solid #e4e4e7 !important;
-      border-radius: 16px !important;
-      padding: 0.85rem 1rem !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-      text-align: center !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01) !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-
-    .role-option input[type=radio] {
-      display: none !important;
-    }
-
-    .role-option:has(input:checked) {
-      border-color: #000000 !important;
-      background: #f4f4f5 !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04) !important;
-    }
-
-    .role-icon {
-      font-size: 1.6rem !important;
-      margin-bottom: 0.2rem !important;
-    }
-
-    .role-label {
-      font-size: 0.95rem !important;
-      font-weight: 800 !important;
-      color: #000000 !important;
-    }
-
-    .role-desc {
-      font-size: 0.75rem !important;
-      color: #71717a !important;
-      margin-top: 0.2rem !important;
-    }
-
-    /* Divider */
-    .divider {
-      height: 1px !important;
-      background: #e4e4e7 !important;
-      margin: 0.8rem 0 !important;
-    }
-
-    /* Outlined Button for Branch Creation */
-    .branch-row {
-      display: flex !important;
-      flex-direction: row !important;
-      gap: 0.8rem !important;
-      align-items: center !important;
-    }
-
-    .btn-new-branch {
-      background: transparent !important;
-      color: #000000 !important;
-      border: 2px solid #000000 !important;
-      border-radius: 9999px !important;
-      padding: 0.85rem 1.4rem !important;
-      font-weight: 800 !important;
-      font-size: 0.9rem !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-      width: auto !important;
-      white-space: nowrap !important;
-      box-sizing: border-box !important;
-      text-align: center !important;
-      box-shadow: none !important;
-    }
-
-    .btn-new-branch:hover {
-      background: #000000 !important;
-      color: #ffffff !important;
-      transform: translateY(-2px) !important;
-    }
-
-    /* New Branch Panel */
-    .new-branch-panel {
-      background: #f4f4f5 !important;
-      border: 1.5px solid #e4e4e7 !important;
-      border-radius: 16px !important;
-      padding: 1.5rem !important;
-      margin-top: 1.25rem !important;
-      box-shadow: none !important;
-    }
-
-    .panel-title {
-      font-size: 1rem !important;
-      font-weight: 800 !important;
-      color: #000000 !important;
-      margin-bottom: 1rem !important;
-    }
-
-    .panel-row {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: 1rem !important;
-    }
-
-    .panel-field label {
-      font-size: 0.7rem !important;
-      font-weight: 800 !important;
-      color: #000000 !important;
-      margin-bottom: 0.3rem !important;
-      text-transform: uppercase !important;
-    }
-
-    .panel-field input {
-      width: 100% !important;
-      padding: 0.7rem 1rem !important;
-      border: 1.5px solid #e4e4e7 !important;
-      border-radius: 8px !important;
-      background: #ffffff !important;
-      font-size: 0.85rem !important;
-    }
-
-    .btn-create-branch {
-      margin-top: 1.2rem !important;
-      background: #000000 !important;
-      color: #ffffff !important;
-      border: 2px solid #000000 !important;
-      border-radius: 9999px !important;
-      padding: 0.9rem !important;
-      font-weight: 800 !important;
-      font-size: 0.95rem !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-      width: 100% !important;
-    }
-
-    .btn-create-branch:hover:not(:disabled) {
-      background: transparent !important;
-      color: #000000 !important;
-    }
-
-    /* Primary Submit Action Buttons */
-    .btn-submit {
-      width: 100% !important;
-      background: #000000 !important;
-      color: #ffffff !important;
-      font-size: 1rem !important;
-      font-weight: 800 !important;
-      padding: 0.75rem !important;
-      border: 2px solid #000000 !important;
-      border-radius: 9999px !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease-in-out !important;
-      box-shadow: none !important;
-    }
-
-    .btn-submit:hover:not(:disabled) {
-      background: transparent !important;
-      color: #000000 !important;
-      transform: translateY(-2px) !important;
-    }
-
-    .btn-submit:active:not(:disabled) {
-      transform: translateY(1px) !important;
-    }
-
-    .btn-submit:disabled {
-      background: #f4f4f5 !important;
-      border-color: #e4e4e7 !important;
-      color: #a1a1aa !important;
-      cursor: not-allowed !important;
-    }
-
-    /* Premium Alert Box */
-    .alert {
-      border: 1px solid #e4e4e7 !important;
-      border-radius: 12px !important;
-      padding: 1rem 1.25rem !important;
-      font-size: 0.9rem !important;
-      font-weight: 600 !important;
-      margin-bottom: 1.5rem !important;
-      box-shadow: none !important;
-    }
-
-    .alert.success {
-      background: #f0fdf4 !important;
-      color: #166534 !important;
-      border-color: #bbf7d0 !important;
-    }
-
-    .alert.error {
-      background: #fef2f2 !important;
-      color: #991b1b !important;
-      border-color: #fca5a5 !important;
-    }
-
-    /* Premium Success Banner */
-    .success-banner {
-      background: #f0fdf4 !important;
-      border: 1px solid #bbf7d0 !important;
-      border-radius: 24px !important;
-      padding: 2.5rem !important;
-      text-align: center !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
-      margin-bottom: 2rem !important;
-    }
-
-    .success-banner h3 {
-      font-size: 1.5rem !important;
-      font-weight: 800 !important;
-      color: #166534 !important;
-      text-shadow: none !important;
-    }
-
-    .success-banner p {
-      color: #166534 !important;
-    }
-
-    .success-banner .sb-info {
-      background: #ffffff !important;
-      border: 1px solid #bbf7d0 !important;
-      border-radius: 16px !important;
-      padding: 1.25rem !important;
-      box-shadow: none !important;
-    }
-
-    .info-row {
-      border-bottom: 1px dashed #e4e4e7 !important;
-    }
-
-    .info-row .v {
-      color: #000000 !important;
-    }
-
-    .btn-another {
-      background: #000000 !important;
-      color: #ffffff !important;
-      border: 2px solid #000000 !important;
-      border-radius: 9999px !important;
-      padding: 1rem 2rem !important;
-      font-weight: 800 !important;
-      box-shadow: none !important;
-      transition: all 0.2s ease !important;
-    }
-
-    .btn-another:hover {
-      background: transparent !important;
-      color: #000000 !important;
-      transform: translateY(-2px) !important;
-    }
-
-    @media (max-width: 600px) {
-      .page-header {
-        padding: 1rem 1.25rem !important;
-      }
-      .page-body {
-        margin: 2rem auto !important;
-      }
-      .form-card {
-        padding: 2.2rem 1.5rem !important;
-      }
-      .form-row {
-        flex-direction: column !important;
-        gap: 0 !important;
-      }
-      .role-grid {
-        flex-direction: column !important;
-      }
-      .branch-row {
-        flex-direction: column !important;
-      }
-      .btn-new-branch {
-        width: 100% !important;
-      }
-      .panel-row {
-        grid-template-columns: 1fr !important;
-      }
-    }
-  </style>
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/superadmin.css" />
 </head>
-<body>
 
-<script>
-  const admin = JSON.parse(localStorage.getItem("currentAdmin"));
-  if (!admin) window.location.href = "../index.html";
-  if (admin.role !== "superadmin") window.location.href = "dashboard.html";
-</script>
+<body class="superadmin-page">
 
-<!-- ── Header ── -->
-<div class="page-header">
-  <button class="btn-back" onclick="goBack()">← Dashboard</button>
-  <h1>Buat Admin Baru</h1>
-</div>
+  <script>
+    const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+    if (!admin) window.location.href = "../index.html";
+    if (admin && admin.role !== "superadmin") window.location.href = "../admin/dashboard.html";
+  </script>
 
-<!-- ── Body ── -->
-<div class="page-body">
+  <div class="superadmin-container max-w-xl">
 
-  <!-- Alert -->
-  <div class="alert" id="alertBox">
-    <span id="alertIcon">⚠️</span>
-    <span id="alertMsg"></span>
-  </div>
-
-  <!-- RLS Alert khusus untuk branches -->
-  <div id="rlsAlert" style="display:none;background:#fef3c7;border:1.5px solid #fbbf24;border-radius:12px;padding:16px;margin-bottom:16px;">
-    <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;">⚠️ Perlu izin RLS untuk buat cabang baru</div>
-    <div style="font-size:12px;color:#78350f;margin-bottom:10px;">Jalankan SQL ini sekali di <strong>Supabase → SQL Editor</strong>:</div>
-    <div style="background:#1e1e1e;color:#4ade80;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;line-height:1.6;overflow-x:auto;white-space:pre;">CREATE POLICY "allow_auth_insert_branches"
-ON branches FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
-CREATE POLICY "allow_auth_select_branches"
-ON branches FOR SELECT
-TO authenticated
-USING (true);</div>
-    <div style="font-size:11px;color:#92400e;margin-top:8px;">Setelah menjalankan SQL, coba lagi buat cabang.</div>
-    <button onclick="document.getElementById('rlsAlert').style.display='none'"
-      style="margin-top:10px;background:#92400e;color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
-      Mengerti, tutup
-    </button>
-  </div>
-
-  <!-- Success Banner -->
-  <div class="success-banner" id="successBanner">
-    <div class="sb-icon">🎉</div>
-    <h3>Admin Berhasil Dibuat!</h3>
-    <p>Akun sudah aktif dan bisa langsung login.</p>
-    <div class="sb-info" id="successInfo"></div>
-    <p style="font-size:11px;color:#006644;margin-bottom:10px;">
-      ⚠️ Simpan password ini sekarang — tidak bisa dilihat lagi.
-    </p>
-    <button class="btn-another" onclick="resetForm()">+ Buat Admin Lagi</button>
-  </div>
-
-  <!-- Form -->
-  <div class="form-card" id="formCard">
-
-    <div class="form-row" style="align-items: flex-start !important; gap: 2.5rem !important;">
-      
-      <!-- Left Column: Identitas Admin -->
-      <div style="flex: 1.15; min-width: 0;">
-        <h2>👤 Identitas Admin</h2>
-
-        <div class="field">
-          <label>Nama Tampilan <span class="req">*</span></label>
-          <input type="text" id="displayName" placeholder="cth: Admin Jakarta Pusat">
-        </div>
-
-        <div class="field">
-          <label>Email <span class="req">*</span></label>
-          <input type="email" id="email" placeholder="cth: jakarta@photobooth.com">
-        </div>
-
-        <div class="field">
-          <label>Password <span class="req">*</span></label>
-          <input type="password" id="password" placeholder="Minimal 8 karakter">
-          <div class="hint">Minimal 8 karakter. Akan diberikan ke admin cabang.</div>
-        </div>
-
-        <div class="field">
-          <label>Konfirmasi Password <span class="req">*</span></label>
-          <input type="password" id="passwordConfirm" placeholder="Ulangi password">
-        </div>
+    <!-- Top Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center;" class="mb-6">
+      <div>
+        <h1 class="superadmin-title" style="font-size:var(--text-xl);">Buat Admin Cabang Baru 👤</h1>
+        <p class="superadmin-subtitle">Daftarkan akun administrator untuk mengelola titik kios photobooth</p>
       </div>
 
-      <!-- Right Column: Role & Cabang -->
-      <div style="flex: 1; min-width: 0;">
-        <!-- Role -->
-        <h2>🔑 Role</h2>
-        <div class="field">
-          <div class="role-grid">
-            <label class="role-option">
-              <input type="radio" name="role" value="admin" checked>
-              <div class="role-icon">🏪</div>
-              <div class="role-label">Admin</div>
-              <div class="role-desc">Kelola 1 cabang</div>
-            </label>
-            <label class="role-option">
-              <input type="radio" name="role" value="superadmin">
-              <div class="role-icon">👑</div>
-              <div class="role-label">Superadmin</div>
-              <div class="role-desc">Akses semua cabang</div>
-            </label>
-          </div>
-        </div>
-
-        <div class="divider" style="margin: 1rem 0 !important; background: linear-gradient(90deg, transparent, #e4e4e7, transparent) !important;"></div>
-
-        <!-- Cabang -->
-        <h2>🏢 Cabang</h2>
-
-        <div class="field">
-          <label>Pilih Cabang <span class="req">*</span></label>
-          <div class="branch-row">
-            <select id="branchSelect">
-              <option value="">⏳ Loading cabang...</option>
-            </select>
-            <button class="btn-new-branch" onclick="toggleNewBranch()">+ Cabang Baru</button>
-          </div>
-        </div>
-
-        <!-- Panel buat cabang baru -->
-        <div class="new-branch-panel" id="newBranchPanel">
-          <div class="panel-title">🏗️ Buat Cabang Baru</div>
-          <div class="panel-row">
-            <div class="panel-field">
-              <label>Nama Cabang</label>
-              <input type="text" id="branchName" placeholder="cth: Jakarta Pusat">
-            </div>
-            <div class="panel-field">
-              <label>Kode Cabang</label>
-              <input type="text" id="branchCode" placeholder="cth: JKT-01" maxlength="20"
-                oninput="this.value=this.value.toUpperCase()">
-            </div>
-          </div>
-          <button class="btn-create-branch" id="btnCreateBranch" onclick="createBranch()">
-            🏢 Simpan Cabang Baru
-          </button>
-        </div>
-      </div>
-
+      <button class="btn btn-outline btn-sm" onclick="window.location.href='dashboard.html'">
+        <span>← Kembali</span>
+      </button>
     </div>
 
-    <div class="divider"></div>
+    <!-- Alert Banner -->
+    <div id="alertBox" class="badge p-3 w-full mb-4 hidden text-left"></div>
 
-    <!-- Submit -->
-    <button class="btn-submit" id="btnSubmit" onclick="createAdmin()">
-      ✅ Buat Akun Admin
-    </button>
+    <!-- Success Card Banner -->
+    <div id="successBanner" class="card p-6 mb-6 hidden"
+      style="background:var(--color-success-light); border:1px solid var(--color-success);">
+      <div style="font-size:2rem;" class="mb-2">🎉</div>
+      <h3 class="font-bold text-lg text-primary mb-1">Akun Admin Berhasil Dibuat!</h3>
+      <p class="text-xs text-secondary mb-4">Salin detail kredensial di bawah ini untuk diserahkan kepada admin cabang:
+      </p>
 
-  </div><!-- /form-card -->
-</div><!-- /page-body -->
+      <div class="card p-4 mb-4" style="background:#fff;" id="successInfo"></div>
 
-<!-- Non-module untuk onclick -->
-<script>
-  let showNewBranch = false;
-
-  function toggleNewBranch() {
-    showNewBranch = !showNewBranch;
-    document.getElementById("newBranchPanel").classList.toggle("show", showNewBranch);
-  }
-
-  function goBack() { window.location.href = "dashboard.html"; }
-
-  function showAlert(msg, type = "error") {
-    const box  = document.getElementById("alertBox");
-    const icon = document.getElementById("alertIcon");
-    const text = document.getElementById("alertMsg");
-    icon.textContent = type === "error" ? "❌" : "✅";
-    text.textContent = msg;
-    box.className = `alert show ${type}`;
-    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    if (type === "success") setTimeout(() => box.classList.remove("show"), 4000);
-  }
-
-  function hideAlert() {
-    document.getElementById("alertBox").classList.remove("show");
-  }
-
-  function resetForm() {
-    document.getElementById("successBanner").classList.remove("show");
-    document.getElementById("formCard").style.display = "block";
-    document.getElementById("displayName").value  = "";
-    document.getElementById("email").value         = "";
-    document.getElementById("password").value      = "";
-    document.getElementById("passwordConfirm").value = "";
-    document.querySelector('input[name=role][value=admin]').checked = true;
-    hideAlert();
-  }
-
-  function setLoading(loading) {
-    const btn = document.getElementById("btnSubmit");
-    btn.disabled = loading;
-    btn.innerHTML = loading
-      ? '<span class="spinner"></span> Membuat akun...'
-      : '✅ Buat Akun Admin';
-  }
-
-  function showRateLimitBanner() {
-    setLoading(false);
-    const existing = document.getElementById("rateLimitBanner");
-    if (existing) existing.remove();
-
-    const div = document.createElement("div");
-    div.id = "rateLimitBanner";
-    div.style.cssText = "background:#fef3c7;border:1.5px solid #fbbf24;border-radius:12px;padding:16px;margin-bottom:16px;";
-    div.innerHTML = `
-      <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:8px;">⏱️ Email Rate Limit — Terlalu banyak email dikirim</div>
-      <div style="font-size:12px;color:#78350f;margin-bottom:12px;">
-        Supabase membatasi pengiriman email konfirmasi. Solusinya: <strong>matikan email confirmation</strong>.
+      <div style="display:flex; gap:var(--space-3);">
+        <button class="btn btn-primary btn-sm flex-1" onclick="location.reload()">＋ Buat Admin Lain</button>
+        <button class="btn btn-outline btn-sm flex-1" onclick="window.location.href='dashboard.html'">Kembali ke
+          Dashboard</button>
       </div>
-      <div style="background:#1e1e1e;color:#facc15;border-radius:8px;padding:12px;font-size:12px;font-family:monospace;line-height:1.8;">
-        Supabase Dashboard<br>
-        → Authentication<br>
-        → Providers<br>
-        → Email<br>
-        → <strong style="color:#4ade80">Confirm email → OFF</strong>
-      </div>
-      <div style="font-size:12px;color:#78350f;margin-top:10px;">
-        Setelah dimatikan, tidak ada email konfirmasi yang dikirim — akun langsung aktif saat dibuat.
-        <br>Coba buat akun lagi setelah setting diubah.
-      </div>
-      <button onclick="document.getElementById('rateLimitBanner').remove()"
-        style="margin-top:10px;background:#92400e;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
-        Mengerti
-      </button>`;
+    </div>
 
-    const body = document.querySelector(".page-body");
-    body.insertBefore(div, body.firstChild);
-    div.scrollIntoView({ behavior: "smooth" });
-  }
+    <!-- Main Form Card -->
+    <div class="card p-6" id="formCard">
+      <form onsubmit="event.preventDefault(); createAdmin();">
 
-  function showProfileErrorBanner(userId, role, branchId, displayName, errMsg) {
-    // Show a dedicated banner with SQL copy button
-    const existing = document.getElementById("profileErrBanner");
-    if (existing) existing.remove();
+        <!-- Role Selection Cards -->
+        <div class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Pilih Role Akses</div>
+        <div class="grid mb-4" style="grid-template-columns:1fr 1fr; gap:var(--space-3);">
 
-    const sql = `INSERT INTO profiles (user_id, role, branch_id, display_name) VALUES ('${userId}', '${role}', '${branchId}', '${displayName}');`;
+          <label class="superadmin-role-card selected" id="roleAdminCard" onclick="selectRole('admin')">
+            <input type="radio" name="role" value="admin" checked style="display:none;">
+            <div style="font-size:1.5rem;" class="mb-1">🏪</div>
+            <div class="font-bold text-sm text-primary">Admin Cabang</div>
+            <div class="caption text-secondary">Akses dashboard cabang tunggal</div>
+          </label>
 
-    const div = document.createElement("div");
-    div.id = "profileErrBanner";
-    div.style.cssText = "background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:16px;";
-    div.innerHTML = `
-      <div style="font-size:13px;font-weight:800;color:#991b1b;margin-bottom:6px;">⚠️ Akun dibuat, tapi profil gagal disimpan</div>
-      <div style="font-size:12px;color:#7f1d1d;margin-bottom:10px;">Error: <code>${errMsg}</code><br><br>
-      Akun email sudah aktif. Jalankan SQL ini di <strong>Supabase → SQL Editor</strong> untuk melengkapi:</div>
-      <div id="sqlBox" style="background:#1e1e1e;color:#4ade80;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;line-height:1.6;word-break:break-all;">${sql}</div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button onclick="navigator.clipboard.writeText(\`${sql.replace(/`/g,'\`')}\`).then(()=>{this.textContent='✅ Tersalin!';setTimeout(()=>{this.textContent='📋 Copy SQL'},2000)})"
-          style="background:#991b1b;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
-          📋 Copy SQL
+          <label class="superadmin-role-card" id="roleSuperadminCard" onclick="selectRole('superadmin')">
+            <input type="radio" name="role" value="superadmin" style="display:none;">
+            <div style="font-size:1.5rem;" class="mb-1">👑</div>
+            <div class="font-bold text-sm text-primary">Superadmin</div>
+            <div class="caption text-secondary">Akses penuh seluruh cabang</div>
+          </label>
+
+        </div>
+
+        <!-- Input Fields -->
+        <div class="input-group mb-3">
+          <label for="displayName" class="input-label">Nama Tampilan Admin <span class="text-danger">*</span></label>
+          <input type="text" id="displayName" placeholder="misal: Admin Store Central" class="input" required>
+        </div>
+
+        <div class="input-group mb-3">
+          <label for="email" class="input-label">Email Administrator <span class="text-danger">*</span></label>
+          <input type="email" id="email" placeholder="admin.central@cabang.com" class="input" required>
+        </div>
+
+        <div class="grid mb-4" style="grid-template-columns:1fr 1fr; gap:var(--space-3);">
+          <div class="input-group">
+            <label for="password" class="input-label">Password <span class="text-danger">*</span></label>
+            <input type="password" id="password" placeholder="Min. 8 karakter" class="input" required>
+          </div>
+
+          <div class="input-group">
+            <label for="passwordConfirm" class="input-label">Konfirmasi Password <span
+                class="text-danger">*</span></label>
+            <input type="password" id="passwordConfirm" placeholder="Ulangi password" class="input" required>
+          </div>
+        </div>
+
+        <!-- Branch Selector Section -->
+        <div class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Penugasan Cabang</div>
+        <div class="card p-4 mb-4" style="background:var(--bg-subtle);">
+          <div style="display:flex; gap:var(--space-2);" class="mb-2">
+            <select id="branchSelect" class="select flex-1">
+              <option value="">-- Pilih Cabang --</option>
+            </select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="toggleNewBranch()">＋ Buat Baru</button>
+          </div>
+
+          <!-- New Branch In-place Form -->
+          <div id="newBranchPanel" class="hidden mt-3 pt-3" style="border-top:1px dashed var(--border-subtle);">
+            <div class="text-xs font-bold text-primary mb-2">Tambah Lokasi Cabang Baru</div>
+            <div class="grid mb-2" style="grid-template-columns:1.5fr 1fr; gap:var(--space-2);">
+              <input type="text" id="newBranchName" placeholder="Nama Cabang (misal: Grand Indonesia)"
+                class="input input-sm">
+              <input type="text" id="newBranchCode" placeholder="Kode (GI-01)" class="input input-sm">
+            </div>
+            <button type="button" class="btn btn-primary btn-xs btn-block" onclick="saveNewBranch()">Simpan &amp; Pilih
+              Cabang Ini</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-xl btn-block" id="btnSubmit">
+          <span>🚀 Daftarkan Akun Admin</span>
         </button>
-        <button onclick="document.getElementById('profileErrBanner').remove()"
-          style="background:#f5f5f5;color:#333;border:1px solid #ddd;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
-          Tutup
-        </button>
-      </div>`;
 
-    const body = document.querySelector(".page-body");
-    body.insertBefore(div, body.firstChild);
-    div.scrollIntoView({ behavior: "smooth" });
-  }
+      </form>
+    </div>
 
-  function showAlertRLS() {
-    document.getElementById("rlsAlert").style.display = "block";
-    document.getElementById("rlsAlert").scrollIntoView({ behavior: "smooth" });
-  }
+  </div>
 
-  function setBranchLoading(loading) {
-    const btn = document.getElementById("btnCreateBranch");
-    btn.disabled = loading;
-    btn.innerHTML = loading
-      ? '<span class="spinner"></span> Menyimpan...'
-      : '🏢 Simpan Cabang Baru';
-  }
-</script>
-
-<script type="module">
-  import { supabase } from "../assets/js/supabase.js";
-
-  // ── Load branches ────────────────────────────────────────────────
-  async function loadBranches(selectId = null) {
-    const sel = document.getElementById("branchSelect");
-    const { data, error } = await supabase
-      .from("branches")
-      .select("id, name, code")
-      .order("name", { ascending: true });
-
-    if (error || !data) {
-      sel.innerHTML = '<option value="">Gagal load cabang</option>';
-      return;
-    }
-
-    sel.innerHTML = '<option value="">-- Pilih Cabang --</option>' +
-      data.map(b =>
-        `<option value="${b.id}" ${b.id === selectId ? "selected" : ""}>
-          ${b.name} (${b.code})
-        </option>`
-      ).join("");
-  }
-
-  loadBranches();
-
-  // ── Buat cabang baru ─────────────────────────────────────────────
-  window.createBranch = async function() {
-    const name = document.getElementById("branchName").value.trim();
-    const code = document.getElementById("branchCode").value.trim();
-
-    if (!name || !code) {
-      showAlert("Nama dan kode cabang wajib diisi!", "error");
-      return;
-    }
-
-    setBranchLoading(true);
-    hideAlert();
-
-    const { data, error } = await supabase
-      .from("branches")
-      .insert([{ name, code }])
-      .select()
-      .single();
-
-    setBranchLoading(false);
-
-    if (error) {
-      let msg = "Gagal buat cabang: " + error.message;
-      if (error.message.includes("row-level security")) {
-        msg = "Gagal: RLS block insert ke tabel branches. Jalankan SQL ini di Supabase dulu:\n" +
-              "CREATE POLICY \"superadmin_insert_branches\" ON branches FOR INSERT TO authenticated WITH CHECK (true);\n" +
-              "CREATE POLICY \"superadmin_select_branches\" ON branches FOR SELECT TO authenticated USING (true);";
-        // Show in alert nicely
-        showAlertRLS();
-        setBranchLoading(false);
-        return;
+  <script>
+    function selectRole(r) {
+      document.querySelectorAll(".superadmin-role-card").forEach(c => c.classList.remove("selected"));
+      if (r === "admin") {
+        document.getElementById("roleAdminCard").classList.add("selected");
+        document.querySelector('input[name="role"][value="admin"]').checked = true;
+      } else {
+        document.getElementById("roleSuperadminCard").classList.add("selected");
+        document.querySelector('input[name="role"][value="superadmin"]').checked = true;
       }
-      showAlert(msg, "error");
-      return;
     }
 
-    // Reset panel & reload branches, auto-select yang baru
-    document.getElementById("branchName").value = "";
-    document.getElementById("branchCode").value = "";
-    document.getElementById("newBranchPanel").classList.remove("show");
-    showNewBranch = false;
-
-    await loadBranches(data.id);
-    showAlert(`✅ Cabang "${name}" berhasil dibuat dan dipilih!`, "success");
-  };
-
-  // ── Buat admin ───────────────────────────────────────────────────
-  window.createAdmin = async function() {
-    hideAlert();
-
-    const displayName    = document.getElementById("displayName").value.trim();
-    const email          = document.getElementById("email").value.trim().toLowerCase();
-    const password       = document.getElementById("password").value;
-    const passwordConfirm= document.getElementById("passwordConfirm").value;
-    const role           = document.querySelector('input[name=role]:checked').value;
-    const branchId       = document.getElementById("branchSelect").value;
-
-    // ── Validasi ──────────────────────────────────────────────────
-    if (!displayName) {
-      showAlert("Nama tampilan wajib diisi!", "error");
-      document.getElementById("displayName").focus();
-      return;
-    }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showAlert("Format email tidak valid!", "error");
-      document.getElementById("email").focus();
-      return;
-    }
-    if (password.length < 8) {
-      showAlert("Password minimal 8 karakter!", "error");
-      document.getElementById("password").focus();
-      return;
-    }
-    if (password !== passwordConfirm) {
-      showAlert("Konfirmasi password tidak cocok!", "error");
-      document.getElementById("passwordConfirm").focus();
-      return;
-    }
-    if (!branchId) {
-      showAlert("Pilih cabang untuk admin ini!", "error");
-      document.getElementById("branchSelect").focus();
-      return;
+    function toggleNewBranch() {
+      const p = document.getElementById("newBranchPanel");
+      p.classList.toggle("hidden");
     }
 
-    setLoading(true);
+    function showAlert(msg, type) {
+      const b = document.getElementById("alertBox");
+      b.classList.remove("hidden");
+      b.className = "badge p-3 w-full mb-4 text-left " + (type === "error" ? "badge-danger" : "badge-success");
+      b.textContent = msg;
+    }
 
-    // ── Step 1: Daftar user ke Supabase Auth ──────────────────────
-    // Pakai signUp biasa — pastikan "Confirm email" sudah di-OFF
-    // di Supabase → Authentication → Providers → Email
-    const { data: authData, error: authError } =
-      await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            display_name: displayName,
-            role: role
-          }
-        }
-      });
+    function hideAlert() {
+      document.getElementById("alertBox").classList.add("hidden");
+    }
 
-    if (authError) {
-      setLoading(false);
-      let msg = "Gagal buat akun: " + authError.message;
-      if (authError.message.toLowerCase().includes("rate limit") ||
-          authError.message.toLowerCase().includes("email rate")) {
-        msg = "";
-        showRateLimitBanner();
-        return;
+    function createAdmin() { if (window._createAdmin) window._createAdmin(); }
+    function saveNewBranch() { if (window._saveNewBranch) window._saveNewBranch(); }
+  </script>
+
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
+
+    async function loadBranches(selectId = null) {
+      const sel = document.getElementById("branchSelect");
+      const { data } = await supabase.from("branches").select("id, name, code").order("name");
+      if (data) {
+        sel.innerHTML = '<option value="">-- Pilih Cabang --</option>' +
+          data.map(b => `<option value="${b.id}">${b.name} (${b.code})</option>`).join("");
+        if (selectId) sel.value = selectId;
       }
-      if (authError.message.toLowerCase().includes("already registered") ||
-          authError.message.toLowerCase().includes("already been registered")) {
-        msg = "Email ini sudah terdaftar. Gunakan email lain.";
+    }
+
+    window._saveNewBranch = async function () {
+      const name = document.getElementById("newBranchName").value.trim();
+      const code = document.getElementById("newBranchCode").value.trim().toUpperCase();
+
+      if (!name || !code) { alert("Nama dan kode cabang wajib diisi!"); return; }
+
+      const { data, error } = await supabase.from("branches").insert([{ name, code }]).select().single();
+      if (error) { alert("Gagal simpan cabang: " + error.message); return; }
+
+      document.getElementById("newBranchName").value = "";
+      document.getElementById("newBranchCode").value = "";
+      document.getElementById("newBranchPanel").classList.add("hidden");
+
+      await loadBranches(data.id);
+      showAlert(`✅ Cabang "${name}" berhasil dibuat dan dipilih!`, "success");
+    };
+
+    window._createAdmin = async function () {
+      hideAlert();
+
+      const displayName = document.getElementById("displayName").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+      const passwordConfirm = document.getElementById("passwordConfirm").value;
+      const role = document.querySelector('input[name=role]:checked').value;
+      const branchId = document.getElementById("branchSelect").value;
+
+      if (!displayName || !email || !password || !branchId) {
+        showAlert("Semua field bertanda bintang wajib diisi!", "error"); return;
       }
-      showAlert(msg, "error");
-      return;
-    }
+      if (password.length < 8) {
+        showAlert("Password minimal 8 karakter!", "error"); return;
+      }
+      if (password !== passwordConfirm) {
+        showAlert("Konfirmasi password tidak cocok!", "error"); return;
+      }
 
-    if (!authData.user) {
-      setLoading(false);
-      showAlert("Gagal mendapatkan data user setelah registrasi.", "error");
-      return;
-    }
+      const btn = document.getElementById("btnSubmit");
+      btn.disabled = true;
+      btn.textContent = "⏳ Memproses...";
 
-    const userId = authData.user.id;
+      try {
+        const { data: currentSession } = await supabase.auth.getSession();
+        const superadminRefreshToken = currentSession?.session?.refresh_token;
+        const superadminAccessToken = currentSession?.session?.access_token;
 
-    // ── Step 2: Get branch name untuk display ─────────────────────
-    const { data: branchData } = await supabase
-      .from("branches")
-      .select("name, code")
-      .eq("id", branchId)
-      .single();
-
-    // ── Step 3: Insert ke tabel profiles (cek dulu apakah sudah ada) ─
-    // Cek apakah trigger otomatis sudah insert profile
-    const { data: existingProfile } = await supabase
-      .from("profiles")
-      .select("user_id")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    let profileError = null;
-
-    if (existingProfile) {
-      // Sudah ada (dibuat oleh trigger) — update saja
-      const { error: updateErr } = await supabase
-        .from("profiles")
-        .update({
-          role:         role,
-          branch_id:    branchId,
-          display_name: displayName
-        })
-        .eq("user_id", userId);
-      profileError = updateErr;
-    } else {
-      // Belum ada — insert baru
-      const { error: insertErr } = await supabase
-        .from("profiles")
-        .insert({
-          user_id:      userId,
-          role:         role,
-          branch_id:    branchId,
-          display_name: displayName
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { display_name: displayName, role: role } }
         });
-      profileError = insertErr;
-    }
 
-    if (profileError) {
-      setLoading(false);
-      showProfileErrorBanner(userId, role, branchId, displayName, profileError.message);
-      return;
-    }
+        if (authError) {
+          if (superadminRefreshToken) {
+            await supabase.auth.setSession({ access_token: superadminAccessToken, refresh_token: superadminRefreshToken });
+          }
+          btn.disabled = false; btn.textContent = "🚀 Daftarkan Akun Admin";
+          showAlert("Gagal daftar: " + authError.message, "error"); return;
+        }
 
-    setLoading(false);
+        const userId = authData.user.id;
 
-    // ── Step 4: Tampilkan success banner ──────────────────────────
-    const branchName = branchData
-      ? `${branchData.name} (${branchData.code})`
-      : branchId;
+        if (superadminRefreshToken) {
+          await supabase.auth.setSession({ access_token: superadminAccessToken, refresh_token: superadminRefreshToken });
+        }
 
-    document.getElementById("formCard").style.display = "none";
-    document.getElementById("successInfo").innerHTML = `
-      <div class="info-row"><span class="k">Nama</span><span class="v">${displayName}</span></div>
-      <div class="info-row"><span class="k">Email</span><span class="v">${email}</span></div>
-      <div class="info-row"><span class="k">Password</span><span class="v">${password}</span></div>
-      <div class="info-row"><span class="k">Role</span><span class="v">${role === "superadmin" ? "👑 Superadmin" : "🏪 Admin"}</span></div>
-      <div class="info-row"><span class="k">Cabang</span><span class="v">${branchName}</span></div>
-    `;
-    document.getElementById("successBanner").classList.add("show");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-</script>
+        const { error: profileErr } = await supabase.from("profiles").insert({
+          user_id: userId, role: role, branch_id: branchId, display_name: displayName
+        });
 
+        if (profileErr) {
+          btn.disabled = false; btn.textContent = "🚀 Daftarkan Akun Admin";
+          showAlert("Gagal buat profil: " + profileErr.message, "error"); return;
+        }
+
+        document.getElementById("formCard").style.display = "none";
+        document.getElementById("successInfo").innerHTML = `
+          <div class="text-xs mb-1"><strong>Nama:</strong> ${displayName}</div>
+          <div class="text-xs mb-1"><strong>Email:</strong> ${email}</div>
+          <div class="text-xs mb-1"><strong>Password:</strong> ${password}</div>
+          <div class="text-xs mb-1"><strong>Role:</strong> ${role}</div>
+          <div class="text-xs"><strong>Cabang ID:</strong> ${branchId}</div>
+        `;
+        document.getElementById("successBanner").classList.remove("hidden");
+
+      } catch (err) {
+        btn.disabled = false; btn.textContent = "🚀 Daftarkan Akun Admin";
+        showAlert("Error: " + err.message, "error");
+      }
+    };
+
+    loadBranches();
+  </script>
 </body>
+
 </html>

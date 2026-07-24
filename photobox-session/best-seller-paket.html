@@ -4,603 +4,199 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="utf-8" />
-  <title>Pilih Paket Foto - Best Seller</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet" />
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+  <title>Pilih Paket Foto — Best Seller 🔥</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/customer.css" />
+
+  <script>
+    if (!localStorage.getItem("currentAdmin") || !localStorage.getItem("currentUser")) {
+      window.location.href = "../index.html";
     }
-
-    html,
-    body {
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to bottom, #e7e7e7 50%, #ffffff 50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .page-wrapper {
-      width: 100%;
-      max-width: 960px;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 3vh 40px;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .logo img {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-    }
-
-    .logo-text {
-      font-size: 22px;
-      font-weight: 700;
-      color: #000;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── STEP INDICATOR WITH BOUNCE EFFECT ── */
-    .steps {
-      display: flex;
-      align-items: center;
-    }
-
-    .step {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      font-size: 16px;
-      font-weight: 700;
-      border: 1.5px solid #000;
-      color: #000;
-      background: #fff;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.3s ease,
-                  color 0.3s ease,
-                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .step:hover {
-      transform: translateY(-4px) scale(1.15);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    @keyframes bouncePop {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.4);
-      }
-
-      100% {
-        transform: scale(1.3);
-      }
-    }
-
-    .step.active {
-      background: #000;
-      color: #fff;
-      animation: bouncePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      z-index: 2;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    .step-line {
-      width: 50px;
-      border-top: 1.5px dashed #000;
-    }
-
-    /* ── TITLE SECTION ── */
-    .title-section {
-      flex-shrink: 0;
-      margin-top: 0.5vh;
-    }
-
-    .title-section h1 {
-      font-size: 38px;
-      font-weight: 800;
-      color: #000;
-      line-height: 1.1;
-    }
-
-    .title-section p {
-      font-size: 15px;
-      font-weight: 500;
-      color: #555;
-      margin-top: 2px;
-    }
-
-    /* ── FILTER TABS (LAYOUT KIRI TANPA GARIS) ── */
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      flex-shrink: 0;
-      margin: 0.5vh 0;
-    }
-
-    .filter-tabs {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .filter-tab {
-      padding: 6px 24px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1.5px solid #000;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.25s ease,
-                  color 0.25s ease;
-    }
-
-    .filter-tab:hover {
-      transform: translateY(-2px);
-    }
-
-    .filter-tab.active {
-      background: #000;
-      color: #fff;
-    }
-
-    .filter-tab:not(.active) {
-      background: #fff;
-      color: #000;
-    }
-
-    /* ── KOTAK HITAM UTAMA ── */
-    .package-container {
-      background: #181818;
-      border-radius: 20px;
-      padding: 2.5vh 32px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-      width: 100%;
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden; /* Paskan layout, tdk perlu terscroll */
-    }
-
-    .package-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: 1fr; /* 1 baris pas untuk 4 paket best seller */
-      gap: 16px;
-      width: 100%;
-      height: 100%;
-    }
-
-    .package-card {
-      background: #444444;
-      border-radius: 16px;
-      padding: 1.5vh 12px;
-      text-align: center;
-      cursor: pointer;
-      border: 2.5px solid transparent;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      height: 100%; /* Paskan tinggi grid */
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.3s ease,
-                  border-color 0.3s ease,
-                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .package-card:hover {
-      background: #555555;
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-    }
-
-    .package-card.selected {
-      border-color: #fff;
-      background: #2a2a2a;
-      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
-    }
-
-    .package-card h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      margin: 0;
-    }
-
-    .package-card .desc {
-      font-size: 13px;
-      font-weight: 500;
-      color: #ccc;
-      margin: 0;
-    }
-
-    .price-tag {
-      display: inline-block;
-      background: #000;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 6px 16px;
-      border-radius: 8px;
-      align-self: center;
-      transition: transform 0.3s ease;
-    }
-
-    .package-card:hover .price-tag {
-      transform: scale(1.05);
-    }
-
-    /* ── BUTTON SELANJUTNYA ── */
-    .btn-container {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      flex-shrink: 0;
-      margin-top: 1vh;
-    }
-
-    .btn-next {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 360px;
-      height: 52px;
-      background: #000;
-      color: #fff;
-      border: none;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                  background-color 0.3s ease,
-                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .btn-next:hover {
-      transform: translateY(-4px) scale(1.03);
-      background: #222;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-    }
-
-    .custom-alert {
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #000;
-      color: white;
-      padding: 14px 32px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 15px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      border: 2px solid #fff;
-      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 1000;
-    }
-
-    .custom-alert.show {
-      top: 30px;
-    }
-
-    /* ── FLUID SCALING (ALWAYS KEEPS 4-COLUMN DESKTOP TATA LETAK) ── */
-    @media (max-width: 900px) {
-      .page-wrapper {
-        padding: 2vh 20px;
-      }
-      .logo img {
-        width: 36px;
-        height: 36px;
-      }
-      .logo-text {
-        font-size: 18px;
-      }
-      .step {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-      }
-      .step-line {
-        width: 35px;
-      }
-      .title-section h1 {
-        font-size: 30px;
-      }
-      .title-section p {
-        font-size: 13px;
-      }
-      .package-container {
-        padding: 16px 20px;
-        /* Hapus max-height agar flex-grow: 1 bekerja sempurna tanpa scroll */
-      }
-      .package-grid {
-        gap: 10px;
-      }
-      .package-card {
-        padding: 1vh 8px;
-        gap: 6px;
-      }
-      .package-card h3 {
-        font-size: 14px;
-      }
-      .package-card .desc {
-        font-size: 11px;
-      }
-      .price-tag {
-        font-size: 11px;
-        padding: 4px 10px;
-      }
-      .btn-next {
-        width: 280px;
-        height: 44px;
-        font-size: 14px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .page-wrapper {
-        padding: 1vh 10px;
-      }
-      .logo img {
-        width: 28px;
-        height: 28px;
-      }
-      .logo-text {
-        font-size: 15px;
-      }
-      .step {
-        width: 26px;
-        height: 26px;
-        font-size: 12px;
-      }
-      .step-line {
-        width: 20px;
-      }
-      .title-section h1 {
-        font-size: 22px;
-      }
-      .title-section p {
-        font-size: 11px;
-      }
-      .package-container {
-        padding: 10px;
-        border-radius: 12px;
-        /* Hapus max-height */
-      }
-      .package-grid {
-        gap: 6px;
-      }
-      .package-card {
-        padding: 0.8vh 4px;
-        border-radius: 10px;
-        gap: 4px;
-      }
-      .package-card h3 {
-        font-size: 12px;
-      }
-      .package-card .desc {
-        font-size: 9.5px;
-      }
-      .price-tag {
-        font-size: 9.5px;
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-      .btn-next {
-        width: 200px;
-        height: 38px;
-        font-size: 12px;
-        border-radius: 10px;
-      }
-    }
-
-    /* Height-based scaling for short viewport heights */
-    @media (max-height: 680px) {
-      .page-wrapper {
-        padding: 1.5vh 30px;
-      }
-      .logo img {
-        width: 32px;
-        height: 32px;
-      }
-      .logo-text {
-        font-size: 18px;
-      }
-      .step {
-        width: 30px;
-        height: 30px;
-        font-size: 13px;
-      }
-      .step-line {
-        width: 35px;
-      }
-      .title-section h1 {
-        font-size: 26px;
-      }
-      .title-section p {
-        font-size: 13px;
-      }
-      .filter-bar {
-        margin: 2px 0;
-      }
-      .filter-tab {
-        padding: 4px 16px;
-        font-size: 12px;
-      }
-      .package-container {
-        padding: 12px 20px;
-        /* Hapus max-height */
-      }
-      .package-grid {
-        gap: 10px;
-      }
-      .package-card {
-        padding: 1vh 8px;
-        gap: 6px;
-      }
-      .package-card h3 {
-        font-size: 14px;
-      }
-      .package-card .desc {
-        font-size: 11px;
-      }
-      .price-tag {
-        font-size: 11px;
-        padding: 4px 10px;
-      }
-      .btn-container {
-        margin-top: 6px;
-      }
-      .btn-next {
-        height: 38px;
-        font-size: 13px;
-        border-radius: 12px;
-      }
-    }
-  </style>
+  </script>
 </head>
 
-<body>
-  <div class="custom-alert" id="alert-banner">Silakan pilih paket foto terlebih dahulu!</div>
+<body class="customer-page korean-register-page">
 
-  <div class="page-wrapper">
-    <div class="header">
-      <div class="logo">
-        <img src="../img/Logo_photobooth_LTI.png" alt="Logo" />
-        <span class="logo-text">PHOTOBOOTH</span>
-      </div>
-      <div class="steps">
-        <div class="step active">1</div>
-        <div class="step-line"></div>
-        <div class="step">2</div>
-        <div class="step-line"></div>
-        <div class="step">3</div>
-        <div class="step-line"></div>
-        <div class="step">4</div>
-      </div>
+  <!-- Skyline & Background Glow -->
+  <div class="korean-bg-skyline"></div>
+  <div class="korean-bg-glow"></div>
+
+  <!-- Custom Alert Toast -->
+  <div class="custom-alert" id="alert-banner" style="position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #FF4886; color: #fff; padding: 12px 28px; border-radius: 30px; font-weight: 800; box-shadow: 0 10px 25px rgba(255, 72, 134, 0.4); transition: top 0.4s ease; z-index: 1000;">
+    Silakan pilih paket foto terlebih dahulu! 🎀
+  </div>
+
+  <!-- Background SVG Decorations -->
+  <div class="background-decoration">
+    
+    <!-- Top Left: Sakura Branch (10.svg) -->
+    <div class="top-left-decoration">
+      <img src="../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
     </div>
 
-    <div class="title-section">
-      <h1>Pilih Paket Foto 🌟</h1>
-      <p>Silakan pilih jenis paket foto yang Anda inginkan</p>
+    <!-- Top Right: Ribbon Bow & Strawberry (07.svg) -->
+    <div class="top-right-decoration">
+      <img src="../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
     </div>
 
-    <div class="filter-bar">
-      <div class="filter-tabs">
-        <button class="filter-tab" onclick="location.href='pilih-paket.html'">Semua</button>
-        <button class="filter-tab active" onclick="location.href='best-seller-paket.html'">Best Seller 🔥</button>
-      </div>
-    </div>
-
-    <div class="package-container">
-      <div class="package-grid">
-        <div class="package-card" id="bs-1" onclick="selectPackage(this)">
-          <h3>BS 1</h3>
-          <p class="desc">5 Foto, 5 Frame</p>
-          <span class="price-tag">Rp35.000</span>
-        </div>
-        <div class="package-card" id="bs-2" onclick="selectPackage(this)">
-          <h3>BS 2</h3>
-          <p class="desc">5 Foto, 5 Frame</p>
-          <span class="price-tag">Rp40.000</span>
-        </div>
-        <div class="package-card" id="bs-3" onclick="selectPackage(this)">
-          <h3>BS 3</h3>
-          <p class="desc">5 Foto, 5 Frame</p>
-          <span class="price-tag">Rp45.000</span>
-        </div>
-        <div class="package-card" id="bs-4" onclick="selectPackage(this)">
-          <h3>BS 4</h3>
-          <p class="desc">5 Foto, 5 Frame</p>
-          <span class="price-tag">Rp50.000</span>
-        </div>
+    <!-- Bottom Left: Photobooth Machine (01.svg), Polaroid (03.svg) & Film Strip Reel (12.svg) -->
+    <div class="bottom-left-decoration">
+      <img src="../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
+      <div class="filmstrip-polaroid-group">
+        <img src="../img/Style/03.svg" alt="Polaroid Girl" class="decor-polaroid-left" />
+        <img src="../img/Style/12.svg" alt="Film Strip Reel" class="decor-filmreel-left" />
       </div>
     </div>
 
-    <div class="btn-container">
-      <button class="btn-next" id="btn-next-step">Selanjutnya</button>
+    <!-- Bottom Right: Bunny (04.svg), Bear + Duck (05.svg) on Cloud (08.svg) -->
+    <div class="bottom-right-decoration">
+      <div class="characters-cloud-group">
+        <img src="../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
+        <img src="../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
+        <img src="../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
+      </div>
+    </div>
+
+    <!-- Floating Sparkles (11.svg) & Hearts (09.svg) -->
+    <div class="floating-items">
+      <img src="../img/Style/11.svg" alt="Sparkle" class="float-item sp1" />
+      <img src="../img/Style/11.svg" alt="Sparkle" class="float-item sp2" />
+      <img src="../img/Style/09.svg" alt="Heart" class="float-item ht1" />
+      <img src="../img/Style/09.svg" alt="Heart" class="float-item ht2" />
+      <img src="../img/Style/08.svg" alt="Cloud" class="float-item cd1" />
     </div>
   </div>
 
+  <!-- Main Container -->
+  <div class="customer-container main-package-container">
+    
+    <!-- Top Header & Stepper & Filter Pills -->
+    <div class="package-header-wrap">
+      
+      <!-- Brand Logo -->
+      <div class="customer-logo brand-header">
+        <div class="camera-icon-badge">
+          <img src="../img/Logo_photobooth_LTI.png" alt="Camera Logo" class="brand-camera-svg" />
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-name-top">AXIONIX</span>
+          <span class="brand-name-bottom">PHOTOBOOTH</span>
+        </div>
+      </div>
+
+      <!-- Top Right Stepper (1 - 2 - 3 - 4) -->
+      <div class="korean-stepper-pill">
+        <div class="korean-step active">1</div>
+        <span class="korean-step-dash">—</span>
+        <div class="korean-step">2</div>
+        <span class="korean-step-dash">—</span>
+        <div class="korean-step">3</div>
+        <span class="korean-step-dash">—</span>
+        <div class="korean-step">4</div>
+      </div>
+
+    </div>
+
+    <!-- Title Section & Filter Tabs -->
+    <div class="package-title-bar">
+      <div>
+        <h1 class="customer-heading register-title mb-1">Paket Best Seller 🔥</h1>
+        <p class="customer-subheading register-subtitle mb-0">Pilihan terfavorit dari pengunjung photobooth kami 🎀</p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="korean-filter-tabs">
+        <button class="korean-tab-btn" onclick="location.href='pilih-paket.html'">
+          <span>Semua Paket</span>
+        </button>
+        <button class="korean-tab-btn active" onclick="location.href='best-seller-paket.html'">
+          <span class="tab-heart">💕</span>
+          <span>Best Seller 🔥</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Package Grid Container -->
+    <div class="package-grid-wrapper">
+      <div class="package-grid" id="packageGrid">
+        <!-- Packages loaded dynamically via Supabase -->
+      </div>
+    </div>
+
+    <!-- Bottom Bar: Action Button & Support Footer -->
+    <div class="package-bottom-bar">
+      <button class="customer-btn-primary korean-btn-gradient" id="btn-next-step" style="max-width: 380px; margin: 0 auto;">
+        <span>Selanjutnya</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+
+      <footer class="package-footer text-center mt-3">
+        <a href="https://www.lti.company/contact" target="_blank" rel="noopener noreferrer" class="support-link">
+          <span class="support-icon">🎧</span>
+          <span>Butuh bantuan? Hubungi tim support kami! 💌</span>
+        </a>
+      </footer>
+    </div>
+
+  </div>
+
   <script>
-    let selectedPackageId = localStorage.getItem('selectedPackage') || null;
+    window.selectedPackageId = localStorage.getItem('selectedPackage') || null;
 
     function showAlert() {
       const banner = document.getElementById('alert-banner');
-      banner.classList.add('show');
-      setTimeout(() => {
-        banner.classList.remove('show');
-      }, 3000);
+      banner.style.top = '24px';
+      setTimeout(() => { banner.style.top = '-100px'; }, 3000);
     }
 
     function selectPackage(card) {
       const nama = card.querySelector('h3').textContent.trim();
-      const desc = card.querySelector('.desc')?.textContent.trim() || '';
       const priceText = card.querySelector('.price-tag').textContent.trim();
-
-      // "Rp35.000" jadi 35000
+      const descText = card.querySelector('.desc')?.textContent.trim() || '';
       const hargaNumeric = parseInt(priceText.replace(/[^0-9]/g, ''), 10) || 0;
 
-      let currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
-        id: 'guest_' + Date.now(),
-        nama: 'Guest',
-        foto: [],
-        selectedFoto: []
-      };
-
-      // Parse limits dynamically from description to maintain consistent logic
       let fotoLimit = 5;
       let frameLimit = 5;
-      const fotoMatch = desc.match(/(\d+)\s*Foto/i);
-      const frameMatch = desc.match(/(\d+)\s*Frame/i);
+      const fotoMatch = descText.match(/(\d+)\s*Foto/i);
+      const frameMatch = descText.match(/(\d+)\s*Frame/i);
       if (fotoMatch) fotoLimit = parseInt(fotoMatch[1], 10);
       if (frameMatch) frameLimit = parseInt(frameMatch[1], 10);
-      const stikerGratis = desc.toLowerCase().includes('stiker gratis') || desc.toLowerCase().includes('sticker gratis');
+      const stikerGratis = descText.toLowerCase().includes('stiker gratis') || descText.toLowerCase().includes('sticker gratis');
+
+      const registeredUser = JSON.parse(localStorage.getItem('registeredUser')) || {};
+      const currentAdmin = JSON.parse(localStorage.getItem('currentAdmin')) || {};
+      const selectedBranch = JSON.parse(sessionStorage.getItem('selectedBranch')) || {};
+      let currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
+        id: 'guest_' + Date.now(),
+        nama: registeredUser.username || 'Guest',
+        nohp: registeredUser.phone || '',
+        email: registeredUser.email || '',
+        branch_id: currentAdmin.branch_id || selectedBranch.id || 'b149999f-33ec-4342-95bb-4f4961956c0b'
+      };
+
+      if (!currentUser.nama || currentUser.nama === 'Guest') {
+        currentUser.nama = registeredUser.username || 'Guest';
+      }
+      if (!currentUser.nohp) currentUser.nohp = registeredUser.phone || '';
+      if (!currentUser.email) currentUser.email = registeredUser.email || '';
+      if (!currentUser.branch_id || currentUser.branch_id === 'test_branch' || currentUser.branch_id === 'b149999f-33ec-4342-95bb-4f4961956c0b') {
+        currentUser.branch_id = currentAdmin.branch_id || selectedBranch.id || 'b149999f-33ec-4342-95bb-4f4961956c0b';
+      }
 
       currentUser.paket = {
         id: card.id,
         nama: nama,
-        deskripsi: desc,
         harga: hargaNumeric,
         foto_limit: fotoLimit,
         frame_limit: frameLimit,
@@ -608,36 +204,157 @@
       };
 
       currentUser.sudahBayar = false;
-
-      selectedPackageId = card.id;
+      delete currentUser.session_id;
+      delete currentUser.duitku_reference;
 
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       localStorage.setItem('selectedPackage', card.id);
       localStorage.setItem('selectedPackageName', nama);
       localStorage.setItem('selectedPackagePrice', String(hargaNumeric));
+      selectedPackageId = card.id;
 
       document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
     }
 
     window.onload = function () {
-      selectedPackageId = localStorage.getItem('selectedPackage') || null;
-
-      if (selectedPackageId && document.getElementById(selectedPackageId)) {
-        document.getElementById(selectedPackageId).classList.add('selected');
+      if (window.selectedPackageId && document.getElementById(window.selectedPackageId)) {
+        document.getElementById(window.selectedPackageId).classList.add('selected');
       }
     };
 
     document.getElementById('btn-next-step').addEventListener('click', function () {
-      selectedPackageId = localStorage.getItem('selectedPackage') || selectedPackageId;
+      if (!window.selectedPackageId) { showAlert(); return; }
+      window.location.href = 'pembayaran.html';
+    });
+  </script>
 
-      if (!selectedPackageId) {
-        showAlert();
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
+
+    async function checkPaidSession() {
+      const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+      if (user.session_id) {
+        const { data: sess } = await supabase
+          .from('sessions')
+          .select('status')
+          .eq('id', user.session_id)
+          .single();
+        if (sess?.status === 'paid') {
+          user.sudahBayar = true;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          window.location.href = 'intro-video.html';
+          return true;
+        } else {
+          delete user.session_id;
+          delete user.duitku_reference;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+        }
+      }
+      return false;
+    }
+
+    async function loadPackages() {
+      if (await checkPaidSession()) return;
+
+      const grid = document.getElementById('packageGrid');
+      grid.innerHTML = '<div style="color:#FF5E93;text-align:center;grid-column:1/-1;font-weight:700;" class="animate-pulse">Memuat paket Best Seller... 🎀</div>';
+      
+      const currentAdmin = JSON.parse(localStorage.getItem('currentAdmin')) || {};
+      const selectedBranch = JSON.parse(sessionStorage.getItem('selectedBranch')) || {};
+      const branchId = currentAdmin.branch_id || selectedBranch.id || 'b149999f-33ec-4342-95bb-4f4961956c0b';
+
+      // First try fetching packages with is_best_seller = true
+      let { data, error } = await supabase
+        .from('packages')
+        .select('*')
+        .eq('branch_id', branchId)
+        .eq('is_active', true)
+        .eq('is_best_seller', true)
+        .order('harga', { ascending: true });
+
+      // Fallback: If no package has is_best_seller = true, load all active packages
+      if (!data || data.length === 0) {
+        const res = await supabase
+          .from('packages')
+          .select('*')
+          .eq('branch_id', branchId)
+          .eq('is_active', true)
+          .order('harga', { ascending: true });
+        data = res.data;
+        error = res.error;
+      }
+
+      if (error) {
+        grid.innerHTML = '<div style="color:var(--color-danger);text-align:center;grid-column:1/-1;">Gagal memuat paket Best Seller.</div>';
+        console.error("Error fetching packages:", error);
         return;
       }
 
-      window.location.href = 'pembayaran.html';
-    });
+      if (!data || data.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-secondary);text-align:center;grid-column:1/-1;">Belum ada paket foto yang tersedia untuk cabang ini.</div>';
+        return;
+      }
+
+      let html = '';
+      data.forEach(pkg => {
+        const stikerText = pkg.stiker_gratis ? " · Stiker Gratis" : "";
+        const limitFotoText = pkg.foto_limit >= 999 ? "Unlimited" : pkg.foto_limit;
+        const limitFrameText = pkg.frame_limit >= 999 ? "All" : pkg.frame_limit;
+        const desc = `${limitFotoText} Foto · ${limitFrameText} Frame${stikerText}`;
+        const limitBadge = `<span class="korean-pkg-top-badge">${limitFotoText} FOTO</span>`;
+
+        html += `
+          <div class="package-card korean-package-card" id="pkg-${pkg.id}" onclick="selectPackage(this)">
+            <span class="best-seller-badge">🔥 Best Seller</span>
+            ${limitBadge}
+
+            <div class="korean-pkg-body">
+              <div class="korean-pkg-left">
+                <h3>${pkg.nama}</h3>
+                <div class="korean-pkg-accent-subtitle">Stiker Cute</div>
+                <p class="desc">${desc}</p>
+
+                <!-- Mini Features Grid -->
+                <div class="korean-mini-features">
+                  <div class="mini-feat-box">
+                    <span class="feat-icon">🖼️</span>
+                    <span class="feat-text">${limitFotoText} Foto</span>
+                  </div>
+                  <div class="mini-feat-box">
+                    <span class="feat-icon">🔳</span>
+                    <span class="feat-text">${limitFrameText} Frame Eksklusif</span>
+                  </div>
+                  <div class="mini-feat-box">
+                    <span class="feat-icon">🐰</span>
+                    <span class="feat-text">${pkg.stiker_gratis ? "Stiker Cute" : "Tanpa Stiker"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="korean-pkg-right-mockup">
+                <img src="../img/strip-photo.png" alt="Sample Strip" class="korean-sample-strip" />
+                <span class="cute-bear-badge">🐻</span>
+              </div>
+            </div>
+
+            <div class="korean-pkg-divider"></div>
+
+            <div class="korean-pkg-footer">
+              <span class="price-tag">Rp${pkg.harga.toLocaleString("id-ID")}</span>
+              <span class="select-check-icon">💕</span>
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+
+      if (window.selectedPackageId && document.getElementById(window.selectedPackageId)) {
+        document.getElementById(window.selectedPackageId).classList.add('selected');
+      }
+    }
+
+    loadPackages();
   </script>
 </body>
 

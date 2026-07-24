@@ -4,446 +4,191 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Photobooth Admin Login</title>
-  <meta name="description" content="Halaman login administrator untuk layanan LTI Photobooth. Akses dashboard admin dan alur pengguna dengan aman." />
+  <title>Admin Login — Axionix Photobooth</title>
+  <meta name="description" content="Halaman login administrator untuk layanan Axionix Photobooth." />
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
+    rel="stylesheet" />
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
-    }
-
-    body {
-      height: 100vh;
-      width: 100vw;
-      background: linear-gradient(135deg, #f4f4f5, #e4e4e7, #d4d4d8);
-      color: #000000;
-      overflow: hidden; /* Lock viewport height completely */
-    }
-
-    .landing-page {
-      height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
-
-    .left-side,
-    .right-side {
-      width: 50%;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 48px; /* Optimized padding for short viewports */
-    }
-
-    .left-side {
-      background: rgba(244, 244, 245, 0.4);
-    }
-
-    @keyframes entryBounce {
-      0% {
-        opacity: 0;
-        transform: scale(0.92) translateY(25px);
-      }
-      60% {
-        opacity: 1;
-        transform: scale(1.03) translateY(-3px);
-      }
-      80% {
-        transform: scale(0.99) translateY(1px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .login-card-wrapper {
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      justify-content: center;
-      animation: entryBounce 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    .login-form-container {
-      width: 100%;
-      padding: 32px 38px; /* Slightly more compact card padding */
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      border-radius: 28px;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.08);
-      
-      /* Buttery smooth interactive spring transition on hover */
-      transition: transform 0.6s cubic-bezier(0.25, 1.25, 0.45, 1), 
-                  box-shadow 0.6s cubic-bezier(0.25, 1.25, 0.45, 1), 
-                  border-color 0.4s ease;
-    }
-
-    .login-form-container:hover {
-      transform: scale(1.05);
-      box-shadow: 0 38px 90px rgba(0, 0, 0, 0.15);
-      border-color: rgba(0, 0, 0, 0.15);
-    }
-
-
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px; /* Reduced margin to fit desktop */
-    }
-
-    .iconex-light-camera {
-      width: 48px; /* Slightly more compact */
-      height: 48px;
-      object-fit: contain;
-      border-radius: 14px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-    }
-
-    .text-wrapper {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #000000;
-    }
-
-    .text-wrapper-2 {
-      margin-bottom: 24px; /* Reduced margin to fit desktop */
-      font-size: 42px; /* Slightly smaller text for better proportion */
-      line-height: 1.05;
-      font-weight: 800;
-      color: #000000;
-    }
-
-    .input-box {
-      width: 100%;
-      height: 52px; /* Compact height */
-      margin-bottom: 14px;
-      padding: 0 18px;
-      border: 1.5px solid #d4d4d8;
-      border-radius: 14px;
-      outline: none;
-      background: #ffffff;
-      font-size: 14px;
-      color: #000000;
-      transition: 0.25s ease;
-    }
-
-    .input-box::placeholder {
-      color: #a1a1aa;
-    }
-
-    .input-box:focus {
-      border-color: #000000;
-      box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.08);
-    }
-
-    button {
-      width: 100%;
-      height: 52px; /* Compact height */
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 700;
-      transition: 0.25s ease;
-    }
-
-    .rectangle-2 {
-      margin-top: 6px;
-      background: #000000;
-      color: #ffffff;
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
-    }
-
-    .rectangle-2:hover {
-      transform: translateY(-2px);
-      background: #222222;
-      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
-    }
-
-    .rectangle-3 {
-      margin-top: 12px;
-      background: #ffffff;
-      color: #000000;
-      border: 2px solid #000000;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
-    }
-
-    .rectangle-3:hover {
-      transform: translateY(-2px);
-      background: #f4f4f5;
-    }
-
-    .right-side {
-      position: relative;
-      background:
-        radial-gradient(circle at top right, rgba(161, 161, 170, 0.3), transparent 34%),
-        radial-gradient(circle at bottom left, rgba(24, 24, 27, 0.15), transparent 35%);
-    }
-
-    .right-side::before {
-      content: "";
-      position: absolute;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.4);
-      filter: blur(8px);
-    }
-
-    .strip-photo {
-      position: relative;
-      z-index: 1;
-      width: min(76%, 380px); /* Slightly narrower to fit perfectly */
-      max-height: 82vh;
-      object-fit: contain;
-      transform: rotate(4deg);
-      filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.2));
-      animation: floatPhoto 4s ease-in-out infinite;
-    }
-
-    @keyframes floatPhoto {
-      0%,
-      100% {
-        transform: rotate(4deg) translateY(0);
-      }
-
-      50% {
-        transform: rotate(4deg) translateY(-12px);
-      }
-    }
-
-    /* ── FLUID SCALING (KEEPS DESKTOP STRUCTURE ALWAYS ON RESIZE/MINIMIZE) ── */
-    @media (max-width: 1024px) {
-      .left-side, .right-side {
-        padding: 2vh 2vw;
-      }
-      .login-card-wrapper {
-        max-width: 360px;
-      }
-      .login-form-container {
-        padding: 20px 24px;
-        border-radius: 20px;
-      }
-      .logo {
-        margin-bottom: 12px;
-      }
-      .logo img {
-        width: 36px;
-        height: 36px;
-      }
-      .logo-text {
-        font-size: 14px;
-      }
-      .text-wrapper-2 {
-        font-size: 32px;
-        margin-bottom: 12px;
-      }
-      .input-box {
-        height: 38px;
-        font-size: 13px;
-        margin-bottom: 10px;
-        padding: 0 14px;
-      }
-      button {
-        height: 38px;
-        font-size: 13px;
-      }
-      .rectangle-3 {
-        margin-top: 6px;
-      }
-      .strip-photo {
-        max-height: 75vh;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .left-side, .right-side {
-        padding: 1.5vh 1.5vw;
-      }
-      .login-card-wrapper {
-        max-width: 310px;
-      }
-      .login-form-container {
-        padding: 16px 20px;
-        border-radius: 16px;
-      }
-      .logo {
-        margin-bottom: 8px;
-      }
-      .logo img {
-        width: 30px;
-        height: 30px;
-      }
-      .logo-text {
-        font-size: 12px;
-      }
-      .text-wrapper-2 {
-        font-size: 26px;
-        margin-bottom: 8px;
-      }
-      .input-box {
-        height: 34px;
-        font-size: 12px;
-        margin-bottom: 8px;
-      }
-      button {
-        height: 34px;
-        font-size: 12px;
-      }
-      .rectangle-3 {
-        margin-top: 4px;
-      }
-      .strip-photo {
-        max-height: 70vh;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .left-side, .right-side {
-        padding: 1vh 1vw;
-      }
-      .login-card-wrapper {
-        max-width: 240px;
-      }
-      .login-form-container {
-        padding: 10px 12px;
-        border-radius: 12px;
-      }
-      .logo img {
-        width: 24px;
-        height: 24px;
-      }
-      .logo-text {
-        font-size: 10px;
-      }
-      .text-wrapper-2 {
-        font-size: 20px;
-        margin-bottom: 6px;
-      }
-      .input-box {
-        height: 30px;
-        font-size: 11px;
-        margin-bottom: 6px;
-      }
-      button {
-        height: 30px;
-        font-size: 11px;
-      }
-      .rectangle-3 {
-        margin-top: 4px;
-      }
-      .strip-photo {
-        max-height: 60vh;
-      }
-    }
-
-    /* Height-based scaling for short viewport heights */
-    @media (max-height: 680px) {
-      .left-side, .right-side {
-        padding: 1vh 2vw;
-      }
-      .login-form-container {
-        padding: 16px 20px;
-      }
-      .logo {
-        margin-bottom: 8px;
-      }
-      .text-wrapper-2 {
-        font-size: 26px;
-        margin-bottom: 8px;
-      }
-      .input-box {
-        height: 34px;
-        font-size: 12px;
-        margin-bottom: 8px;
-      }
-      button {
-        height: 34px;
-        font-size: 12px;
-      }
-      .rectangle-3 {
-        margin-top: 4px;
-      }
-      .strip-photo {
-        max-height: 65vh;
-      }
-    }
-
-    .contact-support-wrapper {
-      text-align: center;
-      margin-top: 14px;
-    }
-
-    .contact-support-link {
-      font-size: 13px;
-      color: #888;
-      text-decoration: none;
-      font-weight: 500;
-      letter-spacing: 0.2px;
-      transition: color 0.25s ease;
-      border-bottom: 1px solid transparent;
-      padding-bottom: 1px;
-    }
-
-    .contact-support-link:hover {
-      color: #000;
-      border-bottom-color: #000;
-    }
-  </style>
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="assets/css/design-system.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/admin.css" />
 </head>
 
-<body>
-  <div class="landing-page">
-    <div class="left-side">
-      <div class="login-card-wrapper">
-        <div class="login-form-container">
-          <div class="logo">
-            <img class="iconex-light-camera" src="img/Logo_photobooth_LTI.png" alt="Logo Photobooth" />
-            <div class="text-wrapper">PHOTOBOOTH</div>
-          </div>
+<body class="korean-login-page admin-login-page">
 
-          <h1 class="text-wrapper-2">
-            Admin <br />
-            Login
-          </h1>
+  <!-- City Skyline Silhouette Background -->
+  <div class="korean-bg-skyline"></div>
+  <div class="korean-bg-glow"></div>
 
-          <input type="email" id="email" placeholder="Email" class="input-box" />
-          <input type="password" id="password" placeholder="Password" class="input-box" />
+  <!-- Floating Cute Decor Wrappers -->
+  <div class="sparkles">
+    <span class="sparkle-item s1">✨</span>
+    <span class="sparkle-item s2">⭐</span>
+    <span class="sparkle-item s3">💕</span>
+    <span class="sparkle-item s4">🌸</span>
+  </div>
+  <div class="clouds">
+    <div class="cloud-item c1">☁️</div>
+    <div class="cloud-item c2">☁️</div>
+  </div>
+  <div class="hearts">
+    <span class="heart-item h1">💖</span>
+    <span class="heart-item h2">💕</span>
+  </div>
+  <div class="flowers">
+    <span class="flower-item f1">🌸</span>
+    <span class="flower-item f2">🌸</span>
+  </div>
 
-          <button class="rectangle-2" id="btn-login-user">
-            Login User Flow
-          </button>
+  <!-- SVG Style Asset Wrappers -->
+  <div class="background-decoration">
 
-          <button class="rectangle-3" id="btn-login-admin">
-            Login Admin Dashboard
-          </button>
-
-          <div class="contact-support-wrapper">
-            <a href="https://www.lti.company/contact" target="_blank" rel="noopener noreferrer" class="contact-support-link">
-              Contact support
-            </a>
-          </div>
-        </div>
+    <!-- Top Left: Cherry Blossom / Ribbon & Speech Bubble -->
+    <div class="top-left-decoration">
+      <img src="img/Style/07.svg" alt="Ribbon & Cherry Blossom" class="decor-cherry-tree" />
+      <div class="speech-bubble-left">
+        <span>오늘도 화이팅 ♡</span>
       </div>
     </div>
 
-    <div class="right-side">
-      <img class="strip-photo" src="./img/strip-photo.png" alt="Photo strip" />
+    <!-- Top Right: Sparkle Ribbon -->
+    <div class="top-right-decoration">
+      <span class="floating-star top-star">⭐</span>
     </div>
+
+    <!-- Bottom Left: Polaroid & Photo Strip -->
+    <div class="bottom-left-decoration">
+      <div class="photo-strip-wrapper">
+        <img src="img/Style/06.svg" alt="Photo Strip" class="decor-photostrip" />
+        <img src="img/Style/03.svg" alt="Polaroid" class="decor-polaroid" />
+      </div>
+    </div>
+
+    <!-- Bottom Right / Right Side: Photobooth Machine & Cute Bunny -->
+    <div class="bottom-right-decoration">
+      <div class="photobooth-machine-wrapper">
+        <img src="img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-booth" />
+      </div>
+      <div class="bunny-wrapper">
+        <img src="img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny" />
+        <img src="img/Style/05.svg" alt="Bear and Duck" class="decor-bear-duck" />
+      </div>
+    </div>
+
+    <div class="floating-decoration"></div>
   </div>
 
-  <script type="module" src="./assets/js/auth.js"></script>
+  <!-- Main Container -->
+  <div class="main-container admin-login-container">
+
+    <!-- Glass Login Card -->
+    <div class="glass-login-card login-card admin-login-card">
+
+      <!-- Card Header -->
+      <header class="login-header admin-login-header">
+
+        <!-- Brand Logo -->
+        <div class="login-brand admin-login-logo">
+          <div class="camera-icon-badge">
+            <img src="img/Logo_photobooth_LTI.png" alt="Camera Logo" class="brand-camera-svg" />
+          </div>
+          <div class="brand-text-group">
+            <span class="brand-name-top">AXIONIX</span>
+            <span class="brand-name-bottom">PHOTOBOOTH</span>
+          </div>
+        </div>
+
+        <!-- Title & Cute Subtitle Banner -->
+        <h1 class="login-title admin-login-title">
+          <span>Admin Portal</span>
+          <span class="title-star">⭐</span>
+        </h1>
+
+        <div class="login-subtitle-banner">
+          <span class="login-subtitle admin-login-subtitle">Masuk untuk mengelola photobooth ♡</span>
+        </div>
+      </header>
+
+      <!-- Form Section -->
+      <form class="login-form admin-login-form" onsubmit="event.preventDefault();">
+
+        <!-- Email Input Field -->
+        <div class="input-wrapper input-group mb-4">
+          <label for="email" class="input-label">
+            <span class="input-label-icon">✉️</span>
+            <span>Email</span>
+          </label>
+
+          <div class="input-field-relative">
+            <span class="input-icon-left">👤</span>
+            <input type="email" id="email" placeholder="admin@cabang.com" class="input input-lg pill-input" required
+              autocomplete="email" />
+            <span class="input-icon-right">💕</span>
+          </div>
+        </div>
+
+        <!-- Password Input Field -->
+        <div class="input-wrapper input-group mb-5">
+          <label for="password" class="input-label">
+            <span class="input-label-icon">🔒</span>
+            <span>Password</span>
+          </label>
+
+          <div class="input-field-relative">
+            <span class="input-icon-left">🔒</span>
+            <input type="password" id="password" placeholder="••••••••" class="input input-lg pill-input" required
+              autocomplete="current-password" />
+            <span class="input-icon-right eye-toggle" title="Toggle Password">👁️</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="login-actions admin-login-actions">
+
+          <div class="primary-action mb-3">
+            <button type="button" class="korean-btn-primary btn btn-primary btn-xl btn-block" id="btn-login-user">
+              <span class="btn-icon">🐰</span>
+              <span class="btn-text">Login User</span>
+            </button>
+          </div>
+
+          <div class="secondary-action">
+            <button type="button" class="korean-btn-secondary btn btn-outline btn-xl btn-block" id="btn-login-admin">
+              <span class="btn-icon">📊</span>
+              <span class="btn-text">Login Admin Dashboard</span>
+              <span class="btn-arrow">›</span>
+            </button>
+          </div>
+
+        </div>
+
+      </form>
+
+      <!-- Ribbon Divider -->
+      <div class="ribbon-divider">
+        <div class="dotted-line"></div>
+        <div class="ribbon-center-badge">🎀</div>
+      </div>
+
+      <!-- Footer Section -->
+      <footer class="login-footer text-center">
+        <a href="https://www.lti.company/contact" target="_blank" rel="noopener noreferrer" class="support-link">
+          <span class="support-icon">🎧</span>
+          <span>Butuh bantuan? Hubungi tim support kami! 💌</span>
+        </a>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="assets/js/auth.js?v=2"></script>
 </body>
 
 </html>

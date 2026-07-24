@@ -3,201 +3,21 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styleadmins.css?v=monochrome-v20">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #f6f8fb;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Overview — Axionix Admin</title>
 
-    .dashboard-container {
-      display: flex;
-      min-height: 100vh;
-      width: 100%;
-    }
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
+    rel="stylesheet" />
 
-    .sidebar {
-      width: 260px;
-      background: #ffffff;
-      border-right: 1px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 100;
-      padding: 24px 16px;
-      box-sizing: border-box;
-    }
-
-    .sidebar-brand {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-      padding: 0 4px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    #adminInfo {
-      font-size: 0.76rem;
-      color: #64748b;
-      background: #f8fafc;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #f1f5f9;
-      margin-bottom: 24px;
-      line-height: 1.5;
-      word-break: break-all;
-      box-sizing: border-box;
-      max-width: 100%;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    #adminInfo strong {
-      color: #0f172a;
-      font-weight: 700;
-    }
-
-    .sidebar-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1;
-    }
-
-    .sidebar-menu-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 12px 14px;
-      background: transparent;
-      border: none;
-      border-radius: 10px;
-      color: #475569;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      box-sizing: border-box;
-    }
-
-    .sidebar-menu-btn:hover {
-      background: #f8fafc;
-      color: #0f172a;
-      transform: translateX(3px);
-    }
-
-    .sidebar-menu-btn.active {
-      background: #0f172a;
-      color: #ffffff;
-    }
-
-    .sidebar-menu-btn .menu-icon {
-      font-size: 1.1rem;
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .sidebar-logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 12px 14px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      color: #64748b;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-sizing: border-box;
-    }
-
-    .sidebar-logout-btn:hover {
-      background: #ef4444;
-      color: #ffffff;
-      border-color: #ef4444;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-    }
-
-    .main-content {
-      flex: 1;
-      margin-left: 260px;
-      padding: 32px;
-      box-sizing: border-box;
-      min-width: 0;
-    }
-
-    .top-header {
-      margin-bottom: 28px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .topbar-title {
-      font-size: 1.65rem;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 4px;
-    }
-
-    .topbar-subtitle {
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-
-    .stats-row {
-      margin-top: 0 !important;
-      margin-bottom: 28px !important;
-      max-width: 100% !important;
-    }
-
-    .dash-body {
-      padding: 0 !important;
-      max-width: 100% !important;
-    }
-
-    @media (max-width: 992px) {
-      .dashboard-container {
-        flex-direction: column;
-      }
-
-      .sidebar {
-        position: static;
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 16px;
-      }
-
-      .main-content {
-        margin-left: 0;
-        padding: 16px;
-      }
-    }
-  </style>
-
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
 </head>
 
-<body>
+<body class="admin-page">
 
   <script>
     if (!localStorage.getItem("currentAdmin")) {
@@ -205,222 +25,286 @@
     }
   </script>
 
-  <div class="dashboard-container">
+  <div class="admin-layout">
 
-    <!-- SIDEBAR (LEFT SIDE NAVBAR) -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <span>📸</span> Photobox Admin
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-sidebar-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </div>
+        <span class="admin-sidebar-title">Axionix Admin</span>
       </div>
 
-      <!-- Admin Info (populated dynamically by JS) -->
-      <div class="header-meta" id="adminInfo">Loading...</div>
-
-      <!-- Sidebar Navigation Menu -->
-      <nav class="sidebar-menu">
-        <button class="sidebar-menu-btn active" onclick="location.reload()">
-          <span class="menu-icon">📊</span>
+      <nav class="admin-sidebar-nav">
+        <button class="admin-sidebar-item active" onclick="location.reload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
           <span>Overview</span>
         </button>
-        <button class="sidebar-menu-btn" onclick="goToPaket()">
-          <span class="menu-icon">🎁</span>
+
+        <button class="admin-sidebar-item" onclick="goToPaket()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
+          </svg>
           <span>Kelola Paket</span>
         </button>
-        <button class="sidebar-menu-btn" onclick="goToPayment()">
-          <span class="menu-icon">💳</span>
+
+        <button class="admin-sidebar-item" onclick="goToPayment()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
           <span>Payment Setting</span>
         </button>
-        <button class="sidebar-menu-btn" onclick="goToFrames()">
-          <span class="menu-icon">🖼️</span>
+
+        <button class="admin-sidebar-item" onclick="goToFrames()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
           <span>Edit Frame</span>
         </button>
-        <button class="sidebar-menu-btn" onclick="goToStiker()">
-          <span class="menu-icon">✨</span>
+
+        <button class="admin-sidebar-item" onclick="goToStiker()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+            </path>
+          </svg>
           <span>Edit Stiker</span>
         </button>
-        <button class="sidebar-menu-btn" onclick="goToFolder()">
-          <span class="menu-icon">📁</span>
-          <span>Folder</span>
+
+        <button class="admin-sidebar-item" onclick="goToFolder()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Folder Foto</span>
         </button>
-        <button class="sidebar-menu-btn" onclick="guestAll()">
-          <span class="menu-icon">👤</span>
-          <span>Customer</span>
+
+        <button class="admin-sidebar-item" onclick="guestAll()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Data Customer</span>
         </button>
       </nav>
 
-      <!-- Sidebar Footer (Logout) -->
-      <div class="sidebar-footer">
-        <button class="sidebar-logout-btn" onclick="logout()">
-          <span class="menu-icon">🚪</span>
+      <div class="admin-sidebar-footer">
+        <div class="admin-sidebar-user mb-3">
+          <div class="avatar avatar-sm">A</div>
+          <div class="admin-sidebar-user-info" id="adminInfo">
+            <div class="admin-sidebar-user-name">Loading...</div>
+          </div>
+        </div>
+
+        <button class="admin-sidebar-item text-danger" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
           <span>Logout</span>
         </button>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT CONTAINER (RIGHT SIDE) -->
-    <main class="main-content">
-
-      <!-- Clean top-header -->
-      <div class="top-header">
-        <h1 class="topbar-title">Dashboard Overview</h1>
-        <p class="topbar-subtitle">Selamat datang kembali! Kelola sesi, pendapatan, dan konfigurasi photobox.</p>
-      </div>
-
-      <div class="stats-row">
-        <!-- Card 1: Sesi Hari Ini (Yellow Theme) -->
-        <div class="stat-card yellow-theme">
-          <div class="stat-card-header">
-            <div class="stat-card-icon-badge">📊</div>
-          </div>
-          <div class="stat-num" id="statTotal">0</div>
-          <div class="stat-label">Sesi Hari Ini</div>
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar-left">
+          <h1 class="admin-topbar-title">Dashboard Overview</h1>
+          <span class="admin-topbar-subtitle">Selamat datang kembali! Kelola sesi, pendapatan, dan konfigurasi
+            photobox.</span>
         </div>
 
-        <!-- Card 2: Lunas (Green Theme) -->
-        <div class="stat-card green-theme">
-          <div class="stat-card-header">
-            <div class="stat-card-icon-badge">✅</div>
-          </div>
-          <div class="stat-num" id="statPaid">0</div>
-          <div class="stat-label">Lunas</div>
-        </div>
-
-        <!-- Card 3: Menunggu (Purple Theme) -->
-        <div class="stat-card purple-theme">
-          <div class="stat-card-header">
-            <div class="stat-card-icon-badge">⏳</div>
-          </div>
-          <div class="stat-num" id="statWaiting">0</div>
-          <div class="stat-label">Menunggu</div>
-        </div>
-
-        <!-- Card 4: Total Pendapatan (Blue Theme) -->
-        <div class="stat-card blue-theme">
-          <div class="stat-card-header">
-            <div class="stat-card-icon-badge">💰</div>
-          </div>
-          <div class="stat-num" id="statRevenue" style="font-size: 1.8rem !important;">Rp 0</div>
-          <div class="stat-label">Total Pendapatan</div>
+        <div class="admin-topbar-right">
+          <button class="btn btn-outline btn-sm" onclick="refreshAll()">
+            <span>🔄 Sync Data</span>
+          </button>
         </div>
       </div>
 
-      <!-- ── Body ── -->
-      <div class="dash-body">
+      <div class="admin-content">
 
-        <!-- ── Chart 7 Hari ── -->
+        <!-- KPI Stat Cards Row -->
+        <div class="stats-row">
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="admin-stat-label">Sesi Hari Ini</span>
+              <div class="admin-stat-icon yellow">📊</div>
+            </div>
+            <div class="admin-stat-value" id="statTotal">0</div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="admin-stat-label">Transaksi Lunas</span>
+              <div class="admin-stat-icon green">✅</div>
+            </div>
+            <div class="admin-stat-value" id="statPaid">0</div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="admin-stat-label">Menunggu Konfirmasi</span>
+              <div class="admin-stat-icon purple">⏳</div>
+            </div>
+            <div class="admin-stat-value" id="statWaiting">0</div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="admin-stat-label">Total Pendapatan</span>
+              <div class="admin-stat-icon blue">💰</div>
+            </div>
+            <div class="admin-stat-value" id="statRevenue" style="font-size:var(--text-2xl);">Rp 0</div>
+          </div>
+        </div>
+
+        <!-- Chart Section (7 Days) -->
         <div class="chart-section">
           <div class="chart-header">
-            <div class="chart-title">
-              📈 Pendapatan & Sesi — 7 Hari Terakhir
-            </div>
+            <span class="chart-title">📈 Pendapatan &amp; Sesi — 7 Hari Terakhir</span>
             <div class="chart-legend">
-              <span><span class="legend-dot" style="background:#0f172a"></span>Pendapatan</span>
-              <span><span class="legend-dot" style="background:#00c8b4"></span>Sesi</span>
+              <span><span class="legend-dot" style="background:var(--color-primary)"></span>Pendapatan</span>
+              <span><span class="legend-dot" style="background:var(--color-secondary)"></span>Sesi</span>
             </div>
           </div>
-          <div class="chart-bars" id="chartBars">
-            <!-- rendered by JS -->
-          </div>
+          <div class="chart-bars" id="chartBars"></div>
         </div>
 
-        <!-- ── Konfirmasi Pembayaran (accordion) ── -->
-        <div class="section-card" id="cardKonfirmasi">
-          <div class="section-header" onclick="toggleSection('konfirmasi')">
-            <div class="section-title">
-              <div class="section-icon icon-orange">⏳</div>
+        <!-- Section: Konfirmasi Pembayaran -->
+        <div class="admin-section" id="cardKonfirmasi">
+          <div class="admin-section-header" onclick="toggleSection('konfirmasi')">
+            <div class="admin-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" style="color:var(--color-warning);">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
               <span>Konfirmasi Pembayaran</span>
             </div>
-            <div class="section-right">
-              <span class="badge orange" id="badgeWaiting">0</span>
+            <div class="admin-section-right">
+              <span class="badge badge-warning" id="badgeWaiting">0</span>
               <span class="chevron open" id="chevKonfirmasi">▼</span>
             </div>
           </div>
-          <div class="section-body open" id="bodyKonfirmasi">
-            <div class="section-inner">
-              <div class="gateway-banner hidden" id="gatewayBanner">
-                ⚡ Mode Payment Gateway aktif — pembayaran otomatis dikonfirmasi tanpa perlu aksi admin.
+
+          <div class="admin-section-body open" id="bodyKonfirmasi">
+            <div class="admin-section-inner">
+              <div class="gateway-banner hidden mb-3" id="gatewayBanner">
+                ⚡ Mode Payment Gateway aktif — pembayaran otomatis dikonfirmasi via webhook.
               </div>
               <div id="waitingList">
-                <p class="empty-state">⏳ Loading...</p>
+                <p class="text-xs text-tertiary">Loading waiting list...</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ── Sesi Hari Ini (accordion) ── -->
-        <div class="section-card">
-          <div class="section-header" onclick="toggleSection('sesi')">
-            <div class="section-title">
-              <div class="section-icon icon-pink">📋</div>
+        <!-- Section: Sesi Hari Ini -->
+        <div class="admin-section">
+          <div class="admin-section-header" onclick="toggleSection('sesi')">
+            <div class="admin-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" style="color:var(--color-primary);">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
               <span>Sesi Hari Ini</span>
             </div>
-            <div class="section-right">
-              <span class="badge" id="badgeSesi">0</span>
-              <span class="refresh-dot" title="Auto-refresh 5s"></span>
+            <div class="admin-section-right">
+              <span class="badge badge-neutral" id="badgeSesi">0</span>
+              <span class="badge-dot badge-dot-pulse badge-dot-success" title="Auto-refresh 5s"></span>
               <span class="chevron open" id="chevSesi">▼</span>
             </div>
           </div>
-          <div class="section-body open" id="bodySesi">
-            <div class="section-inner">
-              <div style="display:flex;justify-content:flex-end;padding:0 0 8px;">
-                <button class="download-btn" onclick="downloadTodayCSV()">⬇ CSV Hari Ini</button>
+
+          <div class="admin-section-body open" id="bodySesi">
+            <div class="admin-section-inner">
+              <div style="display:flex; justify-content:flex-end; margin-bottom:var(--space-3);">
+                <button class="btn btn-outline btn-xs" onclick="downloadTodayCSV()">⬇ CSV Hari Ini</button>
               </div>
               <div id="sesiList">
-                <p class="empty-state">⏳ Loading...</p>
+                <p class="text-xs text-tertiary">Loading sesi hari ini...</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ── Semua Sesi (accordion) ── -->
-        <div class="section-card">
-          <div class="section-header" onclick="toggleSection('allSesi')">
-            <div class="section-title">
-              <div class="section-icon icon-pink">🗂️</div>
-              <span>Semua Sesi</span>
+        <!-- Section: Semua Sesi (With Filters & Pagination) -->
+        <div class="admin-section">
+          <div class="admin-section-header" onclick="toggleSection('allSesi')">
+            <div class="admin-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" style="color:var(--color-secondary);">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Semua Sesi Photobooth</span>
             </div>
-            <div class="section-right">
-              <span class="badge" id="badgeAllSesi">0</span>
+            <div class="admin-section-right">
+              <span class="badge badge-neutral" id="badgeAllSesi">0</span>
               <span class="chevron" id="chevAllSesi">▼</span>
             </div>
           </div>
-          <div class="section-body" id="bodyAllSesi">
-            <div class="section-inner" style="padding:0">
 
-              <!-- Filter strip -->
+          <div class="admin-section-body" id="bodyAllSesi">
+            <div class="admin-section-inner" style="padding:0;">
+
               <div class="filter-strip">
-                <button class="fs-btn active" onclick="filterAll('all',this)">Semua</button>
-                <button class="fs-btn" onclick="filterAll('today',this)">Hari Ini</button>
-                <button class="fs-btn" onclick="filterAll('week',this)">7 Hari</button>
-                <button class="fs-btn" onclick="filterAll('month',this)">30 Hari</button>
-                <button class="fs-btn" onclick="filterAll('paid',this)">Lunas</button>
-                <button class="fs-btn" onclick="filterAll('waiting',this)">Menunggu</button>
-                <button class="download-btn" onclick="downloadAllCSV()">⬇ Download CSV</button>
+                <button class="filter-btn active" onclick="filterAll('all',this)">Semua</button>
+                <button class="filter-btn" onclick="filterAll('today',this)">Hari Ini</button>
+                <button class="filter-btn" onclick="filterAll('week',this)">7 Hari</button>
+                <button class="filter-btn" onclick="filterAll('month',this)">30 Hari</button>
+                <button class="filter-btn" onclick="filterAll('paid',this)">Lunas</button>
+                <button class="filter-btn" onclick="filterAll('waiting',this)">Menunggu</button>
+                <button class="btn btn-outline btn-xs ml-auto" onclick="downloadAllCSV()">⬇ Download CSV</button>
               </div>
 
-              <!-- Count + total rev -->
-              <div class="sesi-count-row">
-                <span id="allSesiCount">0 sesi</span>
-                <span class="rev-total" id="allSesiRev">Rp 0</span>
+              <div
+                style="display:flex; justify-content:space-between; padding:var(--space-3) var(--space-5); border-bottom:1px solid var(--border-subtle); background:var(--bg-subtle);"
+                class="text-xs font-semibold">
+                <span id="allSesiCount" class="text-secondary">0 sesi</span>
+                <span class="text-primary" id="allSesiRev">Rp 0</span>
               </div>
 
               <div id="allSesiList">
-                <p class="empty-state" style="padding:16px;">⏳ Loading...</p>
+                <p class="text-xs text-tertiary p-4">Loading data...</p>
               </div>
 
-              <!-- Pagination -->
               <div class="pagination" id="allSesiPagination"></div>
 
             </div>
           </div>
         </div>
 
-      </div><!-- /dash-body -->
-
+      </div>
     </main>
-  </div><!-- /dashboard-container -->
+  </div>
 
-  <!-- Plain script -->
   <script>
     function toggleSection(id) {
       const key = id.charAt(0).toUpperCase() + id.slice(1);
@@ -452,18 +336,16 @@
     const branchId = admin.branch_id;
 
     document.getElementById("adminInfo").innerHTML =
-      `<strong>${admin.branch_name ?? admin.username}</strong> · ${admin.role}`;
+      `<div class="admin-sidebar-user-name">${admin.branch_name ?? admin.username}</div><div class="admin-sidebar-user-role">${admin.role}</div>`;
 
-    // ── State ─────────────────────────────────────────────────────────
     let paymentMode = "manual";
-    let allSessions = [];   // all sessions dari branch ini
-    let filteredSess = [];   // setelah filter
+    let allSessions = [];
+    let filteredSess = [];
     let todaySessions = [];
     let currentPage = 1;
     const PAGE_SIZE = 15;
     let currentFilter = "all";
 
-    // ── Load payment mode ─────────────────────────────────────────────
     async function loadPaymentMode() {
       const { data } = await supabase
         .from("payment_settings")
@@ -481,7 +363,6 @@
         document.getElementById("gatewayBanner").classList.remove("hidden");
     }
 
-    // ── Load ALL sessions (for chart + all-sesi) ──────────────────────
     async function loadAllSessions() {
       const { data } = await supabase
         .from("sessions")
@@ -491,7 +372,6 @@
       allSessions = data ?? [];
       document.getElementById("badgeAllSesi").textContent = allSessions.length;
 
-      // Hitung statistik keseluruhan (All-Time) untuk metrik card
       const paidCount = allSessions.filter(s => s.status === "paid" || s.status === "done").length;
       const waitingCount = allSessions.filter(s => s.status === "waiting").length;
       const totalRev = allSessions
@@ -506,7 +386,6 @@
       renderChart();
     }
 
-    // ── Chart 7 hari ─────────────────────────────────────────────────
     function renderChart() {
       const days = 7;
       const labels = [];
@@ -538,22 +417,21 @@
 
       const container = document.getElementById("chartBars");
       container.innerHTML = labels.map((lbl, i) => {
-        const revH = Math.round((revData[i] / maxRev) * 75);
-        const sessH = Math.round((sessData[i] / maxSess) * 75);
+        const revH = Math.round((revData[i] / maxRev) * 140);
+        const sessH = Math.round((sessData[i] / maxSess) * 140);
         const revTip = "Pendapatan: Rp " + (revData[i]).toLocaleString("id-ID");
         const sessTip = "Total Sesi: " + sessData[i];
         return `
-        <div class="bar-group">
-          <div class="bar-wrap">
-            <div class="bar rev"  style="height:${revH}px"  data-tip="${revTip}"></div>
-            <div class="bar sess" style="height:${sessH}px" data-tip="${sessTip}"></div>
+        <div class="chart-bar-group">
+          <div class="chart-bar-pair">
+            <div class="chart-bar revenue" style="height:${Math.max(4, revH)}px" title="${revTip}"></div>
+            <div class="chart-bar sessions" style="height:${Math.max(4, sessH)}px" title="${sessTip}"></div>
           </div>
-          <div class="bar-label">${lbl}</div>
+          <div class="chart-bar-label">${lbl}</div>
         </div>`;
       }).join("");
     }
 
-    // ── Filter semua sesi ─────────────────────────────────────────────
     function applyFilter(f) {
       currentFilter = f;
       const now = new Date();
@@ -584,12 +462,11 @@
     }
 
     window._filterAll = function (f, btn) {
-      document.querySelectorAll(".fs-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       applyFilter(f);
     };
 
-    // ── Render paginated sesi ─────────────────────────────────────────
     function renderAllSesiPage() {
       const total = filteredSess.length;
       const pages = Math.ceil(total / PAGE_SIZE) || 1;
@@ -600,36 +477,34 @@
 
       if (!slice.length) {
         list.innerHTML = `<div class="empty-state" style="padding:20px;">
-        <div class="empty-icon">📭</div><div>Tidak ada sesi</div></div>`;
+        <div class="empty-state-icon">📭</div><div class="empty-state-title text-sm">Tidak ada data sesi</div></div>`;
         document.getElementById("allSesiPagination").innerHTML = "";
         return;
       }
 
       list.innerHTML = slice.map(s => {
         const metode = s.pembayaran?.toLowerCase() ?? "qris";
-        const tagClass = ["midtrans", "xendit"].includes(metode) ? "gateway" : metode;
         const dt = new Date(s.created_at);
         const tgl = dt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "2-digit" });
         const jam = dt.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        const statusClass = s.status === "paid" ? "status-paid" : s.status === "waiting" ? "status-waiting" : "status-done";
         const statusLabel = { paid: "✅ Lunas", waiting: "⏳ Menunggu", done: "🏁 Selesai" }[s.status] ?? s.status;
         return `
-        <div class="sesi-row">
-          <div class="sesi-dot ${s.status}"></div>
-          <div class="sesi-info">
-            <div class="si-name">${s.paket ?? "—"}</div>
-            <div class="si-detail">
-              <span class="pay-tag ${tagClass}">${metode.toUpperCase()}</span>
-              · ${tgl} ${jam}
+        <div class="session-row">
+          <div class="session-row-info">
+            <div class="session-row-avatar">${metode.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="session-row-name">${s.paket ?? "—"}</div>
+              <div class="session-row-detail">${metode.toUpperCase()} · ${tgl} ${jam}</div>
             </div>
           </div>
           <div style="text-align:right;">
-            <div class="sesi-price">Rp ${(s.harga ?? 0).toLocaleString("id-ID")}</div>
-            <span class="status-badge ${s.status}">${statusLabel}</span>
+            <div class="session-row-price">Rp ${(s.harga ?? 0).toLocaleString("id-ID")}</div>
+            <span class="badge ${statusClass}">${statusLabel}</span>
           </div>
         </div>`;
       }).join("");
 
-      // Pagination
       const pg = document.getElementById("allSesiPagination");
       if (pages <= 1) { pg.innerHTML = ""; return; }
 
@@ -638,11 +513,11 @@
       let pgEnd = Math.min(pages, pgStart + maxBtn - 1);
       if (pgEnd - pgStart < maxBtn - 1) pgStart = Math.max(1, pgEnd - maxBtn + 1);
 
-      let html = `<button class="pg-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
+      let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
       for (let p = pgStart; p <= pgEnd; p++) {
-        html += `<button class="pg-btn ${p === currentPage ? "active" : ""}" onclick="changePage(${p})">${p}</button>`;
+        html += `<button class="page-btn ${p === currentPage ? "active" : ""}" onclick="changePage(${p})">${p}</button>`;
       }
-      html += `<button class="pg-btn" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? "disabled" : ""}>›</button>`;
+      html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? "disabled" : ""}>›</button>`;
       pg.innerHTML = html;
     }
 
@@ -651,10 +526,8 @@
       if (p < 1 || p > pages) return;
       currentPage = p;
       renderAllSesiPage();
-      document.getElementById("bodyAllSesi").scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
-    // ── Load waiting ──────────────────────────────────────────────────
     async function loadWaiting() {
       const { data, error } = await supabase
         .from("sessions")
@@ -664,15 +537,15 @@
         .order("created_at", { ascending: true });
 
       const list = document.getElementById("waitingList");
-      if (error) { list.innerHTML = `<p class="empty-state" style="color:red;">${error.message}</p>`; return; }
+      if (error) { list.innerHTML = `<p class="text-xs text-danger">${error.message}</p>`; return; }
 
       const count = data?.length ?? 0;
       document.getElementById("badgeWaiting").textContent = count;
-      document.getElementById("badgeWaiting").className = "badge " + (count > 0 ? "orange" : "grey");
+      document.getElementById("badgeWaiting").className = "badge " + (count > 0 ? "badge-warning" : "badge-neutral");
       document.getElementById("statWaiting").textContent = count;
 
       if (!data || !data.length) {
-        list.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div>Semua sudah terkonfirmasi</div></div>`;
+        list.innerHTML = `<div class="empty-state" style="padding:16px;"><div class="empty-state-title text-xs text-secondary">Semua pembayaran sudah terkonfirmasi</div></div>`;
         return;
       }
 
@@ -687,17 +560,20 @@
 
       list.innerHTML = data.map(s => {
         const metode = s.pembayaran?.toLowerCase() ?? "qris";
-        const tagClass = ["midtrans", "xendit"].includes(metode) ? "gateway" : metode;
         const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
         return `
-        <div class="waiting-row">
-          <div class="waiting-avatar">💳</div>
-          <div class="waiting-info">
-            <div class="wi-name">${s.paket}</div>
-            <div class="wi-detail"><span class="pay-tag ${tagClass}">${metode.toUpperCase()}</span> · ${jam}</div>
-            <div class="wi-price">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</div>
+        <div class="session-row">
+          <div class="session-row-info">
+            <div class="session-row-avatar" style="background:var(--color-warning-light); color:var(--color-warning-text);">⏳</div>
+            <div>
+              <div class="session-row-name">${s.paket}</div>
+              <div class="session-row-detail">${metode.toUpperCase()} · ${jam}</div>
+            </div>
           </div>
-          <button class="btn-konfirmasi" id="btnKonfirmasi_${s.id}" onclick="konfirmasi('${s.id}')">✅ Konfirmasi</button>
+          <div class="session-row-actions">
+            <span class="session-row-price">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</span>
+            <button class="btn btn-success btn-xs" id="btnKonfirmasi_${s.id}" onclick="konfirmasi('${s.id}')">Konfirmasi</button>
+          </div>
         </div>`;
       }).join("");
     }
@@ -706,11 +582,10 @@
       const btn = document.getElementById("btnKonfirmasi_" + id);
       if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
       const { error } = await supabase.from("sessions").update({ status: "paid" }).eq("id", id);
-      if (error) { alert("Gagal: " + error.message); if (btn) { btn.disabled = false; btn.textContent = "✅ Konfirmasi"; } return; }
+      if (error) { alert("Gagal: " + error.message); if (btn) { btn.disabled = false; btn.textContent = "Konfirmasi"; } return; }
       await loadWaiting(); await loadSesi(); await loadAllSessions();
     };
 
-    // ── Load sesi hari ini ────────────────────────────────────────────
     async function loadSesi() {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const { data, error } = await supabase
@@ -728,31 +603,32 @@
 
       const list = document.getElementById("sesiList");
       if (!todaySessions.length) {
-        list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>Belum ada sesi hari ini</div></div>`;
+        list.innerHTML = `<div class="empty-state" style="padding:16px;"><div class="empty-state-title text-xs text-secondary">Belum ada sesi foto hari ini</div></div>`;
         return;
       }
 
       list.innerHTML = todaySessions.map(s => {
         const metode = s.pembayaran?.toLowerCase() ?? "qris";
-        const tagClass = ["midtrans", "xendit"].includes(metode) ? "gateway" : metode;
         const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        const statusClass = s.status === "paid" ? "status-paid" : s.status === "waiting" ? "status-waiting" : "status-done";
         const statusLabel = { paid: "✅ Lunas", waiting: "⏳ Menunggu", done: "🏁 Selesai" }[s.status] ?? s.status;
         return `
-        <div class="sesi-row">
-          <div class="sesi-dot ${s.status}"></div>
-          <div class="sesi-info">
-            <div class="si-name">${s.paket}</div>
-            <div class="si-detail"><span class="pay-tag ${tagClass}">${metode.toUpperCase()}</span> · ${jam}</div>
+        <div class="session-row">
+          <div class="session-row-info">
+            <div class="session-row-avatar">${metode.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="session-row-name">${s.paket}</div>
+              <div class="session-row-detail">${metode.toUpperCase()} · ${jam}</div>
+            </div>
           </div>
           <div style="text-align:right;">
-            <div class="sesi-price">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</div>
-            <span class="status-badge ${s.status}">${statusLabel}</span>
+            <div class="session-row-price">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</div>
+            <span class="badge ${statusClass}">${statusLabel}</span>
           </div>
         </div>`;
       }).join("");
     }
 
-    // ── CSV download ──────────────────────────────────────────────────
     function toCSV(rows) {
       const headers = ["Tanggal", "Jam", "Paket", "Harga", "Metode", "Status"];
       const escape = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
@@ -793,12 +669,10 @@
       triggerDownload(toCSV(filteredSess), `sesi_${label}_${today}.csv`);
     };
 
-    // ── Refresh ───────────────────────────────────────────────────────
     window._refreshAll = function () {
       loadWaiting(); loadSesi(); loadAllSessions();
     };
 
-    // ── Init ──────────────────────────────────────────────────────────
     await loadPaymentMode();
     await Promise.all([loadWaiting(), loadSesi(), loadAllSessions()]);
 

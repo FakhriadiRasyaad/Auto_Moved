@@ -4,173 +4,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Download Foto Kamu — Photobooth</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Download Foto — Photobooth</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/customer.css" />
+
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-    }
-
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --primary: #18181b;
-      --primary-hover: #27272a;
-      --primary-l: #e4e4e7;
-      --text: #18181b;
-      --text-muted: #71717a;
-      --border: #e4e4e7;
-      --shadow: rgba(0, 0, 0, 0.04);
-      --accent: #f59e0b; /* rating gold */
+      font-family: "Nunito", "Inter", "Poppins", sans-serif;
     }
 
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #f8fafc, #f1f5f9, #e2e8f0);
-      color: var(--text);
+      background: linear-gradient(135deg, #FFE8F1 0%, #FFF3F8 50%, #F5E8FF 100%);
       min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+      color: #33223B;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 16px 48px;
+      padding: 24px 16px;
     }
 
-    .container {
+    .customer-container {
       width: 100%;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      transition: max-width 0.3s ease;
-    }
-
-    .main-cards-row {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      width: 100%;
-    }
-
-    .right-col {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      width: 100%;
-    }
-
-    @media (min-width: 768px) {
-      .container {
-        max-width: 960px;
-      }
-
-      .main-cards-row {
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-start;
-      }
-
-      .main-cards-row .card,
-      .right-col {
-        flex: 1;
-        max-width: 468px;
-        width: 100%;
-      }
-    }
-
-    header {
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    header h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-
-    header p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .card {
-      background-color: var(--card);
-      border-radius: 24px;
-      border: 1px solid rgba(228, 228, 231, 0.8);
-      box-shadow: 0 12px 40px -12px rgba(24, 24, 27, 0.08), 0 1px 3px rgba(24, 24, 27, 0.02);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .card-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text);
-      border-bottom: 1.5px solid var(--primary-l);
-      padding-bottom: 10px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .photo-preview-container {
-      width: 100%;
-      aspect-ratio: 3/4;
-      border-radius: 16px;
-      overflow: hidden;
-      background-color: #fafafa;
-      border: 1px solid var(--border);
+      max-width: 540px;
       position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── HEADER ── */
+    .customer-logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
-      transition: transform 0.3s ease;
+      gap: 10px;
+      margin-bottom: 4px;
     }
 
-    .photo-preview-container:hover {
-      transform: scale(1.015);
+    .customer-logo-badge {
+      width: 42px;
+      height: 42px;
+      background: #FFFFFF;
+      border: 2px solid #FFD8E7;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(255, 110, 165, 0.15);
     }
 
-    .photo-preview-container img {
-      width: 100%;
-      height: 100%;
+    .customer-logo img {
+      width: 26px;
+      height: auto;
       object-fit: contain;
-      display: block;
     }
 
-    .loading-spinner {
-      position: absolute;
+    .customer-logo-text {
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF5E93 0%, #A875FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-title-box {
+      text-align: center;
+    }
+
+    .customer-heading {
+      font-size: 22px;
+      font-weight: 900;
+      color: #3A2B42;
+      margin-bottom: 4px;
+    }
+
+    .customer-subheading {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7A6988;
+    }
+
+    /* ── CARDS ── */
+    .dl-card {
+      background: #FFFFFF;
+      border: 3px solid #FFD8E7;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(255, 110, 165, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-label {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #FF4886;
+    }
+
+    .img-preview-box {
+      background: linear-gradient(135deg, #F9EFFB 0%, #FFF3F8 100%);
+      border: 2px solid #FFD8E7;
+      border-radius: 20px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      font-size: 0.8rem;
+      justify-content: center;
+      min-height: 240px;
+      position: relative;
+      box-shadow: inset 0 4px 14px rgba(255, 110, 165, 0.08);
+      overflow: hidden;
     }
 
-    .spinner {
+    .img-preview-box img {
+      max-width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(255, 110, 165, 0.2);
+    }
+
+    /* ── BUTTONS ── */
+    .btn-download-primary {
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #FF6FA2 0%, #A875FF 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 26px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 111, 162, 0.35);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-download-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(255, 111, 162, 0.45);
+    }
+
+    .btn-download-gif {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #A875FF 0%, #FF6FA2 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(168, 117, 255, 0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-download-gif:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(168, 117, 255, 0.4);
+    }
+
+    /* ── ASSET GRID (ASLI) ── */
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .asset-card {
+      background: #FFFFFF;
+      border: 2px solid #FFD8E7;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(255, 110, 165, 0.1);
+    }
+
+    .asset-card:hover {
+      transform: scale(1.05);
+      border-color: #FF6FA2;
+    }
+
+    .asset-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .asset-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      font-size: 9px;
+      font-weight: 800;
+      background: rgba(255, 72, 134, 0.85);
+      color: #FFFFFF;
+      border-radius: 6px;
+      padding: 2px 6px;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ── RATING CARD ── */
+    .rating-card {
+      background: #FFF0F5;
+      border: 2px dashed #FFD8E7;
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stars-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      font-size: 2rem;
+      cursor: pointer;
+      margin: 8px 0;
+      transition: transform 0.2s;
+    }
+
+    .stars-wrap span:hover {
+      transform: scale(1.2);
+    }
+
+    /* ── SPINNER ── */
+    .spinner-pink {
       width: 32px;
       height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--primary);
+      border: 3px solid #FFD8E7;
+      border-top-color: #FF4886;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -180,337 +270,140 @@
         transform: rotate(360deg);
       }
     }
-
-    .error-msg {
-      color: var(--primary-hover);
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .btn-download {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      background: var(--primary);
-      color: #ffffff;
-      border: none;
-      border-radius: 14px;
-      padding: 15px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 4px 14px rgba(24, 24, 27, 0.15);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .btn-download:hover {
-      transform: translateY(-2px);
-      background: var(--primary-hover);
-      box-shadow: 0 8px 24px rgba(24, 24, 27, 0.25);
-    }
-
-    .btn-download:active {
-      transform: translateY(0px);
-    }
-
-    /* ── RAW PHOTOS GRID ── */
-    .raw-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: min-content; /* Mencegah baris gepeng/terpotong di grid */
-      gap: 12px;
-      max-height: 220px;
-      overflow-y: auto;
-      padding: 6px;
-    }
-
-    .raw-grid::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .raw-grid::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.12);
-      border-radius: 99px;
-    }
-
-    .raw-item {
-      background-color: var(--card);
-      border-radius: 16px;
-      border: 1px solid rgba(228, 228, 231, 0.8);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 4px 15px rgba(24, 24, 27, 0.03);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .raw-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(24, 24, 27, 0.08);
-    }
-
-    .raw-img-wrap {
-      width: 100%;
-      aspect-ratio: 4/3; /* Mengembalikan ke rasio landscape 4:3 asli */
-      background-color: #fafafa;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .raw-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .raw-actions {
-      padding: 8px;
-    }
-
-    .btn-download-sm {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      width: 100%;
-      background-color: #ffffff;
-      color: var(--primary);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 7px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.72rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-
-    .btn-download-sm:hover {
-      background-color: var(--primary);
-      border-color: var(--primary);
-      color: #ffffff;
-    }
-
-    /* ── RATING SECTION ── */
-    .rating-container {
-      text-align: center;
-      padding: 8px 0;
-    }
-
-    .rating-title {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .stars-wrap {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .star-btn {
-      background: none;
-      border: none;
-      font-size: 2.2rem;
-      cursor: pointer;
-      color: var(--primary-l);
-      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.15s;
-    }
-
-    .star-btn:hover {
-      transform: scale(1.2);
-      color: var(--accent);
-    }
-
-    .star-btn.active {
-      color: var(--accent);
-      text-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
-    }
-
-    .rating-thankyou {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #10b981;
-      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-
-    @keyframes popIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
   </style>
 </head>
 
-<body>
+<body class="customer-page korean-register-page">
 
-  <div class="container">
-    <!-- Header -->
-    <header style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 8px;">
-      <img src="../img/Logo_photobooth_LTI.png" alt="Logo LTI Foto" onerror="this.src='../assets/img/logo.png'" style="width: 50px; height: 50px; object-fit: contain; border-radius: 12px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); margin-bottom: 6px;">
-      <h1 id="guestGreeting" style="font-size: 1.6rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">Halo!</h1>
-      <p style="font-size: 0.88rem; color: var(--text-muted); font-weight: 500;">Terima kasih sudah berfoto di Photobox</p>
-    </header>
+  <!-- Skyline & Background Glow -->
+  <div class="korean-bg-skyline"></div>
+  <div class="korean-bg-glow"></div>
 
-    <!-- MAIN CARDS ROW (Side-by-Side on Desktop) -->
-    <div class="main-cards-row">
-      <!-- FOTO UTAMA -->
-      <div class="card">
-        <div class="card-title">✨ Foto Cetak</div>
-        <div class="photo-preview-container">
-          <div class="loading-spinner" id="mainLoading">
-            <div class="spinner"></div>
-            <span>Memuat foto...</span>
-          </div>
-          <img id="mainPhoto" src="" alt="Foto Utama" style="display: none;">
+  <!-- Background SVG Decorations -->
+  <div class="background-decoration">
+    <div class="top-left-decoration">
+      <img src="../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
+    </div>
+    <div class="top-right-decoration">
+      <img src="../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
+    </div>
+    <div class="bottom-left-decoration">
+      <img src="../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
+    </div>
+    <div class="bottom-right-decoration">
+      <div class="characters-cloud-group">
+        <img src="../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
+        <img src="../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
+        <img src="../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
+      </div>
+    </div>
+  </div>
+
+  <div class="customer-container">
+
+    <!-- Header Logo -->
+    <div class="customer-logo">
+      <div class="customer-logo-badge">
+        <img src="../img/Logo_photobooth_LTI.png" alt="Logo" onerror="this.src='../assets/img/logo.png'">
+      </div>
+      <span class="customer-logo-text">PHOTOBOOTH ✨</span>
+    </div>
+
+    <div class="page-title-box">
+      <h1 class="customer-heading">Simpan Fotomu ke HP! 📱✨</h1>
+      <p class="customer-subheading">Unduh foto cetak, animasi GIF, dan foto jepretan asli langsung ke HP kamu</p>
+    </div>
+
+    <!-- Main Framed Photo Card -->
+    <div class="dl-card">
+      <div class="card-label">🖼️ FOTO STRIP HASIL EDIT</div>
+
+      <div class="img-preview-box">
+        <div id="mainLoading" style="display:flex; flex-direction:column; align-items:center; gap:8px; color:#FF4886; font-size:12px; font-weight:800;">
+          <div class="spinner-pink"></div>
+          <span>⏳ Memuat foto cetak...</span>
         </div>
-        <button class="btn-download" id="btnDownloadMain" style="display: none;">
-          Unduh Foto ⬇️
-        </button>
+        <img id="mainPhoto" alt="Foto Cetak" style="display:none;">
+        <img src="../img/Style/11.svg" alt="Sparkle" style="position: absolute; top: 12px; right: 12px; width: 18px; opacity: 0.8;" />
       </div>
 
-      <!-- KOLOM KANAN: GIF & FOTO MENTAH -->
-      <div class="right-col">
-        <!-- ANIMASI GIF -->
-        <div class="card" id="gifCard" style="display: none;">
-          <div class="card-title">🎬 Animasi GIF</div>
-          <div class="photo-preview-container" style="aspect-ratio: auto; min-height: 200px;">
-            <div class="loading-spinner" id="gifLoading">
-              <div class="spinner"></div>
-              <span>Memuat GIF...</span>
-            </div>
-            <img id="gifPhoto" src="" alt="Animasi GIF" style="display: none; width: 100%; height: auto;">
-          </div>
-          <button class="btn-download" id="btnDownloadGif" style="display: none;">
-            Unduh Animasi GIF ⬇️
-          </button>
-        </div>
+      <button class="btn-download-primary" id="btnDownloadMain" style="display:none;">
+        <span>⬇ Unduh Foto Cetak (.JPG) ✨</span>
+      </button>
+    </div>
 
-        <!-- FOTO MENTAH (RAW) -->
-        <div class="card" id="rawCard" style="display: none;">
-          <div class="card-title">📸 Semua Foto</div>
-          <div class="raw-grid" id="rawGrid"></div>
+    <!-- GIF Animasi Card -->
+    <div class="dl-card" id="gifCard" style="display:none;">
+      <div class="card-label">🎬 ANIMASI GIF SESI PHOTO</div>
+
+      <div class="img-preview-box" style="min-height:200px;">
+        <div id="gifLoading" style="display:flex; flex-direction:column; align-items:center; gap:8px; color:#A875FF; font-size:12px; font-weight:800;">
+          <div class="spinner-pink" style="border-top-color:#A875FF;"></div>
+          <span>⏳ Memuat animasi GIF...</span>
         </div>
+        <img id="gifPhoto" alt="Animasi GIF" style="display:none; max-height:220px;">
+      </div>
+
+      <button class="btn-download-gif" id="btnDownloadGif" style="display:none;">
+        <span>🎬 Unduh Animasi (.GIF) ✨</span>
+      </button>
+    </div>
+
+    <!-- Raw Photos Grid Card -->
+    <div class="dl-card" id="rawCard" style="display:none;">
+      <div class="card-label">📸 FOTO JEPRETAN ASLI</div>
+      <div class="asset-grid" id="rawGrid"></div>
+    </div>
+
+    <!-- Rating & Feedback Card -->
+    <div class="rating-card">
+      <div class="card-label" id="ratingText" style="margin-bottom:6px;">BAGAIMANA PENGALAMANMU? ⭐</div>
+
+      <div class="stars-wrap" id="starsWrap">
+        <span onclick="submitRating(1)">⭐</span>
+        <span onclick="submitRating(2)">⭐</span>
+        <span onclick="submitRating(3)">⭐</span>
+        <span onclick="submitRating(4)">⭐</span>
+        <span onclick="submitRating(5)">⭐</span>
+      </div>
+
+      <div id="ratingThankYou" style="display:none; font-size:13px; font-weight:900; color:#FF4886; margin-top:6px;">
+        🎉 Terima kasih atas ulasanmu! Pengalaman kamu sangat berharga bagi kami. ✨
       </div>
     </div>
 
-    <!-- RATING WIDGET -->
-    <div class="card" id="ratingCard">
-      <div class="rating-container">
-        <div class="rating-title" id="ratingText">Bagaimana pengalaman berfotomu? Beri nilai:</div>
-        <div class="stars-wrap" id="starsWrap">
-          <button class="star-btn" data-value="1" onclick="submitRating(1)">★</button>
-          <button class="star-btn" data-value="2" onclick="submitRating(2)">★</button>
-          <button class="star-btn" data-value="3" onclick="submitRating(3)">★</button>
-          <button class="star-btn" data-value="4" onclick="submitRating(4)">★</button>
-          <button class="star-btn" data-value="5" onclick="submitRating(5)">★</button>
-        </div>
-        <div class="rating-thankyou" id="ratingThankYou" style="display: none;">
-          Terima kasih atas penilaian Anda! ✓
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer info -->
-    <footer>
-      &copy; <span id="year">2026</span> Photobox. Hak Cipta Dilindungi.
-    </footer>
   </div>
 
   <script type="module">
     import { supabase } from "../assets/js/supabase.js";
 
-    // Parse parameters from query string
-    const params = new URLSearchParams(window.location.search);
-    const sessionPath = params.get("session");
-    const guestName = params.get("name");
-    const sessionId = params.get("sessionId");
-    const paramFramed = params.get("framed");
-    const paramGif = params.get("gif");
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionPath = urlParams.get("session");
+    const mainFileName = urlParams.get("framed") || urlParams.get("file");
+    const gifFileName = urlParams.get("gif") || "hasil.gif";
+    const guestName = urlParams.get("name") || urlParams.get("guest") || "";
 
-    // Setup UI texts
-    document.getElementById("year").textContent = new Date().getFullYear();
-    if (guestName) {
-      document.getElementById("guestGreeting").textContent = `Halo, ${guestName}!`;
-    }
-
-    if (!sessionPath) {
-      showError("Data sesi pemotretan tidak valid atau tidak ditemukan.");
+    if (!sessionPath || !mainFileName) {
+      document.getElementById("mainLoading").innerHTML = `<span style="color:#FF4886; font-size:12px; font-weight:800;">❌ Tautan tidak valid / foto tidak ditemukan.</span>`;
     } else {
       loadPhotos();
     }
 
-    // ── LOAD FOTO & SUPABASE INTEGRATION ──────────────────────────────
     async function loadPhotos() {
       try {
-        // Cek file di folder edit untuk mencari hasil foto berframe (baik hasil.jpg maupun hasil_timestamp.jpg)
-        let framedFileName = paramFramed || "hasil.jpg";
-        let gifFileName = paramGif || "hasil.gif";
-        
-        if (!paramFramed) {
-          try {
-            const { data: editFiles } = await supabase.storage
-              .from("photos")
-              .list(`${sessionPath}/edit`, { limit: 10 });
-            if (editFiles && editFiles.length > 0) {
-              const matchedImg = editFiles.find(f => f.name.startsWith("hasil") && (f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png")));
-              if (matchedImg) framedFileName = matchedImg.name;
+        const mainPath = `${sessionPath}/edit/${mainFileName}`;
+        const mainSignedUrl = supabase.storage.from("photos").getPublicUrl(mainPath).data.publicUrl;
 
-              const matchedGif = editFiles.find(f => f.name.startsWith("hasil") && f.name.endsWith(".gif"));
-              if (matchedGif) gifFileName = matchedGif.name;
-            }
-          } catch (listErr) {
-            console.warn("Gagal list folder edit, fallback ke default hasil.jpg/gif:", listErr);
-          }
-        }
-
-        // 1. Memuat foto berframe
-        const editPath = `${sessionPath}/edit/${framedFileName}`;
-        const mainSignedUrl = supabase.storage.from("photos").getPublicUrl(editPath).data.publicUrl;
-
-        // Tampilkan foto utama
         const mainImg = document.getElementById("mainPhoto");
         mainImg.onload = () => {
           document.getElementById("mainLoading").style.display = "none";
           mainImg.style.display = "block";
-
-          // Aktifkan tombol unduh utama
-          const btnDl = document.getElementById("btnDownloadMain");
-          btnDl.style.display = "flex";
-          btnDl.onclick = () => downloadFile(mainSignedUrl, `photobox_${guestName || "foto"}_framed.jpg`);
-        };
-        mainImg.onerror = () => {
-          document.getElementById("mainLoading").innerHTML =
-            "<div class='error-msg'>Gagal memuat foto cetak. Mungkin file belum diunggah.</div>";
+          const btn = document.getElementById("btnDownloadMain");
+          btn.style.display = "flex";
+          btn.onclick = () => downloadFile(mainSignedUrl, `photobox_${guestName || "foto"}_framed.jpg`);
         };
         mainImg.src = mainSignedUrl;
 
-        // 1b. Memuat Animasi GIF
         try {
           const gifPath = `${sessionPath}/edit/${gifFileName}`;
           const gifSignedUrl = supabase.storage.from("photos").getPublicUrl(gifPath).data.publicUrl;
@@ -520,198 +413,59 @@
             document.getElementById("gifLoading").style.display = "none";
             gifImg.style.display = "block";
             document.getElementById("gifCard").style.display = "flex";
-
-            const btnDlGif = document.getElementById("btnDownloadGif");
-            btnDlGif.style.display = "flex";
-            btnDlGif.onclick = () => downloadFile(gifSignedUrl, `photobox_${guestName || "foto"}_animation.gif`);
-          };
-          gifImg.onerror = () => {
-            document.getElementById("gifCard").style.display = "none";
+            const btnGif = document.getElementById("btnDownloadGif");
+            btnGif.style.display = "flex";
+            btnGif.onclick = () => downloadFile(gifSignedUrl, `photobox_${guestName || "foto"}_animation.gif`);
           };
           gifImg.src = gifSignedUrl;
-        } catch (gifLoadErr) {
-          document.getElementById("gifCard").style.display = "none";
-        }
+        } catch (e) { }
 
-        // 2. Memuat foto-foto mentah (raw asli)
         try {
-          const asliFolder = `${sessionPath}/asli`;
-          let imageFiles = [];
-          let useFallback = false;
-
-          try {
-            const { data: files, error: listErr } = await supabase.storage
-              .from("photos")
-              .list(asliFolder, { limit: 20 });
-
-            if (listErr) throw listErr;
-            imageFiles = (files || []).filter(f => f.name.endsWith(".jpg") || f.name.endsWith(".jpeg") || f.name.endsWith(".png"));
-            if (imageFiles.length === 0) {
-              useFallback = true;
-            }
-          } catch (listErr) {
-            console.warn("Gagal listing folder asli via Supabase API. Menggunakan deteksi langsung...", listErr);
-            useFallback = true;
-          }
-
-          if (useFallback) {
-            // Karena client anonim (HP) tidak memiliki hak list/select, 
-            // kita buat 12 slot tebakan nama file foto_1.jpg sampai foto_12.jpg
-            imageFiles = Array.from({ length: 12 }, (_, i) => ({ name: `foto_${i + 1}.jpg` }));
-          }
-
-          if (imageFiles.length > 0) {
+          const { data: files } = await supabase.storage.from("photos").list(`${sessionPath}/asli`, { limit: 20 });
+          if (files && files.length) {
+            document.getElementById("rawCard").style.display = "flex";
             const grid = document.getElementById("rawGrid");
-            grid.innerHTML = "";
-
-            imageFiles.forEach((file, idx) => {
-              const fileName = file.name;
-              const url = supabase.storage.from("photos").getPublicUrl(`${asliFolder}/${fileName}`).data.publicUrl;
-
-              if (useFallback) {
-                // Di alur fallback, pastikan file gambar benar-benar ada (tidak 404) sebelum ditampilkan
-                const checker = new Image();
-                checker.onload = () => {
-                  renderRawItem(url, fileName, grid, idx);
-                };
-                checker.src = url;
-              } else {
-                // Alur normal: langsung tampilkan
-                renderRawItem(url, fileName, grid, idx);
-              }
-            });
+            grid.innerHTML = files.filter(f => f.metadata).map((f, idx) => {
+              const url = supabase.storage.from("photos").getPublicUrl(`${sessionPath}/asli/${f.name}`).data.publicUrl;
+              return `
+                <div class="asset-card" onclick="downloadFile('${url}', 'asli_${idx + 1}.jpg')">
+                  <img src="${url}">
+                  <span class="asset-badge">⬇ Asli ${idx + 1}</span>
+                </div>`;
+            }).join("");
           }
-        } catch (rawErr) {
-          console.warn("Gagal memuat foto mentah:", rawErr);
-          document.getElementById("rawCard").style.display = "none";
-        }
+        } catch (e) { }
 
-        // Fungsi pembantu untuk render item foto raw asli
-        function renderRawItem(url, fileName, grid, idx) {
-          // Tampilkan card foto mentah jika tersembunyi
-          document.getElementById("rawCard").style.display = "flex";
-
-          const item = document.createElement("div");
-          item.className = "raw-item";
-          // Buat ID tombol unik berdasarkan fileName
-          const btnId = `btnRaw-${fileName.replace(/[^a-zA-Z0-9]/g, "_")}`;
-          item.innerHTML = `
-            <div class="raw-img-wrap">
-              <img src="${url}" alt="Foto Mentah" loading="lazy">
-            </div>
-            <div class="raw-actions">
-              <button class="btn-download-sm" id="${btnId}">
-                Unduh Foto ⬇️
-              </button>
-            </div>
-          `;
-          grid.appendChild(item);
-
-          // Pasang handler download
-          document.getElementById(btnId).onclick = () => {
-            downloadFile(url, `photobox_${guestName || "foto"}_asli_${idx + 1}.jpg`);
-          };
-        }
       } catch (err) {
         console.error(err);
-        showError("Gagal memuat beberapa file. Hubungi admin.");
       }
     }
 
-    // Helper untuk download via fetch-to-blob (menghindari tab baru di mobile)
     async function downloadFile(fileUrl, fileName) {
       try {
         const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error("Gagal mengunduh file.");
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
-
         const link = document.createElement("a");
         link.href = blobUrl;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-      } catch (err) {
-        // Fallback jika kena CORS block
-        const link = document.createElement("a");
-        link.href = fileUrl;
-        link.target = "_blank";
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      } catch (e) {
+        window.open(fileUrl, "_blank");
       }
     }
 
-    function showError(msg) {
-      document.getElementById("mainLoading").style.display = "none";
-      const container = document.querySelector(".container");
-      container.innerHTML = `
-      <header>
-        <h1>Oops!</h1>
-        <p>Ada masalah saat mengakses fotomu</p>
-      </header>
-      <div class="card">
-        <div class="error-msg">${msg}</div>
-      </div>
-    `;
-    }
-
-    // ── SUBMIT RATING ──────────────────────────────────────────────────
-    window.submitRating = async function (stars) {
-      // Visual update
-      const starButtons = document.querySelectorAll(".star-btn");
-      starButtons.forEach((btn, idx) => {
-        if (idx < stars) {
-          btn.classList.add("active");
-        } else {
-          btn.classList.remove("active");
-        }
-      });
-
-      document.getElementById("starsWrap").style.pointerEvents = "none";
-
-      try {
-        // 1. Simpan rating ke Supabase
-        if (sessionId) {
-          // Coba simpan langsung ke table sessions
-          const { error: sessErr } = await supabase
-            .from("sessions")
-            .update({ rating: stars })
-            .eq("id", sessionId);
-
-          if (sessErr) {
-            // Fallback: Jika sessions table tidak punya column rating, 
-            // coba simpan ke custom table feedbacks
-            await supabase
-              .from("feedbacks")
-              .insert([{ session_id: sessionId, rating: stars, session_path: sessionPath }]);
-          }
-        } else {
-          // Fallback jika tidak ada sessionId, simpan data anonim berbasis path
-          await supabase
-            .from("feedbacks")
-            .insert([{ rating: stars, session_path: sessionPath }]);
-        }
-      } catch (err) {
-        // Silent error: Rating tetap dianggap sukses oleh user demi kelancaran UX
-        console.warn("Rating save failed (table/columns may not exist):", err);
-      }
-
-      // Tampilkan pesan terima kasih dan arahkan ke terima-kasih.html
+    window.submitRating = function (stars) {
+      document.getElementById("ratingText").style.display = "none";
+      document.getElementById("starsWrap").style.display = "none";
+      document.getElementById("ratingThankYou").style.display = "block";
       setTimeout(() => {
-        document.getElementById("ratingText").style.display = "none";
-        document.getElementById("starsWrap").style.display = "none";
-        document.getElementById("ratingThankYou").style.display = "block";
-        setTimeout(() => {
-          window.location.href = "terima-kasih.html";
-        }, 1500);
-      }, 400);
-    }
+        window.location.href = "terima-kasih.html";
+      }, 1500);
+    };
   </script>
-
 </body>
 
 </html>

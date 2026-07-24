@@ -1,4 +1,4 @@
-import { supabase } from "./supabase.js";
+import { supabase } from "./supabase.js?v=2";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -11,7 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return { email, password };
   }
 
-  async function doLogin(redirectTo, requireAdmin = false) {
+  /**
+   * loginMode:
+   *   "user"  → Login User Flow (admin & superadmin boleh)
+   *   "admin" → Login Admin Dashboard (redirect berdasarkan role)
+   */
+  async function doLogin(loginMode) {
     const { email, password } = getCredentials();
 
     if (!email || !password) {
@@ -22,11 +27,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let authSuccess = false;
     let authData = null;
     let profile = null;
+    let supabaseAuthError = null;
 
     try {
       // 1. Sign in via Supabase Auth
       const { data, error: authError } =
         await supabase.auth.signInWithPassword({ email, password });
+
+      if (authError) {
+        supabaseAuthError = authError;
+      }
 
       if (!authError && data?.user) {
         authData = data;
@@ -48,11 +58,25 @@ document.addEventListener("DOMContentLoaded", () => {
         authSuccess = true;
       }
     } catch (e) {
-      console.warn("Supabase Auth error, checking offline local bypass:", e);
+      console.warn("Supabase Auth network error, checking offline local bypass:", e);
     }
 
-    // Fallback ke kredensial offline lokal jika login asli gagal atau email pengujian bypass digunakan
+    // Jika login Supabase gagal, cek apakah ada error spesifik atau fallback ke offline
     if (!authSuccess) {
+      // Jika ada error dari Supabase Auth (bukan network error), tampilkan pesan yang jelas
+      if (supabaseAuthError) {
+        const errMsg = supabaseAuthError.message.toLowerCase();
+        if (errMsg.includes("email not confirmed")) {
+          alert("Email belum dikonfirmasi! Minta superadmin untuk menonaktifkan 'Confirm email' di Supabase Dashboard → Authentication → Providers → Email.");
+        } else if (errMsg.includes("invalid login credentials") || errMsg.includes("invalid")) {
+          alert("Email atau Password salah! Pastikan akun sudah terdaftar.");
+        } else {
+          alert("Login gagal: " + supabaseAuthError.message);
+        }
+        return;
+      }
+
+      // Fallback ke kredensial offline lokal (hanya jika tidak bisa koneksi ke Supabase)
       if (email === "1@admin.com" && password === "1") {
         localStorage.setItem("loggedIn", "true");
         localStorage.setItem("userEmail", "1@admin.com");
@@ -74,7 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Delay kecil lalu redirect
         await new Promise(resolve => setTimeout(resolve, 300));
-        window.location.href = redirectTo;
+
+        // Mock account selalu role admin → redirect sesuai loginMode
+        if (loginMode === "admin") {
+          window.location.href = "admin/dashboard.html";
+        } else {
+          window.location.href = "photobox-session/daftar-akun.html";
+        }
         return;
       } else {
         alert("Username atau Password salah!");
@@ -82,20 +112,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 3. Cek role jika masuk admin dashboard
-    if (requireAdmin) {
-      if (profile.role !== "admin" && profile.role !== "superadmin") {
-        alert("Akses ditolak! Hanya admin yang bisa masuk dashboard.");
-        await supabase.auth.signOut();
-        return;
-      }
+    // 3. Cek role — admin & superadmin boleh masuk kedua mode
+    const userRole = profile.role;
+    if (userRole !== "admin" && userRole !== "superadmin") {
+      alert("Akses ditolak! Hanya admin atau superadmin yang bisa login.");
+      await supabase.auth.signOut();
+      return;
     }
 
     // 4. Simpan session ke localStorage
     localStorage.setItem("loggedIn",    "true");
     localStorage.setItem("userEmail",   authData.user.email);
     localStorage.setItem("userId",      authData.user.id);
-    localStorage.setItem("userRole",    profile.role);
+    localStorage.setItem("userRole",    userRole);
     localStorage.setItem("branchId",    profile.branch_id ?? "");
     localStorage.setItem("displayName", profile.display_name ?? "");
 
@@ -103,35 +132,64 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("currentAdmin", JSON.stringify({
       id:        authData.user.id,
       username:  authData.user.email,
-      role:      profile.role,
+      role:      userRole,
       branch_id: profile.branch_id ?? ""
     }));
 
-    // Simpan selectedBranch jika diperlukan
+    // 6. Ambil data branch dari Supabase untuk selectedBranch
+    let branchName = "";
+    let branchCode = "";
+    if (profile.branch_id) {
+      try {
+        const { data: branchData } = await supabase
+          .from("branches")
+          .select("name, code")
+          .eq("id", profile.branch_id)
+          .single();
+        if (branchData) {
+          branchName = branchData.name ?? "";
+          branchCode = branchData.code ?? "";
+        }
+      } catch (e) {
+        console.warn("Gagal mengambil data branch:", e);
+      }
+    }
+
     sessionStorage.setItem("selectedBranch", JSON.stringify({
-      id: profile.branch_id ?? "b149999f-33ec-4342-95bb-4f4961956c0b",
-      name: "Jakarta",
-      code: "JKT"
+      id:   profile.branch_id ?? "",
+      name: branchName,
+      code: branchCode
     }));
 
-    // 6. Delay kecil lalu redirect
+    // 7. Tentukan redirect berdasarkan mode login
+    let redirectTo;
+
+    if (loginMode === "user") {
+      // Login User Flow → kedua role (admin & superadmin) boleh
+      redirectTo = "photobox-session/daftar-akun.html";
+    } else {
+      // Login Admin Dashboard → selalu ke admin/dashboard.html
+      redirectTo = "admin/dashboard.html";
+    }
+
+    // 8. Delay kecil lalu redirect
     await new Promise(resolve => setTimeout(resolve, 300));
     window.location.href = redirectTo;
   }
 
-  // Tombol Login User Flow → photobox-session/daftar-akun.html
+  // Tombol Login User Flow → admin & superadmin boleh masuk
   if (btnUserFlow) {
     btnUserFlow.addEventListener("click", (e) => {
       e.preventDefault();
-      doLogin("photobox-session/daftar-akun.html", false);
+      doLogin("user");
     });
   }
 
-  // Tombol Login Admin Dashboard → admin/dashboard.html
+  // Tombol Login Admin Dashboard → redirect berdasarkan role
   if (btnAdmin) {
     btnAdmin.addEventListener("click", (e) => {
       e.preventDefault();
-      doLogin("admin/dashboard.html", true);
+      doLogin("admin");
     });
   }
 

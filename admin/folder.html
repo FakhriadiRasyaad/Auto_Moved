@@ -1,507 +1,554 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
-  <title>Setting Folder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styleadmins.css?v=monochrome-v13">
-  <style>
-    body {
-      position: relative !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: flex-start !important;
-      margin: 0 !important;
-      padding: 40px 20px !important;
-      box-sizing: border-box !important;
-      overflow-x: hidden !important;
-      min-height: 100vh !important;
-    }
-    .page-wrap {
-      width: 100% !important;
-      max-width: 700px !important;
-      margin: 0 auto !important;
-    }
-    .btn-back-floating {
-      position: absolute !important;
-      left: 2.5rem !important;
-      top: 2.5rem !important;
-      margin: 0 !important;
-      background: transparent !important;
-      color: #71717a !important;
-      border: none !important;
-      border-radius: 6px !important;
-      padding: 0.5rem 0.8rem !important;
-      font-family: Poppins, sans-serif !important;
-      font-weight: 600 !important;
-      font-size: 0.85rem !important;
-      cursor: pointer !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 0.3rem !important;
-      box-shadow: none !important;
-      transition: all 0.2s ease !important;
-      z-index: 1000 !important;
-    }
-    .btn-back-floating:hover {
-      background: rgba(24, 24, 27, 0.05) !important;
-      color: #18181b !important;
-      transform: translateX(-2px) !important;
-    }
-    .btn-back-floating:active {
-      transform: translateX(0) !important;
-    }
-    @media (max-width: 768px) {
-      .btn-back-floating {
-        position: relative !important;
-        left: 0 !important;
-        top: 0 !important;
-        margin: 0 0 1.5rem 0 !important;
-        width: fit-content !important;
-        display: inline-flex !important;
-        box-shadow: none !important;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folder Foto — Axionix Admin</title>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  
 </head>
-<body>
 
-<script>
-  if (!localStorage.getItem("currentAdmin")) window.location.href = "../index.html";
-</script>
+<body class="admin-page">
 
-<!-- Progress overlay -->
-<div id="progressOverlay">
-  <div class="progress-box">
-    <h3 id="progTitle">Menyiapkan ZIP...</h3>
-    <p id="progDesc">Mengambil foto dari server</p>
-    <div class="pbar"><div class="pfill" id="pfill"></div></div>
-    <p class="pstatus" id="pstatus">0%</p>
-  </div>
-</div>
+  <script>
+    if (!localStorage.getItem("currentAdmin")) {
+      window.location.href = "../index.html";
+    }
+  </script>
 
-<!-- Modal preview -->
-<div id="imgModal" onclick="closeModal()">
-  <button class="close-btn">✕</button>
-  <img id="modalImg" src="" alt="Preview">
-</div>
+  <!-- Progress Overlay -->
+  <div class="modal-overlay" id="progressOverlay" style="display:none;">
+    <div class="card p-6 max-w-sm w-full text-center">
+      <h3 class="font-bold text-lg text-primary mb-1" id="progTitle">Menyiapkan ZIP...</h3>
+      <p class="text-xs text-secondary mb-4" id="progDesc">Mengambil foto dari server</p>
 
-<button onclick="window.location.href='dashboard.html'" class="btn-back-floating">← Back</button>
-
-<div class="page-wrap">
-  <h1>Setting Folder</h1>
-  <p class="subtitle">Atur folder tujuan dan kelola foto tersimpan</p>
-
-  <!-- Folder Tujuan -->
-  <div class="card">
-    <p class="card-title">Folder Tujuan (Download 2)</p>
-    <p class="card-desc">
-      Download 2 akan menyimpan ZIP langsung ke folder ini di PC kamu. Klik <b>Pilih Folder</b> lalu izinkan akses. Hanya Chrome/Edge yang support fitur ini.
-    </p>
-
-    <div class="folder-status" id="folderStatus">
-      <div class="folder-status-text">
-        <div class="folder-status-name empty" id="folderName">Belum dipilih</div>
-        <div class="folder-status-hint" id="folderHint">Pilih folder untuk Download 2</div>
+      <div class="progress-bar mb-2">
+        <div class="progress-bar-fill" id="pfill" style="width:0%;"></div>
       </div>
-    </div>
 
-    <div class="folder-btns">
-      <button class="btn-pick" onclick="pickFolder()" id="btnPick">
-        Pilih Folder
-      </button>
-      <button class="btn-clear" id="btnClear" onclick="clearFolder()" style="display:none;">
-        Hapus
-      </button>
-    </div>
-
-    <div class="browser-note" id="browserNote">
-      ⚠️ Browser kamu tidak mendukung pemilihan folder langsung (butuh Chrome/Edge). 
-      Download 2 akan tetap berfungsi tapi file masuk ke folder <b>Downloads</b> seperti Download 1.
+      <span class="text-xs font-bold text-tertiary" id="pstatus">0%</span>
     </div>
   </div>
 
-  <!-- Foto Tersimpan -->
-  <div class="card">
-    <p class="card-title">Foto Tersimpan</p>
-    <p class="card-desc">
-      Setiap sesi tersimpan dalam folder <b>NamaGuest / Tanggal / edit</b> (hasil edit) dan <b>noedit</b> (foto asli terpilih).
-      Download sebagai satu ZIP per sesi. Download 2 sesuai yang anda cantumkan.
-    </p>
-
-    <button class="btn-load" onclick="loadSessions()">Muat Sesi Foto</button>
-    <div id="sessionList"><p class="empty-state">Klik tombol di atas untuk memuat.</p></div>
+  <!-- Image Preview Modal -->
+  <div class="modal-overlay" id="imgModal" style="display:none;" onclick="closeModal()">
+    <div style="position:relative; max-width:90vw; max-height:90vh;">
+      <button class="modal-close" style="position:absolute; top:-40px; right:0; color:#fff;"
+        onclick="closeModal()">✕</button>
+      <img id="modalImg" src="" alt="Preview"
+        style="max-width:100%; max-height:85vh; border-radius:var(--radius-xl); box-shadow:var(--shadow-2xl); object-fit:contain;">
+    </div>
   </div>
 
-  <div class="actions">
-    <button class="btn-save" onclick="saveSettings()">Simpan</button>
-  </div>
-  <p id="msgSave"></p>
-</div>
+  <div class="admin-layout">
 
-<script type="module">
-  import { supabase } from "../assets/js/supabase.js";
-
-  const admin      = JSON.parse(localStorage.getItem("currentAdmin"));
-  const branchId   = admin.branch_id;
-  const storageKey = "folder_admin_" + admin.id;
-  let setting      = JSON.parse(localStorage.getItem(storageKey) || "{}");
-  let folderHandle = null; // FileSystemDirectoryHandle
-
-  const supportsFS = "showDirectoryPicker" in window;
-  if (!supportsFS) document.getElementById("browserNote").classList.add("show");
-
-  // ── Load handle dari IndexedDB ────────────────────────────────────────
-  async function openIDB() {
-    return new Promise((res, rej) => {
-      const r = indexedDB.open("photobooth_fs", 1);
-      r.onupgradeneeded = e => e.target.result.createObjectStore("handles");
-      r.onsuccess = e => res(e.target.result);
-      r.onerror   = e => rej(e);
-    });
-  }
-  async function saveHandle(h) {
-    try {
-      const db = await openIDB();
-      db.transaction("handles","readwrite").objectStore("handles").put(h, `folder_${admin.id}`);
-    } catch(e) {}
-  }
-  async function loadHandle() {
-    try {
-      const db  = await openIDB();
-      const req = db.transaction("handles","readonly").objectStore("handles").get(`folder_${admin.id}`);
-      return new Promise(res => { req.onsuccess = e => res(e.target.result||null); req.onerror = ()=>res(null); });
-    } catch(e) { return null; }
-  }
-  async function deleteHandle() {
-    try {
-      const db = await openIDB();
-      db.transaction("handles","readwrite").objectStore("handles").delete(`folder_${admin.id}`);
-    } catch(e) {}
-  }
-
-  // Load saved handle on start
-  loadHandle().then(h => { if (h) { folderHandle = h; showFolderActive(h.name); } });
-
-  // ── Pick folder ───────────────────────────────────────────────────────
-  window.pickFolder = async function() {
-    if (!supportsFS) {
-      showMsg("⚠️ Browser tidak support. Pakai Chrome/Edge untuk fitur ini.", "#e65100"); return;
-    }
-    try {
-      const handle = await window.showDirectoryPicker({ mode: "readwrite" });
-      folderHandle = handle;
-      await saveHandle(handle);
-      setting.folderName = handle.name;
-      showFolderActive(handle.name);
-      showMsg("✅ Folder dipilih: " + handle.name, "green");
-    } catch(e) {
-      if (e.name !== "AbortError") showMsg("❌ " + e.message, "red");
-    }
-  };
-
-  window.clearFolder = function() {
-    folderHandle = null;
-    deleteHandle();
-    delete setting.folderName;
-    document.getElementById("folderName").textContent = "Belum dipilih";
-    document.getElementById("folderName").classList.add("empty");
-    document.getElementById("folderHint").textContent = "Pilih folder untuk Download 2";
-    document.getElementById("folderStatus").classList.remove("active");
-    document.getElementById("btnClear").style.display = "none";
-  };
-
-  function showFolderActive(name) {
-    document.getElementById("folderName").textContent = "📂 " + name;
-    document.getElementById("folderName").classList.remove("empty");
-    document.getElementById("folderHint").textContent = "Folder aktif — Download 2 akan menyimpan ke sini";
-    document.getElementById("folderStatus").classList.add("active");
-    document.getElementById("btnClear").style.display = "inline-flex";
-  }
-
-  // ── Load sesi dari Supabase ───────────────────────────────────────────
-  window.loadSessions = async function() {
-    const list = document.getElementById("sessionList");
-    list.innerHTML = `<p class="empty-state">⏳ Memuat sesi...</p>`;
-
-    const { data: folders, error } = await supabase.storage
-      .from("photos").list(branchId, { limit: 100, sortBy: { column: "name", order: "desc" } });
-
-    if (error) { list.innerHTML = `<p class="empty-state" style="color:red;">❌ ${error.message}</p>`; return; }
-    if (!folders?.length) { list.innerHTML = `<p class="empty-state">Belum ada sesi tersimpan.</p>`; return; }
-
-    list.innerHTML = "";
-
-    for (const folder of folders) {
-      if (folder.metadata) continue; // skip file
-
-      // Parse nama sesi: NamaGuest_YYYY-MM-DDTHH-MM-SS
-      const raw   = folder.name;
-      const parts = raw.match(/^(.+?)_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})$/);
-      const guest = parts ? parts[1].replace(/_/g, " ") : raw.replace(/_/g, " ");
-      const dtRaw = parts ? parts[2] : "";
-      const dt    = dtRaw ? dtRaw.replace("T"," ").replace(/-/g,":").replace(" ","T").slice(0,16).replace("T"," ") : "-";
-
-      const card = document.createElement("div");
-      card.className = "session-card";
-      card.innerHTML = `
-        <div class="session-header" onclick="toggleSession(this, '${raw}')">
-          <div class="session-meta">
-            <div class="session-guest">${guest}</div>
-            <div class="session-info">Tanggal: ${dt}</div>
-          </div>
-          <div class="session-actions">
-            <button class="btn-dl btn-dl1" id="dl1_${raw}"
-              onclick="event.stopPropagation(); downloadZip('${raw}', '${guest}', 1)">
-              Download 1
-            </button>
-            <button class="btn-dl btn-dl2 ${folderHandle ? '' : 'needs-folder'}" id="dl2_${raw}"
-              onclick="event.stopPropagation(); downloadZip('${raw}', '${guest}', 2)">
-              Download 2
-            </button>
-          </div>
-          <span class="session-toggle">▼</span>
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-sidebar-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
         </div>
-        <div class="session-preview" data-folder="${raw}"></div>
-      `;
-      list.appendChild(card);
+        <span class="admin-sidebar-title">Axionix Admin</span>
+      </div>
+
+      <nav class="admin-sidebar-nav">
+        <button class="admin-sidebar-item" onclick="window.location.href='dashboard.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>Overview</span>
+        </button>
+
+        <button class="admin-sidebar-item" onclick="window.location.href='paket.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
+          </svg>
+          <span>Kelola Paket</span>
+        </button>
+
+        <button class="admin-sidebar-item" onclick="window.location.href='payment.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          <span>Payment Setting</span>
+        </button>
+
+        <button class="admin-sidebar-item" onclick="window.location.href='edit-frame.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <span>Edit Frame</span>
+        </button>
+
+        <button class="admin-sidebar-item" onclick="window.location.href='edit-stiker.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+            </path>
+          </svg>
+          <span>Edit Stiker</span>
+        </button>
+
+        <button class="admin-sidebar-item active" onclick="location.reload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Folder Foto</span>
+        </button>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <button class="admin-sidebar-item text-danger" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar-left">
+          <h1 class="admin-topbar-title">Setting Folder &amp; Foto 📁</h1>
+          <span class="admin-topbar-subtitle">Atur folder tujuan otomatis dan kelola foto tersimpan per sesi</span>
+        </div>
+      </div>
+
+      <div class="admin-content max-w-xl">
+
+        <!-- Folder Tujuan Card -->
+        <div class="setting-card">
+          <h2 class="setting-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Folder Tujuan (Download 2)</span>
+          </h2>
+
+          <p class="text-xs text-secondary mb-4">
+            Download 2 menyimpan file ZIP secara otomatis ke folder PC yang ditentukan. Membutuhkan izin browser
+            Chrome/Edge.
+          </p>
+
+          <div class="card p-4 mb-4" id="folderStatus" style="background:var(--bg-subtle);">
+            <div class="text-sm font-bold" id="folderName">Belum dipilih</div>
+            <div class="text-xs text-tertiary" id="folderHint">Pilih folder tujuan untuk Download 2</div>
+          </div>
+
+          <div style="display:flex; gap:var(--space-3);" class="mb-3">
+            <button class="btn btn-primary" onclick="pickFolder()" id="btnPick">Pilih Folder PC</button>
+            <button class="btn btn-outline" id="btnClear" onclick="clearFolder()" style="display:none;">Hapus
+              Akses</button>
+          </div>
+
+          <div class="badge badge-warning p-3 w-full hidden" id="browserNote">
+            ⚠️ Browser ini tidak mendukung File System Access API. Hasil download akan masuk ke folder Downloads
+            default.
+          </div>
+        </div>
+
+        <!-- Foto Tersimpan Card -->
+        <div class="setting-card">
+          <div style="display:flex; align-items:center; justify-content:space-between;" class="mb-4">
+            <div>
+              <h2 class="setting-card-title" style="margin-bottom:2px; padding-bottom:0; border:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span>Foto Tersimpan Per Sesi</span>
+              </h2>
+              <p class="text-xs text-tertiary">Masing-masing sesi menyimpan foto hasil edit dan foto asli terpilih</p>
+            </div>
+
+            <button class="btn btn-outline btn-sm" onclick="loadSessions()">Muat Ulang</button>
+          </div>
+
+          <div id="sessionList">
+            <div class="empty-state" style="padding:var(--space-8);">
+              <div class="empty-state-icon">📁</div>
+              <div class="empty-state-title">Klik "Muat Sesi Foto" untuk melihat data</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button Card -->
+        <div class="setting-card">
+          <button onclick="saveSettings()" class="btn btn-primary btn-block">
+            <span>💾 Simpan Setting Folder</span>
+          </button>
+          <div id="msgSave" class="text-xs text-center mt-2 font-semibold"></div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    function pickFolder() { if (window._pickFolder) window._pickFolder(); }
+    function clearFolder() { if (window._clearFolder) window._clearFolder(); }
+    function loadSessions() { if (window._loadSessions) window._loadSessions(); }
+    function downloadZip(raw, g, m) { if (window._downloadZip) window._downloadZip(raw, g, m); }
+    function saveSettings() { if (window._saveSettings) window._saveSettings(); }
+    function openModal(url) { if (window._openModal) window._openModal(url); }
+    function closeModal() { document.getElementById("imgModal").style.display = "none"; }
+    function logout() {
+      localStorage.clear();
+      window.location.href = "../index.html";
     }
-  };
+  </script>
 
-  // Toggle preview
-  window.toggleSession = async function(header, folderName) {
-    const preview  = header.nextElementSibling;
-    const toggle   = header.querySelector(".session-toggle");
-    const isOpen   = preview.classList.contains("open");
+  <script type="module">
+    import { supabase } from "../assets/js/supabase.js";
 
-    document.querySelectorAll(".session-preview.open").forEach(d => d.classList.remove("open"));
-    document.querySelectorAll(".session-toggle.open").forEach(t => t.classList.remove("open"));
-    if (isOpen) return;
+    const admin = JSON.parse(localStorage.getItem("currentAdmin"));
+    const branchId = admin.branch_id;
+    const storageKey = "folder_admin_" + admin.id;
+    let setting = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    let folderHandle = null;
 
-    preview.classList.add("open");
-    toggle.classList.add("open");
+    const supportsFS = "showDirectoryPicker" in window;
+    if (!supportsFS) document.getElementById("browserNote").classList.remove("hidden");
 
-    if (preview.innerHTML.trim() !== "") return; // already loaded
-    await loadSessionPreview(preview, folderName);
-  };
+    async function openIDB() {
+      return new Promise((res, rej) => {
+        const r = indexedDB.open("photobooth_fs", 1);
+        r.onupgradeneeded = e => e.target.result.createObjectStore("handles");
+        r.onsuccess = e => res(e.target.result);
+        r.onerror = e => rej(e);
+      });
+    }
 
-  // Helper: list semua file dalam subfolder secara rekursif (1 level)
-  async function listAllFiles(sessionPath) {
-    // List root session folder dulu — cari subfolder edit/ dan noedit/
-    const { data: rootItems } = await supabase.storage.from("photos")
-      .list(sessionPath, { limit: 20 });
+    async function saveHandle(h) {
+      try {
+        const db = await openIDB();
+        db.transaction("handles", "readwrite").objectStore("handles").put(h, `folder_${admin.id}`);
+      } catch (e) { }
+    }
 
-    const results = { edit: [], noedit: [] };
-    if (!rootItems) return results;
+    async function loadHandle() {
+      try {
+        const db = await openIDB();
+        const req = db.transaction("handles", "readonly").objectStore("handles").get(`folder_${admin.id}`);
+        return new Promise(res => { req.onsuccess = e => res(e.target.result || null); req.onerror = () => res(null); });
+      } catch (e) { return null; }
+    }
 
-    for (const item of rootItems) {
-      if (item.metadata) {
-        // File langsung di root (format lama: hasil.jpg, foto_01.jpg)
-        if (item.name === "hasil.jpg") results.edit.push({ name: item.name, path: sessionPath + "/" + item.name });
-        else results.noedit.push({ name: item.name, path: sessionPath + "/" + item.name });
-      } else {
-        // Subfolder — list isinya
-        const subPath = sessionPath + "/" + item.name;
-        const { data: subItems } = await supabase.storage.from("photos")
-          .list(subPath, { limit: 50 });
-        if (subItems) {
-          for (const sf of subItems.filter(f => f.metadata)) {
-            const target = item.name === "edit" ? results.edit : results.noedit;
-            target.push({ name: sf.name, path: subPath + "/" + sf.name });
+    async function deleteHandle() {
+      try {
+        const db = await openIDB();
+        db.transaction("handles", "readwrite").objectStore("handles").delete(`folder_${admin.id}`);
+      } catch (e) { }
+    }
+
+    loadHandle().then(h => { if (h) { folderHandle = h; showFolderActive(h.name); } });
+
+    window._pickFolder = async function () {
+      if (!supportsFS) {
+        showMsg("⚠️ Browser tidak mendukung directory picker.", "var(--color-warning-text)"); return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ mode: "readwrite" });
+        folderHandle = handle;
+        await saveHandle(handle);
+        setting.folderName = handle.name;
+        showFolderActive(handle.name);
+        showMsg("✅ Folder dipilih: " + handle.name, "var(--color-success-text)");
+      } catch (e) {
+        if (e.name !== "AbortError") showMsg("❌ " + e.message, "var(--color-danger-text)");
+      }
+    };
+
+    window._clearFolder = function () {
+      folderHandle = null;
+      deleteHandle();
+      delete setting.folderName;
+      document.getElementById("folderName").textContent = "Belum dipilih";
+      document.getElementById("folderHint").textContent = "Pilih folder untuk Download 2";
+      document.getElementById("btnClear").style.display = "none";
+    };
+
+    function showFolderActive(name) {
+      document.getElementById("folderName").textContent = "📂 " + name;
+      document.getElementById("folderHint").textContent = "Folder aktif — Download 2 akan menyimpan ke sini";
+      document.getElementById("btnClear").style.display = "inline-flex";
+    }
+
+    window._loadSessions = async function () {
+      const list = document.getElementById("sessionList");
+      list.innerHTML = `<p class="text-xs text-tertiary">⏳ Memuat sesi foto dari storage...</p>`;
+
+      const { data: folders, error } = await supabase.storage
+        .from("photos").list(branchId, { limit: 100, sortBy: { column: "name", order: "desc" } });
+
+      if (error) { list.innerHTML = `<p class="text-xs text-danger">❌ ${error.message}</p>`; return; }
+      if (!folders?.length) { list.innerHTML = `<div class="empty-state" style="padding:var(--space-8);"><div class="empty-state-title">Belum ada sesi tersimpan</div></div>`; return; }
+
+      list.innerHTML = "";
+
+      for (const folder of folders) {
+        if (folder.metadata) continue;
+
+        const raw = folder.name;
+        const parts = raw.match(/^(.+?)_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})$/);
+        const guest = parts ? parts[1].replace(/_/g, " ") : raw.replace(/_/g, " ");
+        const dtRaw = parts ? parts[2] : "";
+        const dt = dtRaw ? dtRaw.replace("T", " ").replace(/-/g, ":").replace(" ", "T").slice(0, 16).replace("T", " ") : "-";
+
+        const card = document.createElement("div");
+        card.className = "admin-section mb-3";
+        card.innerHTML = `
+          <div class="admin-section-header" onclick="toggleSession(this, '${raw}')">
+            <div class="admin-section-title">
+              <span>👤 ${guest}</span>
+              <span class="caption ml-2">(${dt})</span>
+            </div>
+            <div class="admin-section-right" onclick="event.stopPropagation()">
+              <button class="btn btn-outline btn-xs" onclick="downloadZip('${raw}', '${guest}', 1)">Download 1</button>
+              <button class="btn btn-primary btn-xs" onclick="downloadZip('${raw}', '${guest}', 2)">Download 2</button>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="admin-section-body">
+            <div class="admin-section-inner" data-folder="${raw}" style="padding:var(--space-4);"></div>
+          </div>
+        `;
+        list.appendChild(card);
+      }
+    };
+
+    window.toggleSession = async function (header, folderName) {
+      const body = header.nextElementSibling;
+      const inner = body.querySelector(".admin-section-inner");
+      const chev = header.querySelector(".chevron");
+      const isOpen = body.classList.contains("open");
+
+      body.classList.toggle("open", !isOpen);
+      if (chev) chev.classList.toggle("open", !isOpen);
+
+      if (isOpen || inner.innerHTML.trim() !== "") return;
+      await loadSessionPreview(inner, folderName);
+    };
+
+    async function listAllFiles(sessionPath) {
+      const { data: rootItems } = await supabase.storage.from("photos")
+        .list(sessionPath, { limit: 20 });
+
+      const results = { edit: [], noedit: [] };
+      if (!rootItems) return results;
+
+      for (const item of rootItems) {
+        if (item.metadata) {
+          if (item.name === "hasil.jpg") results.edit.push({ name: item.name, path: sessionPath + "/" + item.name });
+          else results.noedit.push({ name: item.name, path: sessionPath + "/" + item.name });
+        } else {
+          const subPath = sessionPath + "/" + item.name;
+          const { data: subItems } = await supabase.storage.from("photos")
+            .list(subPath, { limit: 50 });
+          if (subItems) {
+            for (const sf of subItems.filter(f => f.metadata)) {
+              const target = item.name === "edit" ? results.edit : results.noedit;
+              target.push({ name: sf.name, path: subPath + "/" + sf.name });
+            }
           }
         }
       }
-    }
-    return results;
-  }
-
-  async function loadSessionPreview(previewEl, folderName) {
-    previewEl.innerHTML = `<p style="font-size:11px;color:#aaa;">⏳ Memuat preview...</p>`;
-    const sessionPath = `${branchId}/${folderName}`;
-
-    const files = await listAllFiles(sessionPath);
-    let html = "";
-
-    if (files.edit.length) {
-      html += `<p class="preview-label">✨ Edit (${files.edit.length} foto)</p><div class="preview-grid">`;
-      for (const f of files.edit) {
-        const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
-        if (s?.signedUrl) html += `
-          <div class="preview-item">
-            <img src="${s.signedUrl}" onclick="openModal('${s.signedUrl}')" title="${f.name}">
-            <span class="tag">edit</span>
-          </div>`;
-      }
-      html += `</div>`;
+      return results;
     }
 
-    if (files.noedit.length) {
-      html += `<p class="preview-label">📷 Foto Asli (${files.noedit.length} foto)</p><div class="preview-grid">`;
-      for (const f of files.noedit) {
-        const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
-        if (s?.signedUrl) html += `
-          <div class="preview-item">
-            <img src="${s.signedUrl}" onclick="openModal('${s.signedUrl}')" title="${f.name}">
-            <span class="tag">noedit</span>
-          </div>`;
-      }
-      html += `</div>`;
-    }
+    async function loadSessionPreview(previewEl, folderName) {
+      previewEl.innerHTML = `<p class="text-xs text-tertiary">⏳ Memuat preview...</p>`;
+      const sessionPath = `${branchId}/${folderName}`;
 
-    previewEl.innerHTML = html || `<p style="font-size:11px;color:#aaa;padding:12px 0;">
-      Tidak ada file. Coba sesi ulang dari pilih-frame.html.</p>`;
-  }
+      const files = await listAllFiles(sessionPath);
+      let html = "";
 
-  // ── Download ZIP ──────────────────────────────────────────────────────
-  // Struktur ZIP: NamaGuest/Tanggal/edit/hasil.jpg
-  //               NamaGuest/Tanggal/noedit/foto_01.jpg ...
-
-  window.downloadZip = async function(folderRaw, guestDisplay, mode) {
-    // Mode 2 perlu folderHandle
-    if (mode === 2 && !folderHandle) {
-      if (!supportsFS) {
-        // Fallback: download ke Downloads seperti mode 1
-        showMsg("⚠️ Browser tidak support folder picker, download ke Downloads.", "#e65100");
-        mode = 1;
-      } else {
-        showMsg("⚠️ Pilih folder tujuan dulu!", "#e65100");
-        document.getElementById("btnPick").scrollIntoView({ behavior: "smooth" });
-        return;
-      }
-    }
-
-    // Pastikan permission masih aktif
-    if (mode === 2 && folderHandle) {
-      try {
-        const perm = await folderHandle.requestPermission({ mode: "readwrite" });
-        if (perm !== "granted") { showMsg("❌ Izin folder ditolak.", "red"); return; }
-      } catch(e) { showMsg("❌ " + e.message, "red"); return; }
-    }
-
-    // Parse nama & tanggal dari folderRaw
-    const parts     = folderRaw.match(/^(.+?)_(\d{4}-\d{2}-\d{2})T(\d{2}-\d{2}-\d{2})$/);
-    const guestName = parts ? parts[1] : folderRaw;
-    const tglPart   = parts ? parts[2] : new Date().toISOString().slice(0,10);
-
-    // Nama path dalam ZIP
-    const zipEditPath   = `${guestName}/${tglPart}/edit/`;
-    const zipNoeditPath = `${guestName}/${tglPart}/noedit/`;
-
-    const btn1 = document.getElementById(`dl1_${folderRaw}`);
-    const btn2 = document.getElementById(`dl2_${folderRaw}`);
-    if (btn1) { btn1.disabled = true; btn1.textContent = "⏳"; }
-    if (btn2) { btn2.disabled = true; btn2.textContent = "⏳"; }
-
-    showProgress("Menyiapkan ZIP...", 0);
-
-    try {
-      const sessionPath = `${branchId}/${folderRaw}`;
-      const zip  = new JSZip();
-      setProgress(0, 1, "Memeriksa sesi...");
-
-      // Gunakan listAllFiles yang sama dengan preview — support semua struktur path
-      const allFiles = await listAllFiles(sessionPath);
-      const combined = [
-        ...allFiles.edit  .map(f => ({ ...f, sub: "edit"   })),
-        ...allFiles.noedit.map(f => ({ ...f, sub: "noedit" })),
-      ];
-
-      if (combined.length === 0) throw new Error("Tidak ada file ditemukan di sesi ini.");
-
-      const newTotal = combined.length;
-      setProgress(0, newTotal, "Mengambil foto...");
-      let done2 = 0;
-
-      for (const item of combined) {
-        const { data: s } = await supabase.storage.from("photos").createSignedUrl(item.path, 120);
-        if (!s?.signedUrl) { done2++; setProgress(done2, newTotal); continue; }
-
-        const res  = await fetch(s.signedUrl);
-        const blob = await res.blob();
-        const buf  = await blob.arrayBuffer();
-
-        const zipPath = item.sub === "edit" ? zipEditPath + item.name : zipNoeditPath + item.name;
-        zip.file(zipPath, buf);
-
-        done2++;
-        setProgress(done2, newTotal, `Mengambil ${done2}/${newTotal} file...`);
+      if (files.edit.length) {
+        html += `<div class="text-xs font-bold mb-2">✨ Hasil Edit (${files.edit.length} foto)</div><div class="asset-grid mb-4">`;
+        for (const f of files.edit) {
+          const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
+          if (s?.signedUrl) html += `
+            <div class="asset-card cursor-pointer" onclick="openModal('${s.signedUrl}')">
+              <img src="${s.signedUrl}" title="${f.name}">
+              <span class="badge badge-primary" style="position:absolute; bottom:4px; left:4px;">edit</span>
+            </div>`;
+        }
+        html += `</div>`;
       }
 
-      setProgress(newTotal, newTotal, "Membuat ZIP...");
-      document.getElementById("progDesc").textContent = "Membuat file ZIP...";
+      if (files.noedit.length) {
+        html += `<div class="text-xs font-bold mb-2">📷 Foto Asli (${files.noedit.length} foto)</div><div class="asset-grid">`;
+        for (const f of files.noedit) {
+          const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
+          if (s?.signedUrl) html += `
+            <div class="asset-card cursor-pointer" onclick="openModal('${s.signedUrl}')">
+              <img src="${s.signedUrl}" title="${f.name}">
+              <span class="badge badge-neutral" style="position:absolute; bottom:4px; left:4px;">noedit</span>
+            </div>`;
+        }
+        html += `</div>`;
+      }
 
-      const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
-      const zipName = `${guestName}_${tglPart}.zip`;
+      previewEl.innerHTML = html || `<p class="text-xs text-tertiary">Tidak ada foto dalam sesi ini.</p>`;
+    }
+
+    window._downloadZip = async function (folderRaw, guestDisplay, mode) {
+      if (mode === 2 && !folderHandle) {
+        if (!supportsFS) {
+          showMsg("⚠️ Browser tidak support folder picker, download ke Downloads.", "var(--color-warning-text)");
+          mode = 1;
+        } else {
+          showMsg("⚠️ Pilih folder tujuan dulu!", "var(--color-warning-text)");
+          document.getElementById("btnPick").scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+      }
 
       if (mode === 2 && folderHandle) {
-        // Simpan langsung ke folder yang dipilih
-        const fileHandle = await folderHandle.getFileHandle(zipName, { create: true });
-        const writable   = await fileHandle.createWritable();
-        await writable.write(zipBlob);
-        await writable.close();
-        showMsg(`✅ ZIP disimpan ke folder: ${zipName}`, "green");
-      } else {
-        // Download ke Downloads
-        const url  = URL.createObjectURL(zipBlob);
-        const link = document.createElement("a");
-        link.href  = url; link.download = zipName;
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-        showMsg(`✅ ZIP didownload: ${zipName}`, "green");
+        try {
+          const perm = await folderHandle.requestPermission({ mode: "readwrite" });
+          if (perm !== "granted") { showMsg("❌ Izin folder ditolak.", "var(--color-danger-text)"); return; }
+        } catch (e) { showMsg("❌ " + e.message, "var(--color-danger-text)"); return; }
       }
 
-      hideProgress();
+      const parts = folderRaw.match(/^(.+?)_(\d{4}-\d{2}-\d{2})T(\d{2}-\d{2}-\d{2})$/);
+      const guestName = parts ? parts[1] : folderRaw;
+      const tglPart = parts ? parts[2] : new Date().toISOString().slice(0, 10);
 
-    } catch(e) {
-      hideProgress();
-      showMsg("❌ Gagal: " + e.message, "red");
-    } finally {
-      if (btn1) { btn1.disabled = false; btn1.textContent = "⬇️ Download 1"; }
-      if (btn2) { btn2.disabled = false; btn2.textContent = folderHandle ? "📥 Download 2" : "📥 Download 2"; }
+      const zipEditPath = `${guestName}/${tglPart}/edit/`;
+      const zipNoeditPath = `${guestName}/${tglPart}/noedit/`;
+
+      showProgress("Menyiapkan ZIP...", 0);
+
+      try {
+        const sessionPath = `${branchId}/${folderRaw}`;
+        const zip = new JSZip();
+        setProgress(0, 1, "Memeriksa sesi...");
+
+        const allFiles = await listAllFiles(sessionPath);
+        const combined = [
+          ...allFiles.edit.map(f => ({ ...f, sub: "edit" })),
+          ...allFiles.noedit.map(f => ({ ...f, sub: "noedit" })),
+        ];
+
+        if (combined.length === 0) throw new Error("Tidak ada file ditemukan di sesi ini.");
+
+        const newTotal = combined.length;
+        setProgress(0, newTotal, "Mengambil foto...");
+        let done2 = 0;
+
+        for (const item of combined) {
+          const { data: s } = await supabase.storage.from("photos").createSignedUrl(item.path, 120);
+          if (!s?.signedUrl) { done2++; setProgress(done2, newTotal); continue; }
+
+          const res = await fetch(s.signedUrl);
+          const blob = await res.blob();
+          const buf = await blob.arrayBuffer();
+
+          const zipPath = item.sub === "edit" ? zipEditPath + item.name : zipNoeditPath + item.name;
+          zip.file(zipPath, buf);
+
+          done2++;
+          setProgress(done2, newTotal, `Mengambil ${done2}/${newTotal} file...`);
+        }
+
+        setProgress(newTotal, newTotal, "Membuat ZIP...");
+        document.getElementById("progDesc").textContent = "Membuat file ZIP...";
+
+        const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+        const zipName = `${guestName}_${tglPart}.zip`;
+
+        if (mode === 2 && folderHandle) {
+          const fileHandle = await folderHandle.getFileHandle(zipName, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(zipBlob);
+          await writable.close();
+          showMsg(`✅ ZIP disimpan ke folder PC: ${zipName}`, "var(--color-success-text)");
+        } else {
+          const url = URL.createObjectURL(zipBlob);
+          const link = document.createElement("a");
+          link.href = url; link.download = zipName;
+          document.body.appendChild(link); link.click(); document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          showMsg(`✅ ZIP didownload: ${zipName}`, "var(--color-success-text)");
+        }
+
+        hideProgress();
+
+      } catch (e) {
+        hideProgress();
+        showMsg("❌ Gagal: " + e.message, "var(--color-danger-text)");
+      }
+    };
+
+    function showProgress(title, pct) {
+      document.getElementById("progTitle").textContent = title;
+      document.getElementById("progressOverlay").style.display = "flex";
+      document.getElementById("pfill").style.width = pct + "%";
     }
-  };
+    function setProgress(done, total, desc) {
+      const pct = total > 0 ? Math.round(done / total * 100) : 0;
+      document.getElementById("pfill").style.width = pct + "%";
+      document.getElementById("pstatus").textContent = `${pct}% (${done}/${total})`;
+      if (desc) document.getElementById("progDesc").textContent = desc;
+    }
+    function hideProgress() {
+      document.getElementById("progressOverlay").style.display = "none";
+    }
 
-  // ── Progress UI ───────────────────────────────────────────────────────
-  function showProgress(title, pct) {
-    document.getElementById("progTitle").textContent = title;
-    document.getElementById("progressOverlay").classList.add("show");
-    document.getElementById("pfill").style.width = pct + "%";
-  }
-  function setProgress(done, total, desc) {
-    const pct = total > 0 ? Math.round(done / total * 100) : 0;
-    document.getElementById("pfill").style.width = pct + "%";
-    document.getElementById("pstatus").textContent = `${pct}% (${done}/${total})`;
-    if (desc) document.getElementById("progDesc").textContent = desc;
-  }
-  function hideProgress() {
-    document.getElementById("progressOverlay").classList.remove("show");
-  }
+    window._openModal = function (url) {
+      document.getElementById("modalImg").src = url;
+      document.getElementById("imgModal").style.display = "flex";
+    };
 
-  // ── Modal ─────────────────────────────────────────────────────────────
-  window.openModal = function(url) {
-    document.getElementById("modalImg").src = url;
-    document.getElementById("imgModal").classList.add("show");
-  };
-  window.closeModal = function() {
-    document.getElementById("imgModal").classList.remove("show");
-  };
+    window._saveSettings = function () {
+      localStorage.setItem(storageKey, JSON.stringify(setting));
+      showMsg("✅ Setting folder disimpan!", "var(--color-success-text)");
+      setTimeout(() => showMsg("", ""), 3000);
+    };
 
-  // ── Save settings ─────────────────────────────────────────────────────
-  window.saveSettings = function() {
-    localStorage.setItem(storageKey, JSON.stringify(setting));
-    showMsg("✅ Setting disimpan!", "green");
-    setTimeout(() => showMsg("", ""), 3000);
-  };
+    function showMsg(text, color) {
+      const el = document.getElementById("msgSave");
+      el.textContent = text; el.style.color = color;
+    }
 
-  function showMsg(text, color) {
-    const el = document.getElementById("msgSave");
-    el.textContent = text; el.style.color = color;
-  }
-</script>
+    _loadSessions();
+  </script>
 
 </body>
+
 </html>

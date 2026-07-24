@@ -1,0 +1,59 @@
+/* ═══════════════════════════════════════════════════════════════
+   AXIONIX SUPERADMIN UI v3.0 — Multi-Branch Control Center
+   ═══════════════════════════════════════════════════════════════ */
+
+.superadmin-page {
+  min-height: 100vh;
+  background: var(--gradient-page-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  font-family: var(--font-sans);
+}
+
+.superadmin-container {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.superadmin-header {
+  text-align: center;
+}
+
+.superadmin-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--text-primary);
+}
+
+.superadmin-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.superadmin-role-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.superadmin-role-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.superadmin-role-card.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-primary);
+}

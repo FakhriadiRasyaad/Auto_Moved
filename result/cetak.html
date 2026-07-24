@@ -3,141 +3,173 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak Foto — Photobooth</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Library QR Code -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
+  <!-- Axionix Design System -->
+  <link rel="stylesheet" href="../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/customer.css" />
+
   <style>
-    /* ── BASE RESET & MODERN MONOCHROME THEME ── */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: "Poppins", sans-serif;
+      font-family: "Nunito", "Inter", "Poppins", sans-serif;
     }
 
     body {
-      background: linear-gradient(135deg, #f4f4f5, #e4e4e7, #d4d4d8);
+      background: linear-gradient(135deg, #FFE8F1 0%, #FFF3F8 50%, #F5E8FF 100%);
       height: 100vh;
       width: 100vw;
       overflow: hidden;
-      color: #18181b;
+      color: #33223B;
       display: flex;
       flex-direction: column;
     }
 
     /* ── GLOBAL HEADER ── */
     .global-header {
-      height: 65px;
-      background: #ffffff;
-      border-bottom: 2px solid #e4e4e7;
+      height: 64px;
+      background: #FFFFFF;
+      border-bottom: 2px solid #FFD8E7;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 28px;
+      padding: 0 24px;
       flex-shrink: 0;
       z-index: 100;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 16px rgba(255, 110, 165, 0.08);
     }
 
     .global-header .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+    }
+
+    .global-header .logo-badge {
+      width: 38px;
+      height: 38px;
+      background: #FFF0F5;
+      border: 1.5px solid #FFD8E7;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .global-header .logo img {
-      width: 34px;
-      height: 34px;
+      width: 24px;
+      height: auto;
       object-fit: contain;
     }
 
     .global-header .logo-text {
-      font-size: 19px;
-      font-weight: 800;
-      color: #18181b;
-      letter-spacing: 0.5px;
+      font-size: 20px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF5E93 0%, #A875FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     /* ── STEPS PROGRESS ── */
     .steps {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+    }
+
+    .step-item-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #7A6988;
+    }
+
+    .step-item-wrap.active {
+      font-weight: 900;
+      color: #FF4886;
     }
 
     .step {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid #D6C2E7;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 13px;
-      font-weight: 700;
-      border: 2px solid #18181b;
-      color: #18181b;
-      background: transparent;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 11px;
+      font-weight: 800;
+      color: #7A6988;
+      background: #FFFFFF;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .step:hover,
     .step.active {
-      transform: scale(1.1);
-      background: #18181b;
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(24, 24, 27, 0.2);
+      background: #FF4886;
+      color: #FFFFFF;
+      border-color: #FF4886;
+      box-shadow: 0 4px 12px rgba(255, 72, 134, 0.3);
     }
 
     .step-line {
-      width: 35px;
-      border-top: 2px dashed #a1a1aa;
+      width: 24px;
+      border-top: 2px dashed #FFD8E7;
     }
 
-    /* ── SPLIT COLUMN EDITOR PAGE ── */
+    /* ── 2 COLUMN CETAK CONTAINER ── */
     .editor-page {
-      display: flex;
-      flex-direction: row;
-      height: calc(100vh - 65px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      height: calc(100vh - 64px);
       width: 100vw;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px;
       overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
 
     .col {
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(24, 24, 27, 0.08);
+      background: #FFFFFF;
+      border: 3px solid #FFD8E7;
+      border-radius: 28px;
       overflow: hidden;
-    }
-
-    .preview-col {
-      width: 50%;
-      min-width: 380px;
-    }
-
-    .slot-col {
-      width: 50%;
-      min-width: 380px;
+      box-shadow: 0 12px 30px rgba(255, 110, 165, 0.12);
     }
 
     .col-header {
-      height: 55px;
-      padding: 0 24px;
+      height: 50px;
+      padding: 0 20px;
       font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      background: #18181b;
-      color: #ffffff;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      background: #FFF0F5;
+      color: #FF4886;
+      border-bottom: 2px solid #FFD8E7;
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .col-body {
@@ -146,111 +178,147 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
       min-height: 0;
     }
 
-    /* Custom Scrollbar */
     .col-body::-webkit-scrollbar {
       width: 6px;
     }
 
     .col-body::-webkit-scrollbar-thumb {
-      background: rgba(24, 24, 27, 0.15);
+      background: #FFD8E7;
       border-radius: 99px;
     }
 
-    /* ── CANVAS PREVIEW SECTION ── */
+    /* ── PREVIEW WRAPPER ── */
     .canvas-wrapper {
       position: relative;
-      background: #09090b;
-      border-radius: 16px;
-      padding: 16px;
+      background: linear-gradient(135deg, #F9EFFB 0%, #FFF3F8 100%);
+      border: 2px solid #FFD8E7;
+      border-radius: 20px;
+      padding: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.4), 0 10px 25px rgba(0, 0, 0, 0.05);
+      box-shadow: inset 0 4px 14px rgba(255, 110, 165, 0.08);
       width: 100%;
-      aspect-ratio: 1.33; /* 4:3 style aspect ratio */
+      flex: 1;
+      min-height: 340px;
       overflow: hidden;
-      flex-shrink: 0;
     }
 
-    /* ── Panel QR Code ── */
-    .qr-section {
-      background: #f4f4f5;
-      border: 1.5px solid #e4e4e7;
-      border-radius: 18px;
-      padding: 16px;
-      text-align: center;
+    #previewImg {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(255, 110, 165, 0.25);
+    }
+
+    /* ── INFO SESI CARD ── */
+    .cetak-card {
+      background: #FFF0F5;
+      border: 2px solid #FFD8E7;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cetak-card h2 {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #FF4886;
+      border-bottom: 1.5px dashed #FFD8E7;
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .info-row span {
+      color: #7A6988;
+      font-weight: 700;
+    }
+
+    .info-row strong {
+      color: #3A2B42;
+      font-weight: 900;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-cetak {
       width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #FF6FA2 0%, #A875FF 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 26px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 111, 162, 0.35);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    .qr-spinner {
-      width: 28px; height: 28px;
-      border: 3px solid rgba(24, 24, 27, 0.1);
-      border-top-color: #18181b;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .qr-link {
-      font-size: 11px;
-      color: #18181b;
-      word-break: break-all;
-      margin-top: 8px;
-      display: block;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .qr-link:hover { text-decoration: underline; }
-
-    /* Status upload Google Drive */
-    .drive-status {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 30px;
-      display: inline-block;
-      margin-bottom: 8px;
-    }
-    .drive-status.uploading { background: #ffe4e6; color: #9f1239; }
-    .drive-status.done      { background: #dcfce7; color: #166534; }
-    .drive-status.error     { background: #fee2e2; color: #991b1b; }
-
-    /* Buttons */
-    .btn-cetak:hover {
-      background: #27272a !important;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(24, 24, 27, 0.25) !important;
+    .btn-cetak:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(255, 111, 162, 0.45);
     }
 
     .btn-cetak:disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
-    .btn-outline:hover {
-      background: #18181b !important;
-      color: #ffffff !important;
+    .btn-outline {
+      width: 100%;
+      height: 46px;
+      background: #FFFFFF;
+      color: #FF4886;
+      border: 2px solid #FFD8E7;
+      border-radius: 23px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: #FFF0F5;
+      border-color: #FF6FA2;
     }
 
     .btn-outline:disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
     .btn-back-small {
       height: 44px;
-      background: transparent;
-      color: #71717a;
-      border: 1.5px solid #e4e4e7;
-      border-radius: 12px;
+      background: #FFFFFF;
+      color: #554363;
+      border: 1.5px solid #FFD8E7;
+      border-radius: 22px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 800;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -259,37 +327,104 @@
     }
 
     .btn-back-small:hover {
-      background: #f4f4f5;
-      color: #18181b;
-      border-color: #d4d4d8;
+      background: #FFF0F5;
+      border-color: #FF6FA2;
     }
 
-    .qty-control button:hover {
-      background: #f4f4f5 !important;
-      border-color: #a1a1aa !important;
-      transform: scale(1.05);
+    .btn-finish {
+      height: 44px;
+      background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 22px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-finish:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+    }
+
+    /* ── Panel QR Code Modal ── */
+    .qr-spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid #FFD8E7;
+      border-top-color: #FF4886;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .qr-link {
+      font-size: 12px;
+      color: #FF4886;
+      word-break: break-all;
+      margin-top: 8px;
+      display: block;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .qr-link:hover {
+      text-decoration: underline;
+    }
+
+    .drive-status {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .drive-status.uploading {
+      background: #FFF0F5;
+      color: #FF4886;
+      border: 1px solid #FFD8E7;
+    }
+
+    .drive-status.done {
+      background: #DCFCE7;
+      color: #166534;
+    }
+
+    .drive-status.error {
+      background: #FEE2E2;
+      color: #991B1B;
     }
 
     /* Print styles */
     @media print {
-      body > *:not(#printArea) { display: none !important; }
+      body>*:not(#printArea) {
+        display: none !important;
+      }
+
       #printArea {
         display: block !important;
-        position: fixed; inset: 0;
+        position: fixed;
+        inset: 0;
         background: white;
       }
     }
 
     @media (max-width: 900px) {
       .editor-page {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         overflow-y: auto;
         height: auto;
       }
-      .preview-col, .slot-col {
-        width: 100%;
-        height: auto;
-      }
+
       body {
         overflow-y: auto;
       }
@@ -297,96 +432,167 @@
   </style>
 </head>
 
-<body>
+<body class="customer-page korean-register-page">
 
-  <div class="global-header">
-    <div class="logo">
-      <img src="../assets/img/logo.png" alt="Logo" onerror="this.src='../img/logo.png'">
-      <span class="logo-text">PHOTOBOOTH</span>
+  <!-- Skyline & Background Glow -->
+  <div class="korean-bg-skyline"></div>
+  <div class="korean-bg-glow"></div>
+
+  <!-- Background SVG Decorations -->
+  <div class="background-decoration">
+    <div class="top-left-decoration">
+      <img src="../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
     </div>
-    <div class="steps">
-      <div class="step" onclick="window.location.href='guest-gallery.html'">1</div>
-      <div class="step-line"></div>
-      <div class="step" onclick="window.location.href='pilih-frame.html'">2</div>
-      <div class="step-line"></div>
-      <div class="step active">3</div>
-      <div class="step-line"></div>
-      <div class="step">4</div>
+    <div class="top-right-decoration">
+      <img src="../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
+    </div>
+    <div class="bottom-left-decoration">
+      <img src="../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
+    </div>
+    <div class="bottom-right-decoration">
+      <div class="characters-cloud-group">
+        <img src="../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
+        <img src="../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
+        <img src="../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
+      </div>
     </div>
   </div>
 
+  <!-- Global Header Bar -->
+  <div class="global-header">
+    <div class="logo">
+      <div class="logo-badge">
+        <img src="../img/Logo_photobooth_LTI.png" alt="Logo" onerror="this.src='../assets/img/logo.png'">
+      </div>
+      <span class="logo-text">PHOTOBOOTH ✨</span>
+    </div>
+    
+    <div class="steps">
+      <div class="step-item-wrap">
+        <div class="step" onclick="window.location.href='guest-gallery.html'">1</div>
+        <span>Foto Tamu</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item-wrap">
+        <div class="step" onclick="window.location.href='pilih-frame.html'">2</div>
+        <span>Frame</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item-wrap active">
+        <div class="step active">3</div>
+        <span>Cetak &amp; Download</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item-wrap">
+        <div class="step">4</div>
+        <span>Selesai</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
   <div class="editor-page">
+    
     <!-- Left Column: Preview Foto -->
     <div class="col preview-col">
-      <div class="col-header">👁️ Preview Foto</div>
+      <div class="col-header">📷 PREVIEW FOTO FINAL ✨</div>
       <div class="col-body" style="justify-content: center; align-items: center;">
         <div class="canvas-wrapper">
-          <p class="no-preview" id="noPreview" style="color: #71717a; font-size: 13px; font-weight: 500;">⏳ Memuat preview...</p>
-          <img id="previewImg" alt="Preview" style="display:none; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+          <p class="no-preview" id="noPreview" style="color: #FF4886; font-size: 13px; font-weight: 800;">⏳ Memuat preview...</p>
+          <img id="previewImg" alt="Preview" style="display:none;">
+          <img src="../img/Style/11.svg" alt="Sparkle" style="position: absolute; top: 12px; right: 14px; width: 20px; opacity: 0.8;" />
+          <img src="../img/Style/09.svg" alt="Heart" style="position: absolute; bottom: 14px; left: 14px; width: 22px; opacity: 0.8;" />
         </div>
-        <p id="infoLayout" style="font-size:11px;color:#71717a;text-align:center;margin-top: 4px; font-weight: 500;"></p>
+        <p id="infoLayout" style="font-size:12px; color:#7A6988; text-align:center; font-weight:800;"></p>
       </div>
     </div>
 
-    <!-- Right Column: Info, QR & Actions -->
-    <div class="col slot-col" style="flex-grow: 1; border-right: none;">
-      <div class="col-header">⚙️ Pengaturan Cetak</div>
+    <!-- Right Column: Info & Actions -->
+    <div class="col slot-col">
+      <div class="col-header">⚙️ PENGATURAN CETAK ✨</div>
       <div class="col-body" style="gap: 16px;">
+        
         <!-- Info Sesi Card -->
-        <div class="cetak-card" style="background:#ffffff; border:1.5px solid #e4e4e7; border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:8px;">
-          <h2 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.75px; color:#71717a; border-bottom:1.5px solid #f4f4f5; padding-bottom:6px; margin-bottom:4px;">Info Sesi</h2>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Nama</span><strong id="infoNama" style="color:#18181b;">-</strong></div>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Paket</span><strong id="infoPaket" style="color:#18181b;">-</strong></div>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Jumlah Cetak</span><strong id="infoJumlahCetak" style="color:#18181b;">1 lembar</strong></div>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Layout</span><strong id="infoLayoutName" style="color:#18181b;">-</strong></div>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Filter</span><strong id="infoFilter" style="color:#18181b;">-</strong></div>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Frame</span><strong id="infoFrame" style="color:#18181b;">-</strong></div>
-          <div class="info-row" style="display:flex; justify-content:between; align-items:center; font-size:13px; justify-content: space-between;"><span style="color:#71717a;">Stiker</span><strong id="infoStiker" style="color:#18181b;">-</strong></div>
+        <div class="cetak-card">
+          <h2>⭐ INFO SESI FOTO</h2>
+          <div class="info-row">
+            <span>Nama</span><strong id="infoNama">-</strong>
+          </div>
+          <div class="info-row">
+            <span>Paket</span><strong id="infoPaket">-</strong>
+          </div>
+          <div class="info-row">
+            <span>Jumlah Cetak</span><strong id="infoJumlahCetak">1 lembar</strong>
+          </div>
+          <div class="info-row">
+            <span>Layout</span><strong id="infoLayoutName">-</strong>
+          </div>
+          <div class="info-row">
+            <span>Filter</span><strong id="infoFilter">-</strong>
+          </div>
+          <div class="info-row">
+            <span>Frame</span><strong id="infoFrame">-</strong>
+          </div>
+          <div class="info-row">
+            <span>Stiker</span><strong id="infoStiker">-</strong>
+          </div>
         </div>
 
         <!-- Cetak Actions -->
-        <div class="cetak-actions" style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
-          <button id="btnCetak" onclick="doCetak()" class="btn-cetak" style="width:100%; height:46px; background:#18181b; color:#ffffff; border:none; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(24, 24, 27, 0.15); transition:all 0.2s ease;" disabled>🖨️ Cetak Sekarang</button>
-          
+        <div class="cetak-actions" style="display:flex; flex-direction:column; gap:12px; margin-top:4px;">
+          <button id="btnCetak" onclick="doCetak()" class="btn-cetak" disabled>🖨️ Cetak Sekarang ✨</button>
+
           <!-- Download Button that opens the QR Code Modal -->
-          <button id="btnDownload" onclick="openQrModal()" class="btn-outline" style="width:100%; height:46px; background:transparent; color:#18181b; border:1.5px solid #18181b; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s ease;" disabled>⬇️ Download File Disini</button>
+          <button id="btnDownload" onclick="openQrModal()" class="btn-outline" disabled>📱 Scan / Download QR Code ✨</button>
           <span id="qtyDisplay" style="display:none;">1</span>
-          
+
           <div style="display:flex; gap:10px; width:100%;">
             <button onclick="window.location.href='pilih-frame.html'" class="btn-back-small" style="flex:1;">← Edit Ulang</button>
-            <button onclick="selesaiSesi()" style="flex:1; height:44px; background:#22c55e; color:white; border:none; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s ease; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);">Selesai Sesi ✅</button>
+            <button onclick="selesaiSesi()" class="btn-finish" style="flex:1;">Selesai Sesi ✅</button>
           </div>
         </div>
-        <p id="msgCetak" style="font-size:12.5px; text-align:center; font-weight:600; margin-top:2px; min-height:18px;"></p>
+        <p id="msgCetak" style="font-size:12px; text-align:center; font-weight:800; min-height:18px;"></p>
       </div>
     </div>
   </div>
 
   <!-- Modal QR Code -->
-  <div class="modal-bg" id="qrModalBg" onclick="bgQrClick(event)" style="position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px;">
-    <div class="modal-content" style="background: #ffffff; border-radius: 24px; padding: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); border: 1px solid rgba(0, 0, 0, 0.08); text-align: center; position: relative; animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-      <button onclick="closeQrModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 18px; cursor: pointer; color: #a1a1aa; font-weight: bold;">✕</button>
-      <h3 style="font-size:15px; font-weight:700; margin-bottom:4px; color: #18181b;">📱 Download via QR Code</h3>
-      <p style="font-size:12px; color:#71717a; margin-bottom:16px;">Scan pakai HP untuk download fotomu langsung</p>
-      
-      <div class="qr-wrap" id="qrWrap" style="display:flex; justify-content:center; margin-bottom:12px; min-height: 200px; align-items: center;">
-        <div class="qr-loading" id="qrLoading" style="display:flex; flex-direction:column; align-items:center; gap:6px; color:#71717a; font-size:11px;">
+  <div class="modal-bg" id="qrModalBg" onclick="bgQrClick(event)"
+    style="position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div class="modal-content"
+      style="background: #FFFFFF; border-radius: 28px; padding: 28px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(255, 110, 165, 0.25); border: 3px solid #FFD8E7; text-align: center; position: relative; animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <button onclick="closeQrModal()"
+        style="position: absolute; top: 16px; right: 16px; background: #FFF0F5; border: 1.5px solid #FFD8E7; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; cursor: pointer; color: #FF4886; font-weight: bold; display: flex; align-items: center; justify-content: center;">✕</button>
+      <h3 style="font-size:16px; font-weight:900; margin-bottom:4px; color: #3A2B42;">📱 Download via QR Code ✨</h3>
+      <p style="font-size:12px; color:#7A6988; font-weight:700; margin-bottom:16px;">Scan pakai HP untuk download fotomu langsung!</p>
+
+      <div class="qr-wrap" id="qrWrap"
+        style="display:flex; justify-content:center; margin-bottom:12px; min-height: 200px; align-items: center;">
+        <div class="qr-loading" id="qrLoading"
+          style="display:flex; flex-direction:column; align-items:center; gap:8px; color:#7A6988; font-size:12px; font-weight:700;">
           <div class="qr-spinner"></div>
           <span id="qrLoadingMsg">Mengunggah foto...</span>
         </div>
-        <canvas id="qrCanvas" style="display:none; margin: 0 auto;"></canvas>
+        <canvas id="qrCanvas" style="display:none; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 14px rgba(255, 110, 165, 0.15);"></canvas>
       </div>
-      
-      <div id="driveStatus" class="drive-status uploading" style="display:none; font-size: 11px;"></div>
-      <a id="qrLink" class="qr-link" href="#" target="_blank" style="display:none; font-size: 12px; color: #18181b; font-weight: 600; text-decoration: underline; margin-top: 8px;">🔗 Buka link foto</a>
+
+      <div id="driveStatus" class="drive-status uploading" style="display:none;"></div>
+      <a id="qrLink" class="qr-link" href="#" target="_blank" style="display:none;">🔗 Buka link foto</a>
     </div>
   </div>
 
-  <!-- Keyframes for modal animation -->
+  <!-- Modal Keyframe animation -->
   <style>
     @keyframes modalPop {
-      from { transform: scale(0.9) translateY(10px); opacity: 0; }
-      to { transform: scale(1) translateY(0); opacity: 1; }
+      from {
+        transform: scale(0.9) translateY(10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
     }
   </style>
 
@@ -395,13 +601,13 @@
 
   <script type="module">
     // Add QR Code modal functions to global window scope
-    window.openQrModal = function() {
+    window.openQrModal = function () {
       document.getElementById("qrModalBg").style.display = "flex";
     };
-    window.closeQrModal = function() {
+    window.closeQrModal = function () {
       document.getElementById("qrModalBg").style.display = "none";
     };
-    window.bgQrClick = function(e) {
+    window.bgQrClick = function (e) {
       if (e.target.id === "qrModalBg") window.closeQrModal();
     };
     import { supabase } from "../assets/js/supabase.js";
@@ -412,28 +618,28 @@
     let cetakData = null;
     try {
       const raw = sessionStorage.getItem("cetakData");
-      const gd  = sessionStorage.getItem("guestData");
+      const gd = sessionStorage.getItem("guestData");
       if (!raw || !gd) { window.location.href = "guest-login.html"; }
       cetakData = JSON.parse(raw);
-    } catch(e) { window.location.href = "guest-login.html"; }
+    } catch (e) { window.location.href = "guest-login.html"; }
 
-    let finalUrl  = cetakData.finalUrl;
-    let blobUrl   = null;
-    let driveLink = null; // link Google Drive setelah upload
-    let qty       = 1;
+    let finalUrl = cetakData.finalUrl;
+    let blobUrl = null;
+    let driveLink = null;
+    let qty = 1;
 
     // ──────────────────────────────────────────────
     //  ISI INFO SESI
     // ──────────────────────────────────────────────
     function fillInfoSesi() {
-      document.getElementById("infoNama").textContent       = cetakData.guestNama    ?? "-";
-      document.getElementById("infoLayoutName").textContent = cetakData.layout?.nama  ?? "-";
-      document.getElementById("infoFilter").textContent     =
+      document.getElementById("infoNama").textContent = cetakData.guestNama ?? "-";
+      document.getElementById("infoLayoutName").textContent = cetakData.layout?.nama ?? "-";
+      document.getElementById("infoFilter").textContent =
         cetakData.filterName ?? ((!cetakData.filter || cetakData.filter === "none") ? "Original" : "Aktif");
-      document.getElementById("infoFrame").textContent      = cetakData.frame?.name   ?? "Tanpa Frame";
-      document.getElementById("infoStiker").textContent     =
+      document.getElementById("infoFrame").textContent = cetakData.frame?.name ?? "Tanpa Frame";
+      document.getElementById("infoStiker").textContent =
         (cetakData.stiker?.length > 0) ? `${cetakData.stiker.length} stiker` : "Tidak ada";
-      document.getElementById("infoLayout").textContent     =
+      document.getElementById("infoLayout").textContent =
         `${cetakData.layout?.orientasi ?? ""} · ${cetakData.layout?.rows ?? "-"}×${cetakData.layout?.cols ?? "-"}`;
     }
 
@@ -442,11 +648,11 @@
     // ──────────────────────────────────────────────
     async function refreshSignedUrl() {
       try {
-        finalUrl           = supabase.storage.from("photos").getPublicUrl(cetakData.editPath).data.publicUrl;
+        finalUrl = supabase.storage.from("photos").getPublicUrl(cetakData.editPath).data.publicUrl;
         cetakData.finalUrl = finalUrl;
         sessionStorage.setItem("cetakData", JSON.stringify(cetakData));
         return true;
-      } catch(e) {
+      } catch (e) {
         setPreviewError("❌ Gagal akses foto: " + e.message);
         return false;
       }
@@ -475,12 +681,12 @@
         };
         img.src = blobUrl;
 
-        document.getElementById("btnCetak").disabled    = false;
+        document.getElementById("btnCetak").disabled = false;
         document.getElementById("btnDownload").disabled = false;
 
         // Setelah preview berhasil load, langsung upload ke Google Drive
         uploadToDrive(blob);
-      } catch(e) {
+      } catch (e) {
         setPreviewError("❌ Gagal load gambar: " + e.message);
       }
     }
@@ -490,14 +696,13 @@
     // ──────────────────────────────────────────────
     async function uploadToDrive(blob) {
       const driveStatus = document.getElementById("driveStatus");
-      const qrLoading   = document.getElementById("qrLoading");
-      const qrLoadMsg   = document.getElementById("qrLoadingMsg");
+      const qrLoading = document.getElementById("qrLoading");
+      const qrLoadMsg = document.getElementById("qrLoadingMsg");
 
       driveStatus.style.display = "inline-block";
-      driveStatus.className     = "drive-status uploading";
-      driveStatus.textContent   = "⬆️ Mengunggah ke Google Drive...";
+      driveStatus.className = "drive-status uploading";
+      driveStatus.textContent = "⬆️ Mengunggah ke Google Drive...";
 
-      // ── COBA UPLOAD KE BACKEND NODE.JS ──
       let uploadedLink = null;
 
       try {
@@ -512,14 +717,14 @@
             reader.readAsDataURL(blob);
           });
 
-          const guestData  = JSON.parse(sessionStorage.getItem("guestData"));
+          const guestData = JSON.parse(sessionStorage.getItem("guestData"));
           const uploadResp = await fetch("http://localhost:3000/api/upload-photo", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               imageBase64: base64,
-              sessionId:   guestData?.guest?.id ?? "unknown",
-              guestNama:   cetakData.guestNama ?? "guest"
+              sessionId: guestData?.guest?.id ?? "unknown",
+              guestNama: cetakData.guestNama ?? "guest"
             })
           });
 
@@ -528,17 +733,16 @@
             uploadedLink = result.driveLink ?? result.webViewLink ?? null;
           }
         }
-      } catch(err) {
+      } catch (err) {
         console.info("Backend Node.js tidak aktif, pakai Supabase link sebagai fallback.");
       }
 
-      // ── FALLBACK: Pakai Supabase public URL / signed URL ──
       if (!uploadedLink) {
         try {
           const guestData = JSON.parse(sessionStorage.getItem("guestData"));
-          const guestId   = guestData?.guest?.id ?? "guest";
-          const tgl       = new Date().toISOString().split("T")[0];
-          const filePath  = `finals/${guestId}_${tgl}_${Date.now()}.jpg`;
+          const guestId = guestData?.guest?.id ?? "guest";
+          const tgl = new Date().toISOString().split("T")[0];
+          const filePath = `finals/${guestId}_${tgl}_${Date.now()}.jpg`;
 
           qrLoadMsg.textContent = "Menyimpan foto final...";
 
@@ -549,18 +753,17 @@
           if (!upErr) {
             uploadedLink = supabase.storage.from("photos").getPublicUrl(filePath).data.publicUrl;
           }
-        } catch(fbErr) {
+        } catch (fbErr) {
           console.error("Fallback upload error:", fbErr);
         }
       }
 
-      // ── GENERATE QR CODE dari link ──
       qrLoading.style.display = "none";
 
       if (uploadedLink) {
         driveLink = uploadedLink;
-        driveStatus.className  = "drive-status done";
-        driveStatus.textContent= "✅ Foto tersimpan! Scan QR untuk download.";
+        driveStatus.className = "drive-status done";
+        driveStatus.textContent = "✅ Foto tersimpan! Scan QR untuk download.";
 
         const qrCanvas = document.getElementById("qrCanvas");
         qrCanvas.style.display = "block";
@@ -579,7 +782,7 @@
         const guestId = guestData?.guest?.id ?? "unknown";
         const sessionPath = cetakData?.sessionFolderPath ?? "";
         const guestName = cetakData?.guestNama ?? "";
-        
+
         let framedFileName = "";
         if (cetakData?.editPath) {
           framedFileName = cetakData.editPath.substring(cetakData.editPath.lastIndexOf("/") + 1);
@@ -599,27 +802,27 @@
 
         try {
           await QRCode.toCanvas(qrCanvas, downloadUrl, {
-            width:  200,
+            width: 200,
             margin: 2,
             color: {
-              dark:  "#18181b",
+              dark: "#FF4886",
               light: "#ffffff"
             }
           });
-        } catch(qrErr) {
+        } catch (qrErr) {
           console.error("QR code error:", qrErr);
         }
 
         const qrLink = document.getElementById("qrLink");
-        qrLink.href           = downloadUrl;
-        qrLink.style.display  = "block";
-        qrLink.textContent    = "🔗 " + downloadUrl.substring(0, 50) + "...";
+        qrLink.href = downloadUrl;
+        qrLink.style.display = "block";
+        qrLink.textContent = "🔗 " + downloadUrl.substring(0, 45) + "...";
 
       } else {
-        driveStatus.className  = "drive-status error";
-        driveStatus.textContent= "⚠️ QR tidak tersedia. Gunakan tombol Download.";
+        driveStatus.className = "drive-status error";
+        driveStatus.textContent = "⚠️ QR tidak tersedia. Gunakan tombol Download.";
         document.getElementById("qrLoading").innerHTML =
-          "<p style='color:#71717a;font-size:0.78rem'>Tidak bisa membuat QR Code. Pakai tombol Download.</p>";
+          "<p style='color:#7A6988;font-size:0.8rem;font-weight:700;'>Tidak bisa membuat QR Code. Pakai tombol Download.</p>";
         document.getElementById("qrLoading").style.display = "flex";
       }
     }
@@ -627,7 +830,7 @@
     // ──────────────────────────────────────────────
     //  QTY CONTROL
     // ──────────────────────────────────────────────
-    window.changeQty = function(delta) {
+    window.changeQty = function (delta) {
       qty = Math.max(1, Math.min(3, qty + delta));
       document.getElementById("qtyDisplay").textContent = qty;
     };
@@ -635,29 +838,28 @@
     // ──────────────────────────────────────────────
     //  CETAK
     // ──────────────────────────────────────────────
-    window.doCetak = function() {
-      if (!blobUrl) { showMsg("❌ Gambar belum siap.", "red"); return; }
-      showMsg("⏳ Menyiapkan cetak...", "#666");
+    window.doCetak = function () {
+      if (!blobUrl) { showMsg("❌ Gambar belum siap.", "#FF4886"); return; }
+      showMsg("⏳ Menyiapkan cetak...", "#7A6988");
 
       const printArea = document.getElementById("printArea");
       let pages = "";
       for (let i = 0; i < qty; i++) {
-        pages += `<div style="page-break-after:${i < qty-1 ? 'always':'avoid'};
+        pages += `<div style="page-break-after:${i < qty - 1 ? 'always' : 'avoid'};
           width:100vw;height:100vh;display:flex;align-items:center;
           justify-content:center;background:white;">
           <img src="${blobUrl}" style="max-width:100%;max-height:100vh;object-fit:contain;">
         </div>`;
       }
-      printArea.innerHTML      = pages;
-      printArea.style.display  = "flex";
+      printArea.innerHTML = pages;
+      printArea.style.display = "flex";
       setTimeout(() => {
         window.print();
         setTimeout(() => {
           printArea.style.display = "none";
           printArea.innerHTML = "";
           showMsg(`✅ ${qty}x halaman dikirim ke printer!`, "green");
-          
-          // Auto redirect to terima-kasih.html after 1.5 seconds to show success msg
+
           setTimeout(() => {
             if (blobUrl) URL.revokeObjectURL(blobUrl);
             sessionStorage.removeItem("cetakData");
@@ -672,12 +874,12 @@
     // ──────────────────────────────────────────────
     //  DOWNLOAD LANGSUNG
     // ──────────────────────────────────────────────
-    window.doDownload = function() {
-      if (!blobUrl) { showMsg("❌ Gambar belum siap.", "red"); return; }
+    window.doDownload = function () {
+      if (!blobUrl) { showMsg("❌ Gambar belum siap.", "#FF4886"); return; }
       const nama = (cetakData.guestNama ?? "foto").replace(/[^a-zA-Z0-9]/g, "_");
-      const tgl  = new Date().toISOString().slice(0, 10);
+      const tgl = new Date().toISOString().slice(0, 10);
       const link = document.createElement("a");
-      link.href     = blobUrl;
+      link.href = blobUrl;
       link.download = `photobooth_${nama}_${tgl}.jpg`;
       document.body.appendChild(link);
       link.click();
@@ -688,7 +890,7 @@
     // ──────────────────────────────────────────────
     //  SELESAI SESI
     // ──────────────────────────────────────────────
-    window.selesaiSesi = function() {
+    window.selesaiSesi = function () {
       if (!confirm("Sesi selesai? Kamu akan kembali ke halaman login.")) return;
       if (blobUrl) URL.revokeObjectURL(blobUrl);
       sessionStorage.removeItem("cetakData");
@@ -708,7 +910,7 @@
     function setPreviewError(text) {
       setPreviewMsg(text);
       document.getElementById("qrLoading").innerHTML =
-        "<p style='color:#71717a;font-size:0.78rem'>QR tidak tersedia karena foto gagal dimuat.</p>";
+        "<p style='color:#7A6988;font-size:0.8rem;font-weight:700;'>QR tidak tersedia karena foto gagal dimuat.</p>";
     }
     function showMsg(text, color) {
       const el = document.getElementById("msgCetak");
@@ -721,7 +923,6 @@
         let branchId = null;
         let packageName = null;
 
-        // 1. Try retrieving from currentUser in localStorage
         const cu = localStorage.getItem("currentUser");
         if (cu) {
           try {
@@ -734,10 +935,9 @@
               guestId = currentUser.id;
               branchId = currentUser.branch_id;
             }
-          } catch(e) {}
+          } catch (e) { }
         }
 
-        // 2. Fallback to guestData in sessionStorage + query database
         if (!packageName) {
           const gd = sessionStorage.getItem("guestData");
           if (gd) {
@@ -763,7 +963,6 @@
         if (packageName) {
           document.getElementById("infoPaket").textContent = packageName;
 
-          // Fetch package info if qty hasn't been set from localStorage
           let foundLimit = false;
           if (qty === 1 && branchId) {
             const { data: packageData } = await supabase
@@ -780,7 +979,6 @@
             }
           }
 
-          // Fallback mapping if not found in database or local storage limit is default/missing
           if (!foundLimit && qty === 1) {
             const name = String(packageName).trim().toLowerCase();
             if (name.startsWith("paket")) {
@@ -788,7 +986,7 @@
               if (match) {
                 const num = parseInt(match[1], 10);
                 if (num >= 1 && num <= 8) {
-                  qty = num + 4; // Paket 1 = 5, Paket 2 = 6, ..., Paket 8 = 12
+                  qty = num + 4;
                 }
               }
             } else if (name.startsWith("bs")) {
@@ -797,7 +995,6 @@
           }
         }
 
-        // Update UI displays
         document.getElementById("infoJumlahCetak").textContent = qty + " lembar";
         document.getElementById("qtyDisplay").textContent = qty;
       } catch (e) {
