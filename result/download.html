@@ -353,9 +353,14 @@
     <div class="dl-card" id="rawCard" style="display:none;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
         <div class="card-label" id="rawCardTitle">📸 FOTO JEPRETAN ASLI (10 TERPILIH)</div>
-        <button id="btnUnlockHeader" onclick="openUnlockModal()" style="display:none; background: #FFF0F5; color: #FF4886; border: 1.5px solid #FFD8E7; border-radius: 14px; padding: 4px 12px; font-size: 11px; font-weight: 800; cursor: pointer;">
-          🔓 Unlock Semua Foto
-        </button>
+        <div>
+          <button id="btnUnlockHeader" onclick="openUnlockModal()" style="display:none; background: #FFF0F5; color: #FF4886; border: 1.5px solid #FFD8E7; border-radius: 14px; padding: 6px 14px; font-size: 11px; font-weight: 800; cursor: pointer;">
+            🔓 Unlock Semua Foto
+          </button>
+          <button id="btnDownloadAllHeader" onclick="downloadAllRawPhotos()" style="display:none; background: #E6F9F0; color: #00B86B; border: 1.5px solid #A3E0C2; border-radius: 14px; padding: 6px 14px; font-size: 11px; font-weight: 800; cursor: pointer;">
+            ⬇ Download Semua Foto
+          </button>
+        </div>
       </div>
 
       <div class="asset-grid" id="rawGrid"></div>
@@ -624,9 +629,12 @@
             if (!isUnlocked && allRawFiles.length > displayFiles.length) {
               document.getElementById("unlockBanner").style.display = "block";
               document.getElementById("btnUnlockHeader").style.display = "inline-block";
+              document.getElementById("btnDownloadAllHeader").style.display = "none";
               document.getElementById("rawCardTitle").textContent = `📸 FOTO JEPRETAN ASLI (${displayFiles.length} TERPILIH)`;
             } else {
               document.getElementById("rawCardTitle").textContent = `📸 FOTO JEPRETAN ASLI (${allRawFiles.length} FOTO UNLOCKED)`;
+              document.getElementById("btnUnlockHeader").style.display = "none";
+              document.getElementById("btnDownloadAllHeader").style.display = "inline-block";
               if (isUnlocked) {
                 const banner = document.getElementById("unlockBanner");
                 if (banner) {
@@ -653,27 +661,51 @@
         const url = supabase.storage.from("photos").getPublicUrl(`${sessionPath}/asli/${f.name}`).data.publicUrl;
         return `
           <div class="asset-card" onclick="downloadFile('${url}', 'asli_${idx + 1}.jpg')">
-            <img src="${url}">
-            <span class="asset-badge">⬇ Asli ${idx + 1}</span>
+            <img src="${url}" loading="lazy" alt="Foto ${idx + 1}">
+            <a href="${url}" download="asli_${idx + 1}.jpg" target="_blank" onclick="event.stopPropagation(); downloadFile('${url}', 'asli_${idx + 1}.jpg'); return false;" class="asset-badge">
+              ⬇ Download Asli ${idx + 1}
+            </a>
           </div>`;
       }).join("");
     }
 
-    async function downloadFile(fileUrl, fileName) {
+    window.downloadAllRawPhotos = async function () {
+      if (!allRawFiles || !allRawFiles.length) return;
+      alert(`⏳ Mulai mengunduh ${allRawFiles.length} foto... Harap izinkan unduhan beruntun di browser Anda.`);
+      for (let i = 0; i < allRawFiles.length; i++) {
+        const f = allRawFiles[i];
+        const url = supabase.storage.from("photos").getPublicUrl(`${sessionPath}/asli/${f.name}`).data.publicUrl;
+        downloadFile(url, `asli_${i + 1}.jpg`);
+        await new Promise(r => setTimeout(r, 400));
+      }
+    };
+
+    window.downloadFile = async function (fileUrl, fileName) {
       try {
-        const response = await fetch(fileUrl);
+        const response = await fetch(fileUrl, { mode: 'cors' });
+        if (!response.ok) throw new Error('Fetch HTTP status ' + response.status);
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = fileName;
+        link.download = fileName || "foto.jpg";
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(blobUrl);
+        }, 600);
       } catch (e) {
-        window.open(fileUrl, "_blank");
+        console.warn("Direct blob download fallback to window.open:", e);
+        const a = document.createElement("a");
+        a.href = fileUrl;
+        a.target = "_blank";
+        a.download = fileName || "foto.jpg";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { document.body.removeChild(a); }, 600);
       }
-    }
+    };
 
     window.submitRating = function (stars) {
       document.getElementById("ratingText").style.display = "none";
