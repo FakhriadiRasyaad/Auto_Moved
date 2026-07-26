@@ -130,7 +130,7 @@
         </div>
         <div class="brand-text-group">
           <span class="brand-name-top">AXIONIX</span>
-          <span class="brand-name-bottom">PHOTOBOOTH</span>
+          <span class="brand-name-bottom">PHOTO 🦾 </span>
         </div>
       </div>
 
@@ -147,7 +147,7 @@
 
       <!-- Controls & Status Badges -->
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <div class="korean-tab-btn" id="timerPill" style="height: 38px; padding: 0 16px; font-size: 13px;">⏱️ 10:00
+        <div class="korean-tab-btn" id="timerPill" style="height: 38px; padding: 0 16px; font-size: 13px;">⏱️ --:--
         </div>
 
         <select id="camSel" class="customer-input pill-input"
@@ -155,8 +155,7 @@
           <option value="">-- Kamera --</option>
         </select>
 
-        <div class="korean-tab-btn active" id="cntPill" style="height: 38px; padding: 0 16px; font-size: 13px;">0 / 3
-          foto</div>
+        <div class="korean-tab-btn active" id="cntPill" style="height: 38px; padding: 0 16px; font-size: 13px;">0 foto</div>
 
         <button class="korean-tab-btn" onclick="openModal()" title="Pengaturan Foto"
           style="height: 38px; width: 38px; padding: 0; justify-content: center; border-radius: 50%;">
@@ -187,6 +186,17 @@
             style="position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:15; transition:opacity 0.08s;">
           </div>
 
+          <!-- 2-Second Hold Photo Preview Overlay -->
+          <div id="photoHoldOverlay"
+            style="display: none; position: absolute; inset: 0; z-index: 25; background: #120D1A; border-radius: 24px; overflow: hidden; animation: fadeIn 0.2s ease;">
+            <img id="photoHoldImg" src="" alt="Hasil Foto Terakhir"
+              style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+            <div
+              style="position: absolute; top: 16px; left: 16px; background: rgba(255, 72, 134, 0.95); color: #FFFFFF; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; box-shadow: 0 4px 14px rgba(255, 72, 134, 0.35); display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
+              <span>📸 Hasil Foto Terakhir (Hold 2s)</span>
+            </div>
+          </div>
+
           <!-- Badges on Camera -->
           <div class="face-badge active" id="statusBadge" style="display: none;">
             <span class="badge-dot"></span>
@@ -210,7 +220,7 @@
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
             <div
               style="font-size: 12px; font-weight: 900; color: #FF5E93; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
-              <span>🎨 PILIH PRESET POSE SUARA / GESTUR:</span>
+              <span>🎨 PILIH PRESET POSE GESTUR:</span>
               <span>✨</span>
             </div>
           </div>
@@ -220,59 +230,39 @@
 
       </div>
 
-      <!-- Right Pane: Stacked Cards (1. Hasil Jepret & 2. Asisten AI Video Player with Sound) -->
+      <!-- Right Pane: Enlarged & Prominent Asisten AI Card -->
       <div style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
 
-        <!-- Card 1: Hasil Jepret (3 Columns Grid Thumbnails) -->
         <div
-          style="background: #FFFFFF; border: 2px solid #FFD8E7; border-radius: 28px; padding: 20px; box-shadow: 0 12px 30px rgba(255, 110, 165, 0.1); min-height: 230px; display: flex; flex-direction: column;">
+          style="background: #FFFFFF; border: 2px solid #FFD8E7; border-radius: 28px; padding: 20px; box-shadow: 0 12px 30px rgba(255, 110, 165, 0.1); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <span style="font-size: 15px; font-weight: 900; color: #3A2B42;">🖼️ Hasil Jepret ✨</span>
-            <span class="korean-pkg-top-badge" id="galCnt"
-              style="margin-bottom: 0; padding: 2px 10px; font-size: 11px;">0 foto</span>
-          </div>
-
-          <!-- Gallery Area (Supports 3 columns per row) -->
-          <div style="flex: 1; overflow-y: auto; max-height: 190px;" id="galScroll">
-            <div class="empty-state" id="galEmpty"
-              style="padding: 20px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-              <img src="../img/Style/03.svg" alt="Polaroid Empty"
-                style="width: 70px; height: auto; margin-bottom: 8px; opacity: 0.8;" />
-              <div class="empty-state-title" style="font-size: 13px; font-weight: 800; color: #3A2B42;">Belum Ada Foto
-              </div>
-              <div class="empty-state-text" style="font-size: 11px; color: #8A789A; margin-top: 4px;">Foto kamu akan
-                muncul di sini secara real-time!</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 16px; font-weight: 900; color: #3A2B42;">🤖 Asisten AI ✨</span>
+              <span class="korean-pkg-top-badge" id="galCnt"
+                style="margin-bottom: 0; padding: 2px 10px; font-size: 11px;">0 foto</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Card 2: Asisten AI Video Guidance Player (Fills Remaining Height + Fully Responsive Badge) -->
-        <div
-          style="background: #FFFFFF; border: 2px solid #FFD8E7; border-radius: 28px; padding: 20px; box-shadow: 0 12px 30px rgba(255, 110, 165, 0.1); flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <span style="font-size: 15px; font-weight: 900; color: #3A2B42;">🤖 Asisten AI ✨</span>
             <span
               style="background: #E6F9F0; color: #00B86B; border-radius: 12px; font-weight: 800; font-size: 11px; padding: 4px 12px; display: flex; align-items: center; gap: 6px;">
               <span style="width: 7px; height: 7px; border-radius: 50%; background: #00B86B;"></span> Online
             </span>
           </div>
 
-          <!-- Video Guidance Container -->
+          <!-- Video Guidance Container (Expanded height to match camera layout) -->
           <div
-            style="position: relative; width: 100%; flex: 1; min-height: 170px; max-height: 230px; background: #1A1524; border-radius: 20px; overflow: hidden; border: 2px solid #FFD8E7; display: flex; align-items: center; justify-content: center;">
+            style="position: relative; width: 100%; flex: 1; min-height: 380px; background: #1A1524; border-radius: 22px; overflow: hidden; border: 2px solid #FFD8E7; display: flex; align-items: center; justify-content: center;">
             <video id="presetVideoPlayer" playsinline
               style="width: 100%; height: 100%; object-fit: cover; display: block;" poster="../img/Style/01.svg">
               <source src="../img/Sesi_Foto/0721.mp4" type="video/mp4">
             </video>
             <div id="videoOverlayText"
-              style="position: absolute; bottom: 10px; left: 12px; background: rgba(0,0,0,0.65); color: #fff; padding: 4px 12px; border-radius: 14px; font-size: 11px; font-weight: 800;">
+              style="position: absolute; bottom: 12px; left: 14px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #fff; padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800;">
               Panduan Preset 1
             </div>
           </div>
 
           <!-- Responsive & Clean Centered Status / Countdown Badge Under Asisten AI Video Layout -->
           <div id="aiStatusBadge"
-            style="margin-top: 12px; background: #FFF0F5; border: 2px solid #FFD8E7; border-radius: 16px; padding: 10px 14px; font-size: 12px; font-weight: 800; color: #FF4886; text-align: center; line-height: 1.4; word-break: break-word; box-shadow: 0 4px 14px rgba(255, 110, 165, 0.1); transition: all 0.2s ease;">
+            style="margin-top: 12px; background: #FFF0F5; border: 2px solid #FFD8E7; border-radius: 16px; padding: 12px 16px; font-size: 13px; font-weight: 800; color: #FF4886; text-align: center; line-height: 1.4; word-break: break-word; box-shadow: 0 4px 14px rgba(255, 110, 165, 0.1); transition: all 0.2s ease;">
             🤖 <b>Asisten AI Online</b> — ✋ 0 jari terdeteksi
           </div>
 
@@ -468,29 +458,30 @@
     if (!user.foto) user.foto = [];
 
     const NAMA = user.nama || user.name || "";
-    const MAX = 40;
+    const LIMIT = Infinity;
 
-    let fallbackFotoLimit = 4;
-    if (user.paket?.nama) {
-      const name = String(user.paket.nama).trim().toLowerCase();
-      if (name.startsWith("paket")) {
-        const match = name.match(/paket\s*(\d+)/i);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (num >= 1 && num <= 8) {
-            fallbackFotoLimit = num + 4;
-          }
-        }
-      } else if (name.startsWith("bs")) {
-        fallbackFotoLimit = 5;
-      }
+    let durasiMenit = user.paket?.durasi_menit;
+    if (!durasiMenit && user.paket?.nama) {
+      const match = String(user.paket.nama).match(/(\d+)\s*Menit/i);
+      if (match) durasiMenit = parseInt(match[1], 10);
     }
-    const LIMIT = Math.min(user.paket?.foto_limit >= 999 ? MAX : (user.paket?.foto_limit ?? fallbackFotoLimit), MAX);
+    if (!durasiMenit && user.paket?.desc) {
+      const match = String(user.paket.desc).match(/Durasi\s*(\d+)\s*Menit/i) || String(user.paket.desc).match(/(\d+)\s*Menit/i);
+      if (match) durasiMenit = parseInt(match[1], 10);
+    }
+    if (!durasiMenit) {
+      durasiMenit = (user.paket?.foto_limit <= 5 ? 5 : (user.paket?.foto_limit <= 10 ? 10 : 5));
+    }
 
-    let isCounting = false, sessionSec = 600, sessionTmr = null, curStream = null;
+    let isCounting = false, sessionSec = durasiMenit * 60, sessionTmr = null, curStream = null;
+    if (timerPill) {
+      const initM = String(Math.floor(sessionSec / 60)).padStart(2, "0");
+      const initS = String(sessionSec % 60).padStart(2, "0");
+      timerPill.textContent = `⏱️ ${initM}:${initS}`;
+    }
     let lockPreset = false, faceTimer = null, lastFace = Date.now();
     const IDLE_MS = 5000;
-    let isIdle = false, faceLoaded = false, recognition = null;
+    let isIdle = false, faceLoaded = false;
     let mpHands = null, lastFingerCount = -1, gestStableTime = 0;
     const GESTURE_STABLE_MS = 1000; // 1 second hold confirms finger gesture
     let isPreVideoCounting = false; // 5-second countdown timer before video starts
@@ -537,11 +528,6 @@
     window.triggerPreset = function (id, src = "click") {
       if (isCounting) return;
 
-      if (user.foto.length >= LIMIT) {
-        showToast(`📸 Sudah ${LIMIT} foto! Klik Selesai!`, 4500);
-        lockPreset = false;
-        return;
-      }
       const p = PRESETS.find(x => x.id === id);
       if (!p) return;
 
@@ -552,7 +538,7 @@
       const chip = document.querySelector(`.pose-chip-btn[data-id="${id}"]`);
       if (chip) chip.classList.add("active");
 
-      const icon = src === "gesture" ? "✋" : src === "voice" ? "🎙️" : "👆";
+      const icon = src === "gesture" ? "✋" : "👆";
       showToast(`${icon} Preset ${id}: ${p.label}`, 3500);
 
       // Play corresponding preset video guidance layout WITH AUDIO ENABLED
@@ -621,7 +607,7 @@
               lastFingerCount = -1;
               gestStableTime = 0;
               document.querySelectorAll(".pose-chip-btn").forEach(c => c.classList.remove("active"));
-              if (user.foto.length < LIMIT) btnSnap.disabled = false;
+              btnSnap.disabled = false;
             }, 3000);
           }
         }, 1000);
@@ -690,62 +676,7 @@
       }
     }
 
-    // Voice recognition logic for presets activation & control
-    function initSpeech() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return;
-      recognition = new SR();
-      recognition.lang = "id-ID";
-      recognition.continuous = true;
-      recognition.interimResults = false;
 
-      recognition.onresult = ev => {
-        if (lockPreset || isCounting || isPreVideoCounting || Date.now() < gestCooldownUntil) return;
-        const txt = ev.results[ev.results.length - 1][0].transcript.toLowerCase().trim();
-
-        if (txt.includes("ulang") || txt.includes("retake")) {
-          let targetIdx = -1;
-          if (txt.includes("1") || txt.includes("satu")) targetIdx = 0;
-          else if (txt.includes("2") || txt.includes("dua")) targetIdx = 1;
-          else if (txt.includes("3") || txt.includes("tiga")) targetIdx = 2;
-          else if (txt.includes("4") || txt.includes("empat")) targetIdx = 3;
-          else if (txt.includes("5") || txt.includes("lima")) targetIdx = 4;
-          else if (txt.includes("6") || txt.includes("enam")) targetIdx = 5;
-          else if (txt.includes("7") || txt.includes("tujuh")) targetIdx = 6;
-          else if (txt.includes("8") || txt.includes("delapan")) targetIdx = 7;
-          else if (txt.includes("9") || txt.includes("sembilan")) targetIdx = 8;
-          else if (txt.includes("10") || txt.includes("sepuluh")) targetIdx = 9;
-
-          if (targetIdx >= 0 && targetIdx < user.foto.length) {
-            retakeFoto(targetIdx);
-            return;
-          }
-        }
-
-        for (const p of PRESETS) {
-          if (p.kw.split(",").map(k => k.trim()).some(k => txt.includes(k))) {
-            triggerPreset(p.id, "voice");
-            return;
-          }
-        }
-
-        if (["foto", "jepret", "ambil", "capture"].some(k => txt.includes(k))) {
-          if (!isCounting && !lockPreset) startCountdown();
-        }
-      };
-
-      recognition.onerror = e => {
-        if (!["no-speech", "aborted"].includes(e.error)) console.warn("Speech error:", e.error);
-      };
-
-      recognition.onend = () => {
-        if (recognition) {
-          try { recognition.start(); } catch (e) { }
-        }
-      };
-
-      try { recognition.start(); } catch (e) { }
-    }
 
     function showToast(msg, dur = 3200) {
       const area = $("toastArea");
@@ -946,66 +877,21 @@
 
     // 3 Columns Grid Gallery Update Logic
     function updateGallery() {
-      galCnt.textContent = `${user.foto.length} foto`;
-      cntPill.textContent = `${user.foto.length} / ${LIMIT} foto`;
-      btnLanjut.disabled = user.foto.length === 0;
-
-      if (user.foto.length === 0) {
-        galScroll.innerHTML = "";
-        galScroll.appendChild(galEmpty);
-        galEmpty.style.display = "flex";
-        return;
-      }
-
-      galEmpty.style.display = "none";
-      galScroll.innerHTML = "";
-
-      const gridDiv = document.createElement("div");
-      gridDiv.style.display = "grid";
-      gridDiv.style.gridTemplateColumns = "repeat(3, 1fr)";
-      gridDiv.style.gap = "8px";
-      gridDiv.style.width = "100%";
-
-      [...user.foto].reverse().forEach((src, ri) => {
-        const idx = user.foto.length - 1 - ri;
-        const div = document.createElement("div");
-        div.className = "polaroid-card";
-        div.style.position = "relative";
-        div.style.marginBottom = "0";
-        div.style.borderRadius = "10px";
-        div.style.padding = "4px 4px 12px 4px";
-        div.style.background = "#FFFFFF";
-        div.style.border = "1px solid #FFD8E7";
-        div.style.boxShadow = "0 4px 10px rgba(255, 110, 165, 0.12)";
-
-        const newBadge = ri === 0 ? '<span style="position:absolute; top:4px; left:4px; background:#FF4886; color:#fff; font-size:8px; font-weight:800; padding:1px 5px; border-radius:6px; z-index:3;">NEW</span>' : '';
-
-        div.innerHTML = `
-          <img src="${src}" alt="Foto ${idx + 1}" style="border-radius:6px; width:100%; height:62px; object-fit:cover; display:block;">
-          ${newBadge}
-          <div class="delete-btn" onclick="hapusFoto(${idx})" title="Hapus foto" style="position:absolute; top:-4px; right:-4px; width:18px; height:18px; background:#FF4886; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:5;">✕</div>
-          <div style="font-size:9px; font-weight:800; color:#554363; text-align:center; margin-top:2px;">#${idx + 1}</div>
-        `;
-        gridDiv.appendChild(div);
-      });
-
-      galScroll.appendChild(gridDiv);
-      galScroll.scrollTop = 0;
+      if (galCnt) galCnt.textContent = `${user.foto.length} foto`;
+      if (cntPill) cntPill.textContent = `${user.foto.length} foto`;
+      if (btnLanjut) btnLanjut.disabled = user.foto.length === 0;
     }
 
-    window.hapusFoto = function (idx) {
-      user.foto.splice(idx, 1); localStorage.setItem("currentUser", JSON.stringify(user)); updateGallery();
-      if (user.foto.length < LIMIT) btnSnap.disabled = false;
-    };
-
-    window.retakeFoto = function (idx) {
-      if (isCounting || lockPreset) return;
-      user.foto.splice(idx, 1);
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      updateGallery();
-      btnSnap.disabled = false;
-      showToast(`🔄 Foto #${idx + 1} dihapus.`, 3000);
-    };
+    function showPhotoHoldPreview(src) {
+      const overlay = $("photoHoldOverlay");
+      const img = $("photoHoldImg");
+      if (!overlay || !img) return;
+      img.src = src;
+      overlay.style.display = "block";
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 2000);
+    }
 
     function buildFilter(cfg) {
       const p = [];
@@ -1026,24 +912,22 @@
       ctx.translate(c.width, 0); ctx.scale(-1, 1);
       const fs = buildFilter(FILTER_CFG); if (fs !== "none") ctx.filter = fs;
       ctx.drawImage(video, 0, 0); ctx.filter = "none";
-      user.foto.push(c.toDataURL("image/jpeg", .88));
-      localStorage.setItem("currentUser", JSON.stringify(user)); updateGallery();
-      if (user.foto.length >= LIMIT) {
-        btnSnap.disabled = true;
-        showToast(`📸 Foto sudah ${user.foto.length}/${LIMIT}. Klik Selesai & Simpan.`, 7000);
-      }
+      const photoUrl = c.toDataURL("image/jpeg", .88);
+      user.foto.push(photoUrl);
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      updateGallery();
+      showPhotoHoldPreview(photoUrl);
     }
 
     window.startCountdown = function () {
       if (isCounting || lockPreset) return;
-      if (user.foto.length >= LIMIT) { showToast(`Sudah ${LIMIT} foto!`); return; }
       runVideoCountdownAndPhoto();
     };
 
     // Keyboard shortcut handler: Space or Enter to snap photo!
     document.addEventListener("keydown", e => {
       if (e.code === "Space" || e.code === "Enter") {
-        if (!isCounting && !lockPreset && user.foto.length < LIMIT) {
+        if (!isCounting && !lockPreset) {
           e.preventDefault();
           startCountdown();
         }
@@ -1062,7 +946,6 @@
     window.finishSession = async function (isTimeout = false) {
       if (user.foto.length === 0) {
         if (isTimeout) {
-          if (recognition) { try { recognition.stop(); } catch (e) { } }
           if (faceTimer) { clearTimeout(faceTimer); }
           clearInterval(sessionTmr);
           if (curStream) curStream.getTracks().forEach(t => t.stop());
@@ -1077,7 +960,6 @@
         showToast("⚠️ Ambil minimal 1 foto dulu!");
         return;
       }
-      if (recognition) { try { recognition.stop(); } catch (e) { } }
       if (faceTimer) { clearTimeout(faceTimer); }
       clearInterval(sessionTmr);
       btnSnap.disabled = true; btnLanjut.disabled = true; upWrap.style.display = "flex";
@@ -1176,7 +1058,7 @@
         <div style="width:24px; height:24px; border-radius:50%; background:var(--color-primary-light); color:var(--color-primary); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; flex-shrink:0;">${p.id}</div>
         <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
           <input type="text" id="pi-label-${i}" value="${p.label}" class="input input-sm" placeholder="Label">
-          <input type="text" id="pi-kw-${i}" value="${p.kw}" class="input input-sm" placeholder="Gestur / Suara">
+          <input type="text" id="pi-kw-${i}" value="${p.kw}" class="input input-sm" placeholder="Gestur Jari">
         </div>
         <button class="btn btn-ghost btn-icon-only text-danger" onclick="deletePreset(${i})">🗑️</button>
       </div>`).join("");
@@ -1191,14 +1073,12 @@
     window.savePresets = () => {
       PRESETS = PRESETS.map((_, i) => ({ id: i + 1, label: $(`pi-label-${i}`)?.value?.trim() || `Preset ${i + 1}`, kw: $(`pi-kw-${i}`)?.value?.trim() || String(i + 1), msg: `Pose ${i + 1}!` }));
       localStorage.setItem("pb_presets", JSON.stringify(PRESETS)); renderChips();
-      if (recognition) { try { recognition.stop(); } catch (e) { } }
-      setTimeout(() => { try { recognition.start(); } catch (e) { } }, 500);
       closeModal(); showToast("✅ Preset disimpan!", 3000);
     };
 
     renderChips(); enumCameras(); startTimer(); updateGallery(); updateFilterBadge();
     const initFs = buildFilter(FILTER_CFG); if (initFs !== "none") video.style.filter = initFs;
-    initSpeech(); loadFace(); initMediaPipe();
+    loadFace(); initMediaPipe();
 
     if (NAMA) {
       setTimeout(() => {

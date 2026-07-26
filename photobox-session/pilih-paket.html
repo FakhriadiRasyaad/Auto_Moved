@@ -91,7 +91,7 @@
         </div>
         <div class="brand-text-group">
           <span class="brand-name-top">AXIONIX</span>
-          <span class="brand-name-bottom">PHOTOBOOTH</span>
+          <span class="brand-name-bottom">PHOTO 🦾 </span>
         </div>
       </div>
 
@@ -171,11 +171,11 @@
       const descText = card.querySelector('.desc')?.textContent || '';
       const hargaNumeric = parseInt(priceText.replace(/[^0-9]/g, ''));
 
-      let fotoLimit = 5;
-      let frameLimit = 5;
-      const fotoMatch = descText.match(/(\d+)\s*Foto/i);
+      let durasiMenit = 5;
+      let frameLimit = 1;
+      const durasiMatch = descText.match(/Durasi\s*(\d+)\s*Menit/i) || descText.match(/(\d+)\s*Menit/i);
       const frameMatch = descText.match(/(\d+)\s*Frame/i);
-      if (fotoMatch) fotoLimit = parseInt(fotoMatch[1], 10);
+      if (durasiMatch) durasiMenit = parseInt(durasiMatch[1], 10);
       if (frameMatch) frameLimit = parseInt(frameMatch[1], 10);
       const stikerGratis = descText.toLowerCase().includes('stiker gratis') || descText.toLowerCase().includes('sticker gratis');
 
@@ -203,7 +203,8 @@
         id: card.id,
         nama: nama,
         harga: hargaNumeric,
-        foto_limit: fotoLimit,
+        durasi_menit: durasiMenit,
+        foto_limit: 999, // Unlimited foto selama durasi berlangsung
         frame_limit: frameLimit,
         stiker_gratis: stikerGratis
       };
@@ -291,11 +292,11 @@
       let html = '';
       data.forEach(pkg => {
         const stikerText = pkg.stiker_gratis ? " · Stiker Gratis" : "";
-        const limitFotoText = pkg.foto_limit >= 999 ? "Unlimited" : pkg.foto_limit;
+        const durasiMenit = pkg.durasi_menit || (pkg.foto_limit <= 5 ? 5 : (pkg.foto_limit <= 10 ? 10 : 15));
         const limitFrameText = pkg.frame_limit >= 999 ? "All" : pkg.frame_limit;
-        const desc = `${limitFotoText} Foto · ${limitFrameText} Frame${stikerText}`;
+        const desc = `Durasi ${durasiMenit} Menit · ${limitFrameText} Frame / Cetak${stikerText}`;
         const bestBadge = pkg.is_best_seller ? '<span class="best-seller-badge">🔥 Best Seller</span>' : '';
-        const limitBadge = `<span class="korean-pkg-top-badge">${limitFotoText} FOTO</span>`;
+        const limitBadge = `<span class="korean-pkg-top-badge">⏱️ DURASI ${durasiMenit} MENIT</span>`;
 
         html += `
           <div class="package-card korean-package-card" id="pkg-${pkg.id}" onclick="selectPackage(this)">
@@ -311,12 +312,16 @@
                 <!-- Mini Features Grid -->
                 <div class="korean-mini-features">
                   <div class="mini-feat-box">
-                    <span class="feat-icon">🖼️</span>
-                    <span class="feat-text">${limitFotoText} Foto</span>
+                    <span class="feat-icon">⏱️</span>
+                    <span class="feat-text">Durasi ${durasiMenit} Menit</span>
                   </div>
                   <div class="mini-feat-box">
-                    <span class="feat-icon">🔳</span>
-                    <span class="feat-text">${limitFrameText} Frame Eksklusif</span>
+                    <span class="feat-icon">🖨️</span>
+                    <span class="feat-text">${limitFrameText} Frame / Cetak</span>
+                  </div>
+                  <div class="mini-feat-box">
+                    <span class="feat-icon">📸</span>
+                    <span class="feat-text">Foto Unlimited</span>
                   </div>
                   <div class="mini-feat-box">
                     <span class="feat-icon">🐰</span>

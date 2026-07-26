@@ -351,8 +351,49 @@
 
     <!-- Raw Photos Grid Card -->
     <div class="dl-card" id="rawCard" style="display:none;">
-      <div class="card-label">📸 FOTO JEPRETAN ASLI</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div class="card-label" id="rawCardTitle">📸 FOTO JEPRETAN ASLI (10 TERPILIH)</div>
+        <button id="btnUnlockHeader" onclick="openUnlockModal()" style="display:none; background: #FFF0F5; color: #FF4886; border: 1.5px solid #FFD8E7; border-radius: 14px; padding: 4px 12px; font-size: 11px; font-weight: 800; cursor: pointer;">
+          🔓 Unlock Semua Foto
+        </button>
+      </div>
+
       <div class="asset-grid" id="rawGrid"></div>
+
+      <!-- Unlock All Photos Banner -->
+      <div id="unlockBanner" style="display:none; background: linear-gradient(135deg, #FFF0F5 0%, #FFE6EF 100%); border: 2px dashed #FF6FA2; border-radius: 20px; padding: 18px; text-align: center; box-shadow: 0 6px 18px rgba(255, 110, 165, 0.12); margin-top: 10px;">
+        <div style="font-size: 14px; font-weight: 900; color: #3A2B42; margin-bottom: 4px;">
+          🔓 Unlock Semua Foto Jepretan Sesi Ini!
+        </div>
+        <p style="font-size: 11px; font-weight: 700; color: #7A6988; margin-bottom: 12px;">
+          Saat ini menampilkan foto terpilih. Buka &amp; download seluruh foto jepretan kamu hanya dengan bayar <b>Rp <span id="unlockPriceDisp">15.000</span></b>.
+        </p>
+        <button onclick="openUnlockModal()" class="btn-download-primary" style="height: 44px; font-size: 13px; background: linear-gradient(135deg, #FF4886 0%, #A875FF 100%); border-radius: 22px; margin: 0 auto; width: auto; padding: 0 24px;">
+          <span>🔓 Unlock Semua Foto (Rp <span id="btnUnlockPriceText">15.000</span>)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Unlock Payment Modal -->
+    <div class="modal-overlay" id="unlockModal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='unlockModal') closeUnlockModal()">
+      <div style="background: #FFFFFF; border: 3px solid #FFD8E7; border-radius: 28px; padding: 26px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.25); position: relative;">
+        <button onclick="closeUnlockModal()" style="position: absolute; top: 14px; right: 14px; background: #FFF0F5; border: 1.5px solid #FFD8E7; color: #FF4886; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer;">✕</button>
+        
+        <div style="font-size: 40px; margin-bottom: 8px;">🔓✨</div>
+        <h3 style="font-size: 18px; font-weight: 900; color: #3A2B42; margin-bottom: 6px;">Unlock Semua Foto</h3>
+        <p style="font-size: 12px; font-weight: 700; color: #7A6988; margin-bottom: 16px;">
+          Dapatkan akses unduh tanpa batas untuk seluruh <b id="modalTotalPhotoCount">foto</b> jepretan sesi kamu!
+        </p>
+
+        <div style="background: #FFF0F5; border: 1.5px solid #FFD8E7; border-radius: 18px; padding: 14px; margin-bottom: 18px;">
+          <div style="font-size: 10px; font-weight: 800; color: #7A6988; letter-spacing: 0.5px; text-transform: uppercase;">BIAYA UNLOCK SEMUA FOTO</div>
+          <div style="font-size: 24px; font-weight: 900; color: #FF4886; margin-top: 2px;" id="modalUnlockPriceText">Rp 15.000</div>
+        </div>
+
+        <button id="btnConfirmPay" onclick="confirmUnlockPayment()" class="btn-download-primary" style="height: 48px; border-radius: 24px;">
+          <span>💳 Bayar Via Duitku &amp; Unlock</span>
+        </button>
+      </div>
     </div>
 
     <!-- Rating & Feedback Card -->
@@ -382,6 +423,135 @@
     const mainFileName = urlParams.get("framed") || urlParams.get("file");
     const gifFileName = urlParams.get("gif") || "hasil.gif";
     const guestName = urlParams.get("name") || urlParams.get("guest") || "";
+    const selectedParam = urlParams.get("sel") || "";
+    const selectedList = selectedParam.split(",").map(s => s.trim()).filter(Boolean);
+
+    const resultCode = urlParams.get("resultCode");
+    const merchantOrderId = urlParams.get("merchantOrderId");
+    const unlockParam = urlParams.get("unlock");
+
+    let allRawFiles = [];
+    let unlockPrice = 15000;
+    let isUnlocked = localStorage.getItem("unlocked_" + sessionPath) === "true";
+
+    if (resultCode === "00" || unlockParam === "success") {
+      isUnlocked = true;
+      if (sessionPath) {
+        localStorage.setItem("unlocked_" + sessionPath, "true");
+      }
+    }
+
+    window.openUnlockModal = function () {
+      document.getElementById("modalUnlockPriceText").textContent = `Rp ${unlockPrice.toLocaleString("id-ID")}`;
+      document.getElementById("modalTotalPhotoCount").textContent = `${allRawFiles.length} foto`;
+      document.getElementById("unlockModal").style.display = "flex";
+    };
+
+    window.closeUnlockModal = function () {
+      document.getElementById("unlockModal").style.display = "none";
+    };
+
+    window.confirmUnlockPayment = async function () {
+      const btn = document.getElementById("btnConfirmPay");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Menghubungi Duitku...</span>`;
+      }
+
+      try {
+        let branchId = sessionPath ? sessionPath.split("/")[0] : "";
+        if (!branchId || branchId.length < 10 || branchId === "null" || branchId === "undefined") {
+          branchId = "b149999f-33ec-4342-95bb-4f4961956c0b";
+        }
+
+        const cleanGuestName = guestName || "Guest Customer";
+        const email = `${cleanGuestName.toLowerCase().replace(/[^a-z0-9]/g, "") || "guest"}@photobooth.com`;
+
+        const validPrice = (unlockPrice !== undefined && unlockPrice !== null && !isNaN(unlockPrice)) ? unlockPrice : 15000;
+
+        const guestIdParam = urlParams.get("sessionId") || urlParams.get("guestId") || urlParams.get("guest_id");
+        let validGuestId = (guestIdParam && guestIdParam.length > 20 && guestIdParam !== "unknown") ? guestIdParam : null;
+
+        if (!validGuestId) {
+          try {
+            const { data: gData } = await supabase.from("guests").select("id").eq("branch_id", branchId).limit(1);
+            if (gData && gData.length > 0) {
+              validGuestId = gData[0].id;
+            } else {
+              const { data: newG } = await supabase.from("guests").insert([{ nama: cleanGuestName, branch_id: branchId }]).select("id").single();
+              if (newG) validGuestId = newG.id;
+            }
+          } catch (e) { }
+        }
+
+        const sessionPayload = {
+          branch_id: branchId,
+          paket: "Unlock Full Foto",
+          harga: validPrice,
+          pembayaran: "duitku",
+          status: "waiting"
+        };
+        if (validGuestId) sessionPayload.guest_id = validGuestId;
+
+        let { data: sData, error: sErr } = await supabase.from("sessions").insert([sessionPayload]).select().single();
+
+        if (sErr && sErr.message && sErr.message.includes("guest_id")) {
+          try {
+            const { data: fallbackG } = await supabase.from("guests").insert([{ nama: cleanGuestName, branch_id: branchId }]).select("id").single();
+            if (fallbackG) {
+              sessionPayload.guest_id = fallbackG.id;
+              const retryS = await supabase.from("sessions").insert([sessionPayload]).select().single();
+              sData = retryS.data;
+              sErr = retryS.error;
+            }
+          } catch (e) { }
+        }
+
+        if (sErr || !sData) {
+          throw new Error("Gagal menyimpan sesi di database: " + (sErr?.message || ""));
+        }
+
+        const sessionId = sData.id;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("unlock", "success");
+        const returnUrl = currentUrl.toString();
+
+        const { data: duitkuData, error: duitkuErr } = await supabase.functions.invoke("create-duitku-transaction", {
+          body: {
+            session_id: sessionId,
+            amount: validPrice,
+            customer_name: cleanGuestName,
+            phone: "081234567890",
+            email: email,
+            description: `Unlock Full Foto - ${cleanGuestName}`,
+            return_url: returnUrl
+          }
+        });
+
+        if (duitkuData && duitkuData.paymentUrl) {
+          window.location.href = duitkuData.paymentUrl;
+          return;
+        }
+
+        let detailMsg = duitkuErr?.message || "Respon pembayaran tidak valid";
+        if (duitkuErr && duitkuErr.context) {
+          try {
+            const errBody = await duitkuErr.context.json();
+            if (errBody?.detail) detailMsg = typeof errBody.detail === "object" ? JSON.stringify(errBody.detail) : errBody.detail;
+            else if (errBody?.error) detailMsg = errBody.error;
+          } catch (e) { }
+        }
+
+        throw new Error(detailMsg);
+      } catch (err) {
+        console.error("Unlock payment error:", err);
+        alert("⚠️ Gagal memuat Duitku Gateway: " + (err.message || "Silakan coba lagi."));
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>💳 Bayar Via Duitku &amp; Unlock</span>`;
+        }
+      }
+    };
 
     if (!sessionPath || !mainFileName) {
       document.getElementById("mainLoading").innerHTML = `<span style="color:#FF4886; font-size:12px; font-weight:800;">❌ Tautan tidak valid / foto tidak ditemukan.</span>`;
@@ -391,6 +561,23 @@
 
     async function loadPhotos() {
       try {
+        try {
+          let branchId = sessionPath.split("/")[0];
+          if (!branchId || branchId.length < 10) branchId = "b149999f-33ec-4342-95bb-4f4961956c0b";
+
+          const { data: pkgs } = await supabase.from("packages").select("biaya_full_foto").eq("branch_id", branchId).limit(1);
+          if (pkgs && pkgs.length && pkgs[0].biaya_full_foto !== undefined && pkgs[0].biaya_full_foto !== null) {
+            unlockPrice = parseInt(pkgs[0].biaya_full_foto);
+          }
+        } catch (e) { }
+
+        if (unlockPrice === undefined || unlockPrice === null || isNaN(unlockPrice)) {
+          unlockPrice = 15000;
+        }
+
+        document.getElementById("unlockPriceDisp").textContent = unlockPrice.toLocaleString("id-ID");
+        document.getElementById("btnUnlockPriceText").textContent = unlockPrice.toLocaleString("id-ID");
+
         const mainPath = `${sessionPath}/edit/${mainFileName}`;
         const mainSignedUrl = supabase.storage.from("photos").getPublicUrl(mainPath).data.publicUrl;
 
@@ -421,24 +608,55 @@
         } catch (e) { }
 
         try {
-          const { data: files } = await supabase.storage.from("photos").list(`${sessionPath}/asli`, { limit: 20 });
+          const { data: files } = await supabase.storage.from("photos").list(`${sessionPath}/asli`, { limit: 100 });
           if (files && files.length) {
+            allRawFiles = files.filter(f => f.metadata);
             document.getElementById("rawCard").style.display = "flex";
-            const grid = document.getElementById("rawGrid");
-            grid.innerHTML = files.filter(f => f.metadata).map((f, idx) => {
-              const url = supabase.storage.from("photos").getPublicUrl(`${sessionPath}/asli/${f.name}`).data.publicUrl;
-              return `
-                <div class="asset-card" onclick="downloadFile('${url}', 'asli_${idx + 1}.jpg')">
-                  <img src="${url}">
-                  <span class="asset-badge">⬇ Asli ${idx + 1}</span>
-                </div>`;
-            }).join("");
+
+            let displayFiles = allRawFiles;
+            if (selectedList.length > 0 && !isUnlocked) {
+              displayFiles = allRawFiles.filter(f => selectedList.includes(f.name));
+              if (displayFiles.length === 0) displayFiles = allRawFiles.slice(0, 10);
+            } else if (!isUnlocked && allRawFiles.length > 10) {
+              displayFiles = allRawFiles.slice(0, 10);
+            }
+
+            if (!isUnlocked && allRawFiles.length > displayFiles.length) {
+              document.getElementById("unlockBanner").style.display = "block";
+              document.getElementById("btnUnlockHeader").style.display = "inline-block";
+              document.getElementById("rawCardTitle").textContent = `📸 FOTO JEPRETAN ASLI (${displayFiles.length} TERPILIH)`;
+            } else {
+              document.getElementById("rawCardTitle").textContent = `📸 FOTO JEPRETAN ASLI (${allRawFiles.length} FOTO UNLOCKED)`;
+              if (isUnlocked) {
+                const banner = document.getElementById("unlockBanner");
+                if (banner) {
+                  banner.style.display = "block";
+                  banner.style.background = "#E6F9F0";
+                  banner.style.borderColor = "#00B86B";
+                  banner.innerHTML = `<div style="font-size:13px; font-weight:900; color:#00B86B; padding:4px 0;">🎉 Pembayaran Berhasil! Semua ${allRawFiles.length} Foto Telah Terbuka ✨</div>`;
+                }
+              }
+            }
+
+            renderRawGrid(displayFiles);
           }
         } catch (e) { }
 
       } catch (err) {
         console.error(err);
       }
+    }
+
+    function renderRawGrid(files) {
+      const grid = document.getElementById("rawGrid");
+      grid.innerHTML = files.map((f, idx) => {
+        const url = supabase.storage.from("photos").getPublicUrl(`${sessionPath}/asli/${f.name}`).data.publicUrl;
+        return `
+          <div class="asset-card" onclick="downloadFile('${url}', 'asli_${idx + 1}.jpg')">
+            <img src="${url}">
+            <span class="asset-badge">⬇ Asli ${idx + 1}</span>
+          </div>`;
+      }).join("");
     }
 
     async function downloadFile(fileUrl, fileName) {

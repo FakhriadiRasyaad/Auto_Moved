@@ -800,6 +800,17 @@
           downloadUrl += `&gif=${encodeURIComponent(gifFileName)}`;
         }
 
+        const rawSel = sessionStorage.getItem("guestSelectedPhotos");
+        if (rawSel) {
+          try {
+            const selPaths = JSON.parse(rawSel);
+            if (Array.isArray(selPaths) && selPaths.length > 0) {
+              const selNames = selPaths.map(p => p.substring(p.lastIndexOf("/") + 1)).join(",");
+              downloadUrl += `&sel=${encodeURIComponent(selNames)}`;
+            }
+          } catch (e) { }
+        }
+
         try {
           await QRCode.toCanvas(qrCanvas, downloadUrl, {
             width: 200,

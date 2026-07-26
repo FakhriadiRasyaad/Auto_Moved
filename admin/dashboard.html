@@ -7,9 +7,7 @@
   <title>Dashboard Overview — Axionix Admin</title>
 
   <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Axionix Design System -->
   <link rel="stylesheet" href="../assets/css/design-system.css" />
@@ -25,25 +23,30 @@
     }
   </script>
 
+  <!-- SIDEBAR BACKDROP FOR MOBILE -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMobileSidebar()"></div>
+
   <div class="admin-layout">
 
     <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar" id="adminSidebar">
       <div class="admin-sidebar-header">
         <div class="admin-sidebar-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
           </svg>
         </div>
-        <span class="admin-sidebar-title">Axionix Admin</span>
+        <div class="admin-sidebar-title-group">
+          <span class="admin-sidebar-title">Axionix Photobooth</span>
+          <span class="admin-sidebar-subtitle">Admin Workspace</span>
+        </div>
       </div>
 
       <nav class="admin-sidebar-nav">
+        <div class="admin-sidebar-section-label">Main Menu</div>
         <button class="admin-sidebar-item active" onclick="location.reload()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"></line>
             <line x1="12" y1="20" x2="12" y2="4"></line>
             <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -52,27 +55,23 @@
         </button>
 
         <button class="admin-sidebar-item" onclick="goToPaket()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path
-              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-            </path>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
           </svg>
           <span>Kelola Paket</span>
         </button>
 
         <button class="admin-sidebar-item" onclick="goToPayment()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
             <line x1="1" y1="10" x2="23" y2="10"></line>
           </svg>
           <span>Payment Setting</span>
         </button>
 
+        <div class="admin-sidebar-section-label">Assets &amp; Content</div>
         <button class="admin-sidebar-item" onclick="goToFrames()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <circle cx="8.5" cy="8.5" r="1.5"></circle>
             <polyline points="21 15 16 10 5 21"></polyline>
@@ -81,25 +80,22 @@
         </button>
 
         <button class="admin-sidebar-item" onclick="goToStiker()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
-            </path>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
           </svg>
           <span>Edit Stiker</span>
         </button>
 
+        <div class="admin-sidebar-section-label">Reports &amp; Gallery</div>
         <button class="admin-sidebar-item" onclick="goToFolder()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
           </svg>
           <span>Folder Foto</span>
         </button>
 
         <button class="admin-sidebar-item" onclick="guestAll()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -110,16 +106,15 @@
       </nav>
 
       <div class="admin-sidebar-footer">
-        <div class="admin-sidebar-user mb-3">
-          <div class="avatar avatar-sm">A</div>
+        <div class="admin-sidebar-user">
+          <div class="admin-user-avatar" id="avatarInitial">A</div>
           <div class="admin-sidebar-user-info" id="adminInfo">
             <div class="admin-sidebar-user-name">Loading...</div>
           </div>
         </div>
 
         <button class="admin-sidebar-item text-danger" onclick="logout()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -133,12 +128,20 @@
     <main class="admin-main">
       <div class="admin-topbar">
         <div class="admin-topbar-left">
-          <h1 class="admin-topbar-title">Dashboard Overview</h1>
-          <span class="admin-topbar-subtitle">Selamat datang kembali! Kelola sesi, pendapatan, dan konfigurasi
-            photobox.</span>
+          <button class="mobile-nav-toggle" onclick="toggleMobileSidebar()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div>
+            <h1 class="admin-topbar-title">Dashboard Overview ✨</h1>
+            <span class="admin-topbar-subtitle">Kelola sesi, transaksi real-time, dan performa cabang photobox.</span>
+          </div>
         </div>
 
         <div class="admin-topbar-right">
+          <span class="branch-badge-pill">
+            <span class="status-dot-pulse"></span>
+            <span id="branchBadgeText">Loading...</span>
+          </span>
           <button class="btn btn-outline btn-sm" onclick="refreshAll()">
             <span>🔄 Sync Data</span>
           </button>
@@ -176,7 +179,7 @@
           <div class="admin-stat-card">
             <div class="stat-card-header">
               <span class="admin-stat-label">Total Pendapatan</span>
-              <div class="admin-stat-icon blue">💰</div>
+              <div class="admin-stat-icon pink">💰</div>
             </div>
             <div class="admin-stat-value" id="statRevenue" style="font-size:var(--text-2xl);">Rp 0</div>
           </div>
@@ -187,8 +190,8 @@
           <div class="chart-header">
             <span class="chart-title">📈 Pendapatan &amp; Sesi — 7 Hari Terakhir</span>
             <div class="chart-legend">
-              <span><span class="legend-dot" style="background:var(--color-primary)"></span>Pendapatan</span>
-              <span><span class="legend-dot" style="background:var(--color-secondary)"></span>Sesi</span>
+              <span><span class="legend-dot" style="background:#FF3385"></span>Pendapatan</span>
+              <span><span class="legend-dot" style="background:#7C3AED"></span>Sesi</span>
             </div>
           </div>
           <div class="chart-bars" id="chartBars"></div>
@@ -198,8 +201,7 @@
         <div class="admin-section" id="cardKonfirmasi">
           <div class="admin-section-header" onclick="toggleSection('konfirmasi')">
             <div class="admin-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" style="color:var(--color-warning);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-warning);">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
@@ -213,7 +215,7 @@
 
           <div class="admin-section-body open" id="bodyKonfirmasi">
             <div class="admin-section-inner">
-              <div class="gateway-banner hidden mb-3" id="gatewayBanner">
+              <div class="gateway-banner hidden mb-3" id="gatewayBanner" style="background:#EEF2FF; border:1px solid #C7D2FE; color:#3730A3; padding:10px 16px; border-radius:14px; font-size:13px; font-weight:700;">
                 ⚡ Mode Payment Gateway aktif — pembayaran otomatis dikonfirmasi via webhook.
               </div>
               <div id="waitingList">
@@ -227,8 +229,7 @@
         <div class="admin-section">
           <div class="admin-section-header" onclick="toggleSection('sesi')">
             <div class="admin-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" style="color:var(--color-primary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#FF3385;">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -248,6 +249,7 @@
               <div style="display:flex; justify-content:flex-end; margin-bottom:var(--space-3);">
                 <button class="btn btn-outline btn-xs" onclick="downloadTodayCSV()">⬇ CSV Hari Ini</button>
               </div>
+
               <div id="sesiList">
                 <p class="text-xs text-tertiary">Loading sesi hari ini...</p>
               </div>
@@ -259,8 +261,7 @@
         <div class="admin-section">
           <div class="admin-section-header" onclick="toggleSection('allSesi')">
             <div class="admin-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" style="color:var(--color-secondary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#7C3AED;">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
               </svg>
               <span>Semua Sesi Photobooth</span>
@@ -284,9 +285,7 @@
                 <button class="btn btn-outline btn-xs ml-auto" onclick="downloadAllCSV()">⬇ Download CSV</button>
               </div>
 
-              <div
-                style="display:flex; justify-content:space-between; padding:var(--space-3) var(--space-5); border-bottom:1px solid var(--border-subtle); background:var(--bg-subtle);"
-                class="text-xs font-semibold">
+              <div style="display:flex; justify-content:space-between; padding:var(--space-3) var(--space-5); border-bottom:1px solid #F0E6F4; background:#FAF7FC;" class="text-xs font-semibold">
                 <span id="allSesiCount" class="text-secondary">0 sesi</span>
                 <span class="text-primary" id="allSesiRev">Rp 0</span>
               </div>
@@ -295,7 +294,7 @@
                 <p class="text-xs text-tertiary p-4">Loading data...</p>
               </div>
 
-              <div class="pagination" id="allSesiPagination"></div>
+              <div class="pagination" id="allSesiPagination" style="padding:16px; display:flex; justify-content:center; gap:8px;"></div>
 
             </div>
           </div>
@@ -306,6 +305,15 @@
   </div>
 
   <script>
+    function toggleMobileSidebar() {
+      const sb = document.getElementById("adminSidebar");
+      const bd = document.getElementById("sidebarBackdrop");
+      if (sb && bd) {
+        sb.classList.toggle("open");
+        bd.classList.toggle("active");
+      }
+    }
+
     function toggleSection(id) {
       const key = id.charAt(0).toUpperCase() + id.slice(1);
       const body = document.getElementById("body" + key);
@@ -334,9 +342,13 @@
 
     const admin = JSON.parse(localStorage.getItem("currentAdmin"));
     const branchId = admin.branch_id;
+    const branchName = admin.branch_name ?? admin.username ?? "Cabang";
+
+    document.getElementById("branchBadgeText").textContent = branchName;
+    document.getElementById("avatarInitial").textContent = branchName.charAt(0).toUpperCase();
 
     document.getElementById("adminInfo").innerHTML =
-      `<div class="admin-sidebar-user-name">${admin.branch_name ?? admin.username}</div><div class="admin-sidebar-user-role">${admin.role}</div>`;
+      `<div class="admin-sidebar-user-name">${branchName}</div><div class="admin-sidebar-user-role">${admin.role ?? "Admin"}</div>`;
 
     let paymentMode = "manual";
     let allSessions = [];
@@ -424,8 +436,8 @@
         return `
         <div class="chart-bar-group">
           <div class="chart-bar-pair">
-            <div class="chart-bar revenue" style="height:${Math.max(4, revH)}px" title="${revTip}"></div>
-            <div class="chart-bar sessions" style="height:${Math.max(4, sessH)}px" title="${sessTip}"></div>
+            <div class="chart-bar revenue" style="height:${Math.max(6, revH)}px" title="${revTip}"></div>
+            <div class="chart-bar sessions" style="height:${Math.max(6, sessH)}px" title="${sessTip}"></div>
           </div>
           <div class="chart-bar-label">${lbl}</div>
         </div>`;
@@ -476,8 +488,8 @@
       const list = document.getElementById("allSesiList");
 
       if (!slice.length) {
-        list.innerHTML = `<div class="empty-state" style="padding:20px;">
-        <div class="empty-state-icon">📭</div><div class="empty-state-title text-sm">Tidak ada data sesi</div></div>`;
+        list.innerHTML = `<div class="empty-state" style="padding:24px; text-align:center;">
+        <div class="empty-state-icon" style="font-size:32px;">📭</div><div class="empty-state-title text-sm" style="font-weight:700; color:#7C6E87; margin-top:8px;">Tidak ada data sesi</div></div>`;
         document.getElementById("allSesiPagination").innerHTML = "";
         return;
       }
@@ -487,20 +499,20 @@
         const dt = new Date(s.created_at);
         const tgl = dt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "2-digit" });
         const jam = dt.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-        const statusClass = s.status === "paid" ? "status-paid" : s.status === "waiting" ? "status-waiting" : "status-done";
+        const statusClass = s.status === "paid" ? "badge-success" : s.status === "waiting" ? "badge-warning" : "badge-neutral";
         const statusLabel = { paid: "✅ Lunas", waiting: "⏳ Menunggu", done: "🏁 Selesai" }[s.status] ?? s.status;
         return `
-        <div class="session-row">
-          <div class="session-row-info">
-            <div class="session-row-avatar">${metode.charAt(0).toUpperCase()}</div>
+        <div class="session-row" style="display:flex; justify-content:space-between; align-items:center; padding:14px 24px; border-bottom:1px solid #F0E6F4;">
+          <div class="session-row-info" style="display:flex; align-items:center; gap:14px;">
+            <div class="session-row-avatar" style="width:40px; height:40px; border-radius:12px; background:#F3ECF8; color:#7C3AED; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px;">${metode.charAt(0).toUpperCase()}</div>
             <div>
-              <div class="session-row-name">${s.paket ?? "—"}</div>
-              <div class="session-row-detail">${metode.toUpperCase()} · ${tgl} ${jam}</div>
+              <div class="session-row-name" style="font-weight:800; color:#261B2E; font-size:14px;">${s.paket ?? "—"}</div>
+              <div class="session-row-detail" style="font-size:12px; color:#8C7B99;">${metode.toUpperCase()} · ${tgl} ${jam}</div>
             </div>
           </div>
           <div style="text-align:right;">
-            <div class="session-row-price">Rp ${(s.harga ?? 0).toLocaleString("id-ID")}</div>
-            <span class="badge ${statusClass}">${statusLabel}</span>
+            <div class="session-row-price" style="font-weight:800; color:#FF3385; font-size:15px;">Rp ${(s.harga ?? 0).toLocaleString("id-ID")}</div>
+            <span class="badge ${statusClass}" style="padding:4px 10px; border-radius:12px; font-size:11px; font-weight:700;">${statusLabel}</span>
           </div>
         </div>`;
       }).join("");
@@ -513,11 +525,11 @@
       let pgEnd = Math.min(pages, pgStart + maxBtn - 1);
       if (pgEnd - pgStart < maxBtn - 1) pgStart = Math.max(1, pgEnd - maxBtn + 1);
 
-      let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
+      let html = `<button class="btn btn-outline btn-xs" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
       for (let p = pgStart; p <= pgEnd; p++) {
-        html += `<button class="page-btn ${p === currentPage ? "active" : ""}" onclick="changePage(${p})">${p}</button>`;
+        html += `<button class="btn btn-xs ${p === currentPage ? "btn-primary" : "btn-outline"}" onclick="changePage(${p})">${p}</button>`;
       }
-      html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? "disabled" : ""}>›</button>`;
+      html += `<button class="btn btn-outline btn-xs" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? "disabled" : ""}>›</button>`;
       pg.innerHTML = html;
     }
 
@@ -545,7 +557,7 @@
       document.getElementById("statWaiting").textContent = count;
 
       if (!data || !data.length) {
-        list.innerHTML = `<div class="empty-state" style="padding:16px;"><div class="empty-state-title text-xs text-secondary">Semua pembayaran sudah terkonfirmasi</div></div>`;
+        list.innerHTML = `<div class="empty-state" style="padding:16px; text-align:center;"><div class="empty-state-title text-xs text-secondary" style="font-weight:700;">Semua pembayaran sudah terkonfirmasi ✨</div></div>`;
         return;
       }
 
@@ -562,16 +574,16 @@
         const metode = s.pembayaran?.toLowerCase() ?? "qris";
         const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
         return `
-        <div class="session-row">
-          <div class="session-row-info">
-            <div class="session-row-avatar" style="background:var(--color-warning-light); color:var(--color-warning-text);">⏳</div>
+        <div class="session-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#FEF3C7; border-radius:16px; margin-bottom:10px;">
+          <div class="session-row-info" style="display:flex; align-items:center; gap:12px;">
+            <div class="session-row-avatar" style="background:#F59E0B; color:#FFFFFF; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800;">⏳</div>
             <div>
-              <div class="session-row-name">${s.paket}</div>
-              <div class="session-row-detail">${metode.toUpperCase()} · ${jam}</div>
+              <div class="session-row-name" style="font-weight:800; color:#78350F; font-size:14px;">${s.paket}</div>
+              <div class="session-row-detail" style="font-size:12px; color:#B45309;">${metode.toUpperCase()} · ${jam}</div>
             </div>
           </div>
-          <div class="session-row-actions">
-            <span class="session-row-price">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</span>
+          <div class="session-row-actions" style="display:flex; align-items:center; gap:12px;">
+            <span class="session-row-price" style="font-weight:800; color:#78350F;">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</span>
             <button class="btn btn-success btn-xs" id="btnKonfirmasi_${s.id}" onclick="konfirmasi('${s.id}')">Konfirmasi</button>
           </div>
         </div>`;
@@ -603,27 +615,27 @@
 
       const list = document.getElementById("sesiList");
       if (!todaySessions.length) {
-        list.innerHTML = `<div class="empty-state" style="padding:16px;"><div class="empty-state-title text-xs text-secondary">Belum ada sesi foto hari ini</div></div>`;
+        list.innerHTML = `<div class="empty-state" style="padding:16px; text-align:center;"><div class="empty-state-title text-xs text-secondary" style="font-weight:700;">Belum ada sesi foto hari ini</div></div>`;
         return;
       }
 
       list.innerHTML = todaySessions.map(s => {
         const metode = s.pembayaran?.toLowerCase() ?? "qris";
         const jam = new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-        const statusClass = s.status === "paid" ? "status-paid" : s.status === "waiting" ? "status-waiting" : "status-done";
+        const statusClass = s.status === "paid" ? "badge-success" : s.status === "waiting" ? "badge-warning" : "badge-neutral";
         const statusLabel = { paid: "✅ Lunas", waiting: "⏳ Menunggu", done: "🏁 Selesai" }[s.status] ?? s.status;
         return `
-        <div class="session-row">
-          <div class="session-row-info">
-            <div class="session-row-avatar">${metode.charAt(0).toUpperCase()}</div>
+        <div class="session-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #F0E6F4;">
+          <div class="session-row-info" style="display:flex; align-items:center; gap:12px;">
+            <div class="session-row-avatar" style="width:36px; height:36px; border-radius:10px; background:#FFF0F5; color:#FF3385; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px;">${metode.charAt(0).toUpperCase()}</div>
             <div>
-              <div class="session-row-name">${s.paket}</div>
-              <div class="session-row-detail">${metode.toUpperCase()} · ${jam}</div>
+              <div class="session-row-name" style="font-weight:800; color:#261B2E; font-size:14px;">${s.paket}</div>
+              <div class="session-row-detail" style="font-size:12px; color:#8C7B99;">${metode.toUpperCase()} · ${jam}</div>
             </div>
           </div>
           <div style="text-align:right;">
-            <div class="session-row-price">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</div>
-            <span class="badge ${statusClass}">${statusLabel}</span>
+            <div class="session-row-price" style="font-weight:800; color:#FF3385; font-size:14px;">Rp ${s.harga?.toLocaleString("id-ID") ?? "-"}</div>
+            <span class="badge ${statusClass}" style="padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700;">${statusLabel}</span>
           </div>
         </div>`;
       }).join("");

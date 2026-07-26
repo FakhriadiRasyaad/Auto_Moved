@@ -76,7 +76,7 @@
         </div>
         <div class="brand-text-group">
           <span class="brand-name-top">AXIONIX</span>
-          <span class="brand-name-bottom">PHOTOBOOTH</span>
+          <span class="brand-name-bottom">PHOTO 🦾 </span>
         </div>
       </div>
 
@@ -115,11 +115,16 @@
       <img src="../img/Style/04.svg" alt="Cute Bunny" style="position: absolute; top: -30px; right: 20px; width: 75px; height: auto; z-index: 15; pointer-events: none; filter: drop-shadow(0 6px 12px rgba(255, 110, 165, 0.2));" />
 
       <!-- Header Title & Greeting -->
-      <div style="margin-bottom: 20px;">
-        <h1 id="greetingName" style="font-size: 24px; font-weight: 900; color: #3A2B42; margin: 0; line-height: 1.2; display: flex; align-items: center; gap: 8px;">
-          Galeri Foto Tamu 📸 ✨
-        </h1>
-        <p style="font-size: 12px; font-weight: 600; color: #7A6988; margin-top: 4px;">Lihat hasil foto jepretan kamu dan klik "Lanjut ke Pilih Frame"</p>
+      <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h1 id="greetingName" style="font-size: 24px; font-weight: 900; color: #3A2B42; margin: 0; line-height: 1.2; display: flex; align-items: center; gap: 8px;">
+            Galeri Foto Tamu 📸 ✨
+          </h1>
+          <p style="font-size: 12px; font-weight: 600; color: #7A6988; margin-top: 4px;">Pilih maksimal 10 foto jepretan terbaik kamu untuk dicetak ke frame!</p>
+        </div>
+        <div id="selectCountBadge" style="background: #FFEBF2; color: #FF4886; border: 2px solid #FFD8E7; border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 900; box-shadow: 0 4px 12px rgba(255, 110, 165, 0.12);">
+          0 / 10 Terpilih
+        </div>
       </div>
 
       <!-- Photo Area Container -->
@@ -132,7 +137,7 @@
 
     </div>
 
-    <!-- Bottom Action Row Buttons (NO DOWNLOAD BUTTON) -->
+    <!-- Bottom Action Row Buttons -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 12px;">
       
       <!-- Left Exit/Switch Guest Button -->
@@ -146,7 +151,7 @@
       <!-- Right Next to Frame Button -->
       <button id="btnNext" onclick="goNext()" disabled class="customer-btn-primary korean-btn-gradient"
         style="height: 50px; padding: 0 32px; border-radius: 25px; font-size: 15px; font-weight: 900; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(255, 111, 162, 0.35);">
-        <span>Lanjut ke Pilih Frame →</span>
+        <span>Lanjut ke Pilih Frame (0 Foto) →</span>
       </button>
 
     </div>
@@ -167,8 +172,11 @@
 
   <script>
     let curLbIdx = 0;
+    let selectedPhotoIndices = new Set();
+    const MAX_SELECT = 10;
 
-    function lbOpen(i) {
+    function lbOpen(i, e) {
+      if (e) e.stopPropagation();
       if (window.allUrls && window.allUrls[i]) {
         curLbIdx = i;
         document.getElementById("lbImg").src = window.allUrls[i];
@@ -179,16 +187,66 @@
     function lbClose() {
       document.getElementById("lightbox").style.display = "none";
     }
-    function toggleFolder(header) {
-      const content = header.nextElementSibling;
-      const chev = header.querySelector(".folder-toggle");
-      if (content) {
-        const isOpen = content.classList.contains("open");
-        content.classList.toggle("open", !isOpen);
-        if (chev) chev.classList.toggle("open", !isOpen);
+
+    function togglePhotoSelect(i, e) {
+      if (e) e.stopPropagation();
+      if (selectedPhotoIndices.has(i)) {
+        selectedPhotoIndices.delete(i);
+      } else {
+        if (selectedPhotoIndices.size >= MAX_SELECT) {
+          alert("⚠️ Maksimal 10 foto terpilih yang dapat digunakan!");
+          return;
+        }
+        selectedPhotoIndices.add(i);
+      }
+      updateSelectUI();
+    }
+
+    function updateSelectUI() {
+      const badge = document.getElementById("selectCountBadge");
+      if (badge) badge.textContent = `📌 ${selectedPhotoIndices.size} / ${MAX_SELECT} Terpilih`;
+
+      const btnNext = document.getElementById("btnNext");
+      if (btnNext) {
+        btnNext.disabled = selectedPhotoIndices.size === 0;
+        btnNext.innerHTML = selectedPhotoIndices.size === 0
+          ? `<span>Lanjut ke Pilih Frame (Pilih Min 1 Foto) →</span>`
+          : `<span>Lanjut ke Pilih Frame (${selectedPhotoIndices.size} Foto) →</span>`;
+      }
+
+      if (window.allPhotos) {
+        window.allPhotos.forEach((_, idx) => {
+          const card = document.getElementById(`photoCard-${idx}`);
+          const chk = document.getElementById(`photoChk-${idx}`);
+          const isSelected = selectedPhotoIndices.has(idx);
+          if (card) {
+            card.style.borderColor = isSelected ? '#FF4886' : '#FFD8E7';
+            card.style.borderWidth = isSelected ? '2.5px' : '1.5px';
+            card.style.boxShadow = isSelected ? '0 8px 20px rgba(255, 72, 134, 0.28)' : '0 6px 16px rgba(255, 110, 165, 0.12)';
+          }
+          if (chk) {
+            chk.style.background = isSelected ? '#FF4886' : 'rgba(255, 255, 255, 0.9)';
+            chk.style.borderColor = isSelected ? '#FF4886' : '#FFD8E7';
+            chk.innerHTML = isSelected ? '✓' : '';
+          }
+        });
       }
     }
+
     function goNext() {
+      if (selectedPhotoIndices.size === 0) {
+        alert("Pilih minimal 1 foto terlebih dahulu!");
+        return;
+      }
+      const selectedIndices = Array.from(selectedPhotoIndices);
+      const selectedPhotos = selectedIndices.map(i => window.allPhotos[i]);
+      const selectedUrls = selectedIndices.map(i => window.allUrls[i]);
+      const selectedPaths = selectedPhotos.map(p => p.path);
+
+      sessionStorage.setItem("guestSelectedPhotos", JSON.stringify(selectedPaths));
+      sessionStorage.setItem("guestSelectedUrls", JSON.stringify(selectedUrls));
+      sessionStorage.setItem("guestAllPhotos", JSON.stringify(window.allPhotos));
+
       window.location.href = "pilih-frame.html";
     }
   </script>
@@ -271,8 +329,6 @@
         sessionStorage.setItem("sessionBranchId", String(latestFolder.branchId));
         sessionStorage.removeItem("cetakData");
 
-        document.getElementById("btnNext").disabled = false;
-
         let allFiles = [];
 
         for (const folder of guestFolders) {
@@ -322,6 +378,12 @@
         window.allPhotos = allFiles;
         window.allUrls = signedUrls;
 
+        // Auto pre-select up to 10 photos by default
+        selectedPhotoIndices.clear();
+        for (let i = 0; i < Math.min(10, allFiles.length); i++) {
+          selectedPhotoIndices.add(i);
+        }
+
         let html = '', currentFolder = '';
 
         for (let i = 0; i < allFiles.length; i++) {
@@ -347,12 +409,23 @@
           }
 
           const icon = SUBFOLDER_ICON[file.kind] || '📷';
+          const isSelected = selectedPhotoIndices.has(i);
+
           html += `
-            <div onclick="lbOpen(${i})" style="background: #FFFFFF; border: 1.5px solid #FFD8E7; border-radius: 18px; padding: 6px; box-shadow: 0 6px 16px rgba(255, 110, 165, 0.12); cursor: pointer; transition: transform 0.2s ease; position: relative;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-              <span style="position: absolute; top: -6px; right: -6px; font-size: 14px; z-index: 5;">✨</span>
+            <div id="photoCard-${i}" onclick="togglePhotoSelect(${i}, event)" style="background: #FFFFFF; border: ${isSelected ? '2.5px solid #FF4886' : '1.5px solid #FFD8E7'}; border-radius: 18px; padding: 6px; box-shadow: ${isSelected ? '0 8px 20px rgba(255, 72, 134, 0.28)' : '0 6px 16px rgba(255, 110, 165, 0.12)'}; cursor: pointer; transition: all 0.2s ease; position: relative;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+              
+              <!-- Checkbox Toggle -->
+              <div id="photoChk-${i}" onclick="togglePhotoSelect(${i}, event)" title="Pilih foto ini" style="position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 50%; background: ${isSelected ? '#FF4886' : 'rgba(255,255,255,0.92)'}; border: 2px solid ${isSelected ? '#FF4886' : '#FFD8E7'}; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: 900; font-size: 13px; z-index: 10; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.18);">
+                ${isSelected ? '✓' : ''}
+              </div>
+
               <img src="${signedUrls[i]}" alt="Foto ${i+1}" style="border-radius: 14px; width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block;">
-              <div style="background: #FFF0F5; border: 1px solid #FFD8E7; border-radius: 12px; padding: 4px 8px; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 800; color: #554363;">
-                <span>${icon}</span> <span>${file.kind} ${i+1}</span>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; gap: 4px;">
+                <div style="flex: 1; background: #FFF0F5; border: 1px solid #FFD8E7; border-radius: 12px; padding: 4px 6px; display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 800; color: #554363;">
+                  <span>${icon}</span> <span>${file.kind} ${i+1}</span>
+                </div>
+                <button onclick="lbOpen(${i}, event)" title="Preview Besar" style="background: #FFFFFF; border: 1px solid #FFD8E7; border-radius: 12px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; color: #FF5E93;">🔍</button>
               </div>
             </div>
           `;
@@ -360,6 +433,7 @@
 
         if (currentFolder !== '') html += '</div></div></div>';
         document.getElementById("photoArea").innerHTML = html;
+        updateSelectUI();
 
       } catch (e) {
         document.getElementById("photoArea").innerHTML = `

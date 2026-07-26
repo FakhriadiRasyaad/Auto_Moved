@@ -7,13 +7,12 @@
   <title>Buat Admin Baru — Axionix Superadmin</title>
 
   <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Axionix Design System -->
   <link rel="stylesheet" href="../assets/css/design-system.css" />
   <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
   <link rel="stylesheet" href="../assets/css/superadmin.css" />
 </head>
 
@@ -25,112 +24,106 @@
     if (admin && admin.role !== "superadmin") window.location.href = "../admin/dashboard.html";
   </script>
 
-  <div class="superadmin-container max-w-xl">
+  <div class="superadmin-container max-w-xl" style="max-width:720px;">
 
     <!-- Top Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center;" class="mb-6">
+    <div class="superadmin-top-nav">
       <div>
-        <h1 class="superadmin-title" style="font-size:var(--text-xl);">Buat Admin Cabang Baru 👤</h1>
-        <p class="superadmin-subtitle">Daftarkan akun administrator untuk mengelola titik kios photobooth</p>
+        <h1 class="superadmin-page-title">Buat Admin Cabang Baru 👤</h1>
+        <p class="superadmin-subtitle" style="text-align:left; margin:0; font-size:12.5px;">Daftarkan akun administrator untuk mengelola titik kios photobooth</p>
       </div>
 
-      <button class="btn btn-outline btn-sm" onclick="window.location.href='dashboard.html'">
+      <button class="btn btn-outline btn-sm" onclick="window.location.href='dashboard.html'" style="border-radius:14px;">
         <span>← Kembali</span>
       </button>
     </div>
 
     <!-- Alert Banner -->
-    <div id="alertBox" class="badge p-3 w-full mb-4 hidden text-left"></div>
+    <div id="alertBox" class="badge p-3 w-full mb-4 hidden text-left" style="border-radius:14px; font-size:13px; font-weight:700;"></div>
 
     <!-- Success Card Banner -->
-    <div id="successBanner" class="card p-6 mb-6 hidden"
-      style="background:var(--color-success-light); border:1px solid var(--color-success);">
-      <div style="font-size:2rem;" class="mb-2">🎉</div>
-      <h3 class="font-bold text-lg text-primary mb-1">Akun Admin Berhasil Dibuat!</h3>
-      <p class="text-xs text-secondary mb-4">Salin detail kredensial di bawah ini untuk diserahkan kepada admin cabang:
-      </p>
+    <div id="successBanner" class="setting-card p-6 mb-6 hidden" style="background:#ECFDF5; border:1.5px solid #10B981; border-radius:28px;">
+      <div style="font-size:2.5rem; text-align:center;" class="mb-2">🎉</div>
+      <h3 class="font-bold text-lg text-primary mb-1 text-center" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; color:#065F46;">Akun Admin Berhasil Dibuat!</h3>
+      <p class="text-xs text-secondary mb-4 text-center" style="color:#047857; font-size:13px;">Salin detail kredensial di bawah ini untuk diserahkan kepada admin cabang:</p>
 
-      <div class="card p-4 mb-4" style="background:#fff;" id="successInfo"></div>
+      <div class="card p-4 mb-4" style="background:#FFFFFF; border-radius:18px; border:1px solid #A7F3D0; padding:18px; line-height:1.6;" id="successInfo"></div>
 
-      <div style="display:flex; gap:var(--space-3);">
-        <button class="btn btn-primary btn-sm flex-1" onclick="location.reload()">＋ Buat Admin Lain</button>
-        <button class="btn btn-outline btn-sm flex-1" onclick="window.location.href='dashboard.html'">Kembali ke
-          Dashboard</button>
+      <div style="display:flex; gap:12px;">
+        <button class="btn btn-primary btn-sm flex-1" onclick="location.reload()" style="border-radius:14px; padding:12px; box-shadow:0 8px 20px rgba(255,51,133,0.35);">＋ Buat Admin Lain</button>
+        <button class="btn btn-outline btn-sm flex-1" onclick="window.location.href='dashboard.html'" style="border-radius:14px; padding:12px;">Kembali ke Dashboard</button>
       </div>
     </div>
 
     <!-- Main Form Card -->
-    <div class="card p-6" id="formCard">
+    <div class="setting-card" id="formCard" style="border-radius:28px;">
       <form onsubmit="event.preventDefault(); createAdmin();">
 
         <!-- Role Selection Cards -->
-        <div class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Pilih Role Akses</div>
-        <div class="grid mb-4" style="grid-template-columns:1fr 1fr; gap:var(--space-3);">
+        <div class="text-xs font-bold text-secondary uppercase tracking-wider mb-2" style="font-size:11px; letter-spacing:1px; color:#8C7B99; margin-bottom:8px;">Pilih Role Akses</div>
+        <div class="grid mb-4" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
 
           <label class="superadmin-role-card selected" id="roleAdminCard" onclick="selectRole('admin')">
             <input type="radio" name="role" value="admin" checked style="display:none;">
-            <div style="font-size:1.5rem;" class="mb-1">🏪</div>
-            <div class="font-bold text-sm text-primary">Admin Cabang</div>
-            <div class="caption text-secondary">Akses dashboard cabang tunggal</div>
+            <div style="font-size:1.8rem;" class="mb-1">🏪</div>
+            <div class="font-bold text-sm text-primary" style="font-weight:800; color:#261B2E; font-size:14px;">Admin Cabang</div>
+            <div class="caption text-secondary" style="font-size:11.5px; color:#7C6E87;">Akses dashboard cabang tunggal</div>
           </label>
 
           <label class="superadmin-role-card" id="roleSuperadminCard" onclick="selectRole('superadmin')">
             <input type="radio" name="role" value="superadmin" style="display:none;">
-            <div style="font-size:1.5rem;" class="mb-1">👑</div>
-            <div class="font-bold text-sm text-primary">Superadmin</div>
-            <div class="caption text-secondary">Akses penuh seluruh cabang</div>
+            <div style="font-size:1.8rem;" class="mb-1">👑</div>
+            <div class="font-bold text-sm text-primary" style="font-weight:800; color:#261B2E; font-size:14px;">Superadmin</div>
+            <div class="caption text-secondary" style="font-size:11.5px; color:#7C6E87;">Akses penuh seluruh cabang</div>
           </label>
 
         </div>
 
         <!-- Input Fields -->
-        <div class="input-group mb-3">
+        <div class="input-group mb-3" style="margin-bottom:16px;">
           <label for="displayName" class="input-label">Nama Tampilan Admin <span class="text-danger">*</span></label>
-          <input type="text" id="displayName" placeholder="misal: Admin Store Central" class="input" required>
+          <input type="text" id="displayName" placeholder="misal: Admin Store Central" class="input pill-input" style="height:48px !important; border-radius:14px !important;" required>
         </div>
 
-        <div class="input-group mb-3">
+        <div class="input-group mb-3" style="margin-bottom:16px;">
           <label for="email" class="input-label">Email Administrator <span class="text-danger">*</span></label>
-          <input type="email" id="email" placeholder="admin.central@cabang.com" class="input" required>
+          <input type="email" id="email" placeholder="admin.central@cabang.com" class="input pill-input" style="height:48px !important; border-radius:14px !important;" required>
         </div>
 
-        <div class="grid mb-4" style="grid-template-columns:1fr 1fr; gap:var(--space-3);">
+        <div class="grid mb-4" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
           <div class="input-group">
             <label for="password" class="input-label">Password <span class="text-danger">*</span></label>
-            <input type="password" id="password" placeholder="Min. 8 karakter" class="input" required>
+            <input type="password" id="password" placeholder="Min. 8 karakter" class="input pill-input" style="height:48px !important; border-radius:14px !important;" required>
           </div>
 
           <div class="input-group">
-            <label for="passwordConfirm" class="input-label">Konfirmasi Password <span
-                class="text-danger">*</span></label>
-            <input type="password" id="passwordConfirm" placeholder="Ulangi password" class="input" required>
+            <label for="passwordConfirm" class="input-label">Konfirmasi Password <span class="text-danger">*</span></label>
+            <input type="password" id="passwordConfirm" placeholder="Ulangi password" class="input pill-input" style="height:48px !important; border-radius:14px !important;" required>
           </div>
         </div>
 
         <!-- Branch Selector Section -->
-        <div class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Penugasan Cabang</div>
-        <div class="card p-4 mb-4" style="background:var(--bg-subtle);">
-          <div style="display:flex; gap:var(--space-2);" class="mb-2">
-            <select id="branchSelect" class="select flex-1">
+        <div class="text-xs font-bold text-secondary uppercase tracking-wider mb-2" style="font-size:11px; letter-spacing:1px; color:#8C7B99; margin-bottom:8px;">Penugasan Cabang</div>
+        <div class="card p-4 mb-4" style="background:#FAF7FC; border:1px solid #F0E6F4; border-radius:18px; padding:16px; margin-bottom:24px;">
+          <div style="display:flex; gap:10px;" class="mb-2">
+            <select id="branchSelect" class="input pill-input flex-1" style="height:48px !important; border-radius:14px !important;">
               <option value="">-- Pilih Cabang --</option>
             </select>
-            <button type="button" class="btn btn-outline btn-sm" onclick="toggleNewBranch()">＋ Buat Baru</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="toggleNewBranch()" style="border-radius:14px; padding:0 16px;">＋ Buat Baru</button>
           </div>
 
           <!-- New Branch In-place Form -->
-          <div id="newBranchPanel" class="hidden mt-3 pt-3" style="border-top:1px dashed var(--border-subtle);">
-            <div class="text-xs font-bold text-primary mb-2">Tambah Lokasi Cabang Baru</div>
-            <div class="grid mb-2" style="grid-template-columns:1.5fr 1fr; gap:var(--space-2);">
-              <input type="text" id="newBranchName" placeholder="Nama Cabang (misal: Grand Indonesia)"
-                class="input input-sm">
-              <input type="text" id="newBranchCode" placeholder="Kode (GI-01)" class="input input-sm">
+          <div id="newBranchPanel" class="hidden mt-3 pt-3" style="border-top:1px dashed #E5DAD4; margin-top:12px; padding-top:12px;">
+            <div class="text-xs font-bold text-primary mb-2" style="font-weight:800; color:#261B2E; font-size:13px; margin-bottom:8px;">Tambah Lokasi Cabang Baru</div>
+            <div class="grid mb-2" style="display:grid; grid-template-columns:1.5fr 1fr; gap:10px; margin-bottom:10px;">
+              <input type="text" id="newBranchName" placeholder="Nama Cabang (misal: Grand Indonesia)" class="input pill-input" style="height:42px !important; border-radius:12px !important; font-size:13px !important;">
+              <input type="text" id="newBranchCode" placeholder="Kode (GI-01)" class="input pill-input" style="height:42px !important; border-radius:12px !important; font-size:13px !important;">
             </div>
-            <button type="button" class="btn btn-primary btn-xs btn-block" onclick="saveNewBranch()">Simpan &amp; Pilih
-              Cabang Ini</button>
+            <button type="button" class="btn btn-primary btn-xs btn-block" onclick="saveNewBranch()" style="width:100%; height:40px; border-radius:12px; font-weight:800;">Simpan &amp; Pilih Cabang Ini</button>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-xl btn-block" id="btnSubmit">
+        <button type="submit" class="btn btn-primary btn-xl btn-block" id="btnSubmit" style="width:100%; height:52px; border-radius:16px; font-size:16px; font-weight:800; box-shadow:0 10px 24px rgba(255, 51, 133, 0.35);">
           <span>🚀 Daftarkan Akun Admin</span>
         </button>
 
@@ -249,9 +242,9 @@
           await supabase.auth.setSession({ access_token: superadminAccessToken, refresh_token: superadminRefreshToken });
         }
 
-        const { error: profileErr } = await supabase.from("profiles").insert({
+        const { error: profileErr } = await supabase.from("profiles").upsert({
           user_id: userId, role: role, branch_id: branchId, display_name: displayName
-        });
+        }, { onConflict: 'user_id' });
 
         if (profileErr) {
           btn.disabled = false; btn.textContent = "🚀 Daftarkan Akun Admin";

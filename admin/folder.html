@@ -7,9 +7,7 @@
   <title>Folder Foto — Axionix Admin</title>
 
   <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Axionix Design System -->
   <link rel="stylesheet" href="../assets/css/design-system.css" />
@@ -28,48 +26,51 @@
   </script>
 
   <!-- Progress Overlay -->
-  <div class="modal-overlay" id="progressOverlay" style="display:none;">
-    <div class="card p-6 max-w-sm w-full text-center">
-      <h3 class="font-bold text-lg text-primary mb-1" id="progTitle">Menyiapkan ZIP...</h3>
-      <p class="text-xs text-secondary mb-4" id="progDesc">Mengambil foto dari server</p>
+  <div class="modal-overlay" id="progressOverlay" style="display:none; background:rgba(14, 11, 22, 0.7); backdrop-filter:blur(8px); z-index:1000;">
+    <div class="card p-6 max-w-sm w-full text-center" style="background:#FFFFFF; border-radius:24px; padding:28px; box-shadow:0 24px 60px rgba(0,0,0,0.25);">
+      <h3 class="font-bold text-lg text-primary mb-1" id="progTitle" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; color:#FF3385;">Menyiapkan ZIP...</h3>
+      <p class="text-xs text-secondary mb-4" id="progDesc" style="color:#7C6E87; font-size:12px; margin-bottom:16px;">Mengambil foto dari server</p>
 
-      <div class="progress-bar mb-2">
-        <div class="progress-bar-fill" id="pfill" style="width:0%;"></div>
+      <div class="progress-bar mb-2" style="height:10px; background:#F0E6F4; border-radius:10px; overflow:hidden; margin-bottom:8px;">
+        <div class="progress-bar-fill" id="pfill" style="width:0%; height:100%; background:linear-gradient(90deg, #FF3385, #7C3AED); transition:width 0.3s ease;"></div>
       </div>
 
-      <span class="text-xs font-bold text-tertiary" id="pstatus">0%</span>
+      <span class="text-xs font-bold text-tertiary" id="pstatus" style="font-size:12px; font-weight:800; color:#261B2E;">0%</span>
     </div>
   </div>
 
   <!-- Image Preview Modal -->
-  <div class="modal-overlay" id="imgModal" style="display:none;" onclick="closeModal()">
+  <div class="modal-overlay" id="imgModal" style="display:none; background:rgba(14, 11, 22, 0.85); backdrop-filter:blur(12px); z-index:1000;" onclick="closeModal()">
     <div style="position:relative; max-width:90vw; max-height:90vh;">
-      <button class="modal-close" style="position:absolute; top:-40px; right:0; color:#fff;"
-        onclick="closeModal()">✕</button>
-      <img id="modalImg" src="" alt="Preview"
-        style="max-width:100%; max-height:85vh; border-radius:var(--radius-xl); box-shadow:var(--shadow-2xl); object-fit:contain;">
+      <button class="modal-close" style="position:absolute; top:-44px; right:0; color:#fff; background:rgba(255,255,255,0.2); border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer;" onclick="closeModal()">✕</button>
+      <img id="modalImg" src="" alt="Preview" style="max-width:100%; max-height:85vh; border-radius:20px; box-shadow:0 24px 60px rgba(0,0,0,0.5); object-fit:contain;">
     </div>
   </div>
+
+  <!-- SIDEBAR BACKDROP FOR MOBILE -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMobileSidebar()"></div>
 
   <div class="admin-layout">
 
     <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar" id="adminSidebar">
       <div class="admin-sidebar-header">
         <div class="admin-sidebar-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
           </svg>
         </div>
-        <span class="admin-sidebar-title">Axionix Admin</span>
+        <div class="admin-sidebar-title-group">
+          <span class="admin-sidebar-title">Axionix Photobooth</span>
+          <span class="admin-sidebar-subtitle">Admin Workspace</span>
+        </div>
       </div>
 
       <nav class="admin-sidebar-nav">
+        <div class="admin-sidebar-section-label">Main Menu</div>
         <button class="admin-sidebar-item" onclick="window.location.href='dashboard.html'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"></line>
             <line x1="12" y1="20" x2="12" y2="4"></line>
             <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -78,27 +79,23 @@
         </button>
 
         <button class="admin-sidebar-item" onclick="window.location.href='paket.html'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path
-              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-            </path>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
           </svg>
           <span>Kelola Paket</span>
         </button>
 
         <button class="admin-sidebar-item" onclick="window.location.href='payment.html'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
             <line x1="1" y1="10" x2="23" y2="10"></line>
           </svg>
           <span>Payment Setting</span>
         </button>
 
+        <div class="admin-sidebar-section-label">Assets &amp; Content</div>
         <button class="admin-sidebar-item" onclick="window.location.href='edit-frame.html'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <circle cx="8.5" cy="8.5" r="1.5"></circle>
             <polyline points="21 15 16 10 5 21"></polyline>
@@ -107,27 +104,41 @@
         </button>
 
         <button class="admin-sidebar-item" onclick="window.location.href='edit-stiker.html'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
-            </path>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
           </svg>
           <span>Edit Stiker</span>
         </button>
 
+        <div class="admin-sidebar-section-label">Reports &amp; Gallery</div>
         <button class="admin-sidebar-item active" onclick="location.reload()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
           </svg>
           <span>Folder Foto</span>
         </button>
+
+        <button class="admin-sidebar-item" onclick="window.location.href='../result/guest-login.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Data Customer</span>
+        </button>
       </nav>
 
       <div class="admin-sidebar-footer">
+        <div class="admin-sidebar-user">
+          <div class="admin-user-avatar" id="avatarInitial">A</div>
+          <div class="admin-sidebar-user-info" id="adminInfo">
+            <div class="admin-sidebar-user-name">Loading...</div>
+          </div>
+        </div>
+
         <button class="admin-sidebar-item text-danger" onclick="logout()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -141,12 +152,17 @@
     <main class="admin-main">
       <div class="admin-topbar">
         <div class="admin-topbar-left">
-          <h1 class="admin-topbar-title">Setting Folder &amp; Foto 📁</h1>
-          <span class="admin-topbar-subtitle">Atur folder tujuan otomatis dan kelola foto tersimpan per sesi</span>
+          <button class="mobile-nav-toggle" onclick="toggleMobileSidebar()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div>
+            <h1 class="admin-topbar-title">Setting Folder &amp; Foto 📁</h1>
+            <span class="admin-topbar-subtitle" id="cabangLabel">Atur folder tujuan otomatis dan kelola foto tersimpan per sesi</span>
+          </div>
         </div>
       </div>
 
-      <div class="admin-content max-w-xl">
+      <div class="admin-content max-w-xl" style="max-width:860px;">
 
         <!-- Folder Tujuan Card -->
         <div class="setting-card">
@@ -157,31 +173,28 @@
             <span>Folder Tujuan (Download 2)</span>
           </h2>
 
-          <p class="text-xs text-secondary mb-4">
-            Download 2 menyimpan file ZIP secara otomatis ke folder PC yang ditentukan. Membutuhkan izin browser
-            Chrome/Edge.
+          <p class="text-xs text-secondary mb-4" style="color:#7C6E87; margin-bottom:16px;">
+            Download 2 menyimpan file ZIP secara otomatis ke folder PC yang ditentukan. Membutuhkan izin browser Chrome/Edge.
           </p>
 
-          <div class="card p-4 mb-4" id="folderStatus" style="background:var(--bg-subtle);">
-            <div class="text-sm font-bold" id="folderName">Belum dipilih</div>
-            <div class="text-xs text-tertiary" id="folderHint">Pilih folder tujuan untuk Download 2</div>
+          <div class="card p-4 mb-4" id="folderStatus" style="background:#FAF7FC; border:1px solid #F0E6F4; border-radius:18px; padding:16px; margin-bottom:16px;">
+            <div class="text-sm font-bold" id="folderName" style="font-weight:800; color:#261B2E;">Belum dipilih</div>
+            <div class="text-xs text-tertiary" id="folderHint" style="font-size:12px; color:#8C7B99;">Pilih folder tujuan untuk Download 2</div>
           </div>
 
-          <div style="display:flex; gap:var(--space-3);" class="mb-3">
-            <button class="btn btn-primary" onclick="pickFolder()" id="btnPick">Pilih Folder PC</button>
-            <button class="btn btn-outline" id="btnClear" onclick="clearFolder()" style="display:none;">Hapus
-              Akses</button>
+          <div style="display:flex; gap:12px;" class="mb-3">
+            <button class="btn btn-primary" onclick="pickFolder()" id="btnPick" style="border-radius:14px; padding:10px 20px; box-shadow:0 8px 20px rgba(255,51,133,0.35);">Pilih Folder PC</button>
+            <button class="btn btn-outline" id="btnClear" onclick="clearFolder()" style="display:none; border-radius:14px; padding:10px 20px;">Hapus Akses</button>
           </div>
 
-          <div class="badge badge-warning p-3 w-full hidden" id="browserNote">
-            ⚠️ Browser ini tidak mendukung File System Access API. Hasil download akan masuk ke folder Downloads
-            default.
+          <div class="badge badge-warning p-3 w-full hidden" id="browserNote" style="border-radius:14px; font-size:12px; font-weight:700; margin-top:12px;">
+            ⚠️ Browser ini tidak mendukung File System Access API. Hasil download akan masuk ke folder Downloads default.
           </div>
         </div>
 
         <!-- Foto Tersimpan Card -->
         <div class="setting-card">
-          <div style="display:flex; align-items:center; justify-content:space-between;" class="mb-4">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
             <div>
               <h2 class="setting-card-title" style="margin-bottom:2px; padding-bottom:0; border:none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -191,26 +204,26 @@
                 </svg>
                 <span>Foto Tersimpan Per Sesi</span>
               </h2>
-              <p class="text-xs text-tertiary">Masing-masing sesi menyimpan foto hasil edit dan foto asli terpilih</p>
+              <p class="text-xs text-tertiary" style="color:#7C6E87; font-size:12.5px;">Masing-masing sesi menyimpan foto hasil edit dan foto asli terpilih</p>
             </div>
 
-            <button class="btn btn-outline btn-sm" onclick="loadSessions()">Muat Ulang</button>
+            <button class="btn btn-outline btn-sm" onclick="loadSessions()" style="border-radius:12px;">Muat Ulang</button>
           </div>
 
           <div id="sessionList">
-            <div class="empty-state" style="padding:var(--space-8);">
-              <div class="empty-state-icon">📁</div>
-              <div class="empty-state-title">Klik "Muat Sesi Foto" untuk melihat data</div>
+            <div class="empty-state" style="padding:32px; text-align:center;">
+              <div class="empty-state-icon" style="font-size:36px;">📁</div>
+              <div class="empty-state-title" style="font-weight:800; color:#261B2E; margin-top:8px;">Klik "Muat Sesi Foto" untuk melihat data</div>
             </div>
           </div>
         </div>
 
         <!-- Save Button Card -->
         <div class="setting-card">
-          <button onclick="saveSettings()" class="btn btn-primary btn-block">
+          <button onclick="saveSettings()" class="btn btn-primary btn-block" style="width:100%; height:50px; border-radius:16px; font-weight:800; box-shadow:0 8px 20px rgba(255,51,133,0.35);">
             <span>💾 Simpan Setting Folder</span>
           </button>
-          <div id="msgSave" class="text-xs text-center mt-2 font-semibold"></div>
+          <div id="msgSave" class="text-xs text-center mt-2 font-semibold" style="margin-top:12px; font-size:13px; font-weight:700;"></div>
         </div>
 
       </div>
@@ -219,6 +232,15 @@
   </div>
 
   <script>
+    function toggleMobileSidebar() {
+      const sb = document.getElementById("adminSidebar");
+      const bd = document.getElementById("sidebarBackdrop");
+      if (sb && bd) {
+        sb.classList.toggle("open");
+        bd.classList.toggle("active");
+      }
+    }
+
     function pickFolder() { if (window._pickFolder) window._pickFolder(); }
     function clearFolder() { if (window._clearFolder) window._clearFolder(); }
     function loadSessions() { if (window._loadSessions) window._loadSessions(); }
@@ -237,9 +259,16 @@
 
     const admin = JSON.parse(localStorage.getItem("currentAdmin"));
     const branchId = admin.branch_id;
+    const branchName = admin.branch_name ?? admin.username ?? "Cabang";
     const storageKey = "folder_admin_" + admin.id;
     let setting = JSON.parse(localStorage.getItem(storageKey) || "{}");
     let folderHandle = null;
+
+    document.getElementById("cabangLabel").innerText = `Cabang: ${branchName}`;
+    document.getElementById("avatarInitial").textContent = branchName.charAt(0).toUpperCase();
+
+    document.getElementById("adminInfo").innerHTML =
+      `<div class="admin-sidebar-user-name">${branchName}</div><div class="admin-sidebar-user-role">${admin.role ?? "Admin"}</div>`;
 
     const supportsFS = "showDirectoryPicker" in window;
     if (!supportsFS) document.getElementById("browserNote").classList.remove("hidden");
@@ -316,7 +345,7 @@
         .from("photos").list(branchId, { limit: 100, sortBy: { column: "name", order: "desc" } });
 
       if (error) { list.innerHTML = `<p class="text-xs text-danger">❌ ${error.message}</p>`; return; }
-      if (!folders?.length) { list.innerHTML = `<div class="empty-state" style="padding:var(--space-8);"><div class="empty-state-title">Belum ada sesi tersimpan</div></div>`; return; }
+      if (!folders?.length) { list.innerHTML = `<div class="empty-state" style="padding:32px; text-align:center;"><div class="empty-state-title" style="font-weight:800; color:#261B2E;">Belum ada sesi tersimpan</div></div>`; return; }
 
       list.innerHTML = "";
 
@@ -331,20 +360,21 @@
 
         const card = document.createElement("div");
         card.className = "admin-section mb-3";
+        card.style.cssText = "margin-bottom:12px; border-radius:18px;";
         card.innerHTML = `
-          <div class="admin-section-header" onclick="toggleSession(this, '${raw}')">
+          <div class="admin-section-header" onclick="toggleSession(this, '${raw}')" style="padding:16px 20px;">
             <div class="admin-section-title">
               <span>👤 ${guest}</span>
-              <span class="caption ml-2">(${dt})</span>
+              <span class="caption ml-2" style="font-size:12px; color:#8C7B99; font-weight:600;">(${dt})</span>
             </div>
-            <div class="admin-section-right" onclick="event.stopPropagation()">
-              <button class="btn btn-outline btn-xs" onclick="downloadZip('${raw}', '${guest}', 1)">Download 1</button>
-              <button class="btn btn-primary btn-xs" onclick="downloadZip('${raw}', '${guest}', 2)">Download 2</button>
+            <div class="admin-section-right" onclick="event.stopPropagation()" style="gap:8px;">
+              <button class="btn btn-outline btn-xs" style="border-radius:10px;" onclick="downloadZip('${raw}', '${guest}', 1)">Download 1</button>
+              <button class="btn btn-primary btn-xs" style="border-radius:10px;" onclick="downloadZip('${raw}', '${guest}', 2)">Download 2</button>
               <span class="chevron">▼</span>
             </div>
           </div>
           <div class="admin-section-body">
-            <div class="admin-section-inner" data-folder="${raw}" style="padding:var(--space-4);"></div>
+            <div class="admin-section-inner" data-folder="${raw}" style="padding:16px 20px;"></div>
           </div>
         `;
         list.appendChild(card);
@@ -398,26 +428,26 @@
       let html = "";
 
       if (files.edit.length) {
-        html += `<div class="text-xs font-bold mb-2">✨ Hasil Edit (${files.edit.length} foto)</div><div class="asset-grid mb-4">`;
+        html += `<div class="text-xs font-bold mb-2" style="font-weight:800; color:#261B2E; margin-bottom:10px;">✨ Hasil Edit (${files.edit.length} foto)</div><div class="asset-grid mb-4" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; margin-bottom:16px;">`;
         for (const f of files.edit) {
           const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
           if (s?.signedUrl) html += `
-            <div class="asset-card cursor-pointer" onclick="openModal('${s.signedUrl}')">
-              <img src="${s.signedUrl}" title="${f.name}">
-              <span class="badge badge-primary" style="position:absolute; bottom:4px; left:4px;">edit</span>
+            <div class="asset-card cursor-pointer" onclick="openModal('${s.signedUrl}')" style="position:relative; border-radius:14px; overflow:hidden; border:1px solid #F0E6F4;">
+              <img src="${s.signedUrl}" title="${f.name}" style="width:100%; height:110px; object-fit:cover;">
+              <span class="badge badge-primary" style="position:absolute; bottom:4px; left:4px; font-size:10px; padding:2px 6px; border-radius:6px;">edit</span>
             </div>`;
         }
         html += `</div>`;
       }
 
       if (files.noedit.length) {
-        html += `<div class="text-xs font-bold mb-2">📷 Foto Asli (${files.noedit.length} foto)</div><div class="asset-grid">`;
+        html += `<div class="text-xs font-bold mb-2" style="font-weight:800; color:#261B2E; margin-bottom:10px;">📷 Foto Asli (${files.noedit.length} foto)</div><div class="asset-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px;">`;
         for (const f of files.noedit) {
           const { data: s } = await supabase.storage.from("photos").createSignedUrl(f.path, 300);
           if (s?.signedUrl) html += `
-            <div class="asset-card cursor-pointer" onclick="openModal('${s.signedUrl}')">
-              <img src="${s.signedUrl}" title="${f.name}">
-              <span class="badge badge-neutral" style="position:absolute; bottom:4px; left:4px;">noedit</span>
+            <div class="asset-card cursor-pointer" onclick="openModal('${s.signedUrl}')" style="position:relative; border-radius:14px; overflow:hidden; border:1px solid #F0E6F4;">
+              <img src="${s.signedUrl}" title="${f.name}" style="width:100%; height:110px; object-fit:cover;">
+              <span class="badge badge-neutral" style="position:absolute; bottom:4px; left:4px; font-size:10px; padding:2px 6px; border-radius:6px;">noedit</span>
             </div>`;
         }
         html += `</div>`;

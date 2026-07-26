@@ -1058,6 +1058,18 @@
             }
           }
           if (!all.length) throw new Error("Tidak ada foto di folder sesi ini.");
+          
+          const selRaw = sessionStorage.getItem("guestSelectedPhotos");
+          if (selRaw) {
+            try {
+              const selPaths = JSON.parse(selRaw);
+              if (Array.isArray(selPaths) && selPaths.length > 0) {
+                const filtered = all.filter(item => selPaths.includes(item.path));
+                if (filtered.length > 0) all = filtered;
+              }
+            } catch (e) { }
+          }
+
           const ko = { asli: 0, noedit: 1 };
           all.sort((a, b) => (ko[a.kind] ?? 9) - (ko[b.kind] ?? 9) || a.name.localeCompare(b.name));
           lm.textContent = `Membuat URL untuk ${all.length} foto...`;
