@@ -65,13 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!authSuccess) {
       // Jika ada error dari Supabase Auth (bukan network error), tampilkan pesan yang jelas
       if (supabaseAuthError) {
-        const errMsg = supabaseAuthError.message.toLowerCase();
+        const errDetail = supabaseAuthError.message || supabaseAuthError.error_description || (typeof supabaseAuthError === "object" ? JSON.stringify(supabaseAuthError) : String(supabaseAuthError));
+        const errMsg = errDetail.toLowerCase();
+
         if (errMsg.includes("email not confirmed")) {
-          alert("Email belum dikonfirmasi! Minta superadmin untuk menonaktifkan 'Confirm email' di Supabase Dashboard → Authentication → Providers → Email.");
+          alert("Email belum dikonfirmasi! Matikan 'Confirm email' di Supabase Dashboard → Authentication → Providers → Email, atau buat user via Dashboard UI dengan centang Auto Confirm User.");
         } else if (errMsg.includes("invalid login credentials") || errMsg.includes("invalid")) {
-          alert("Email atau Password salah! Pastikan akun sudah terdaftar.");
+          alert("Email atau Password salah! Pastikan akun sudah dibuat via Supabase Dashboard → Authentication → Users.");
         } else {
-          alert("Login gagal: " + supabaseAuthError.message);
+          alert("Login gagal: " + errDetail);
         }
         return;
       }
