@@ -4,11 +4,11 @@
 | Field | Detail |
 |---|---|
 | **Nama Produk** | LTI Photobooth (AutoMoved) |
-| **Versi Dokumen** | 1.0 |
-| **Tanggal** | 22 Juli 2026 |
-| **Status** | Active Development |
+| **Versi Dokumen** | 2.0 (System v2 Update) |
+| **Tanggal** | 26 Juli 2026 |
+| **Status** | Active Development / Production Ready |
 | **Platform** | Web Application + Desktop (PyWebView) |
-| **Tech Stack** | HTML/CSS/JS, Supabase (BaaS), Deno Edge Functions, Node.js (opsional), Python (opsional) |
+| **Tech Stack** | HTML/CSS/JS, Supabase (BaaS), Deno Edge Functions, Duitku Payment Gateway, MediaPipe Gestures |
 
 ---
 
@@ -646,23 +646,21 @@ Auto_Moved-main/
 | 3 | Pilih Paket (dynamic dari database, filter best seller) | ✅ Done |
 | 4 | Pembayaran QRIS Manual (dynamic CRC16-CCITT) | ✅ Done |
 | 5 | Pembayaran Duitku (Edge Function + Callback) | ✅ Done |
-| 6 | Sesi Foto (split screen, countdown, galeri live) | ✅ Done |
-| 7 | Face Detection + Suara Sambutan | ✅ Done |
-| 8 | Voice Control Preset Pose (10 pose) | ✅ Done |
-| 9 | Pilih Foto & Pilih Frame/Layout | ✅ Done |
-| 10 | Stiker Layer (drag-and-drop) | ✅ Done |
-| 11 | QR Code Download (Google Drive / Supabase) | ✅ Done |
-| 12 | Admin Dashboard (statistik, chart, konfirmasi) | ✅ Done |
-| 13 | Admin CRUD Paket | ✅ Done |
-| 14 | Admin Payment Settings | ✅ Done |
-| 15 | Admin Frame & Stiker Management | ✅ Done |
-| 16 | Superadmin Buat Admin | ✅ Done |
-| 17 | Superadmin Statistik Lintas Cabang | ✅ Done |
-| 18 | Guest Gallery & Result Pages | ✅ Done |
+| 6 | Sesi Foto (unlimited foto per sesi waktu, countdown live) | ✅ Done (v2) |
+| 7 | 2-Second Hold Photo Preview Overlay di Viewport | ✅ Done (v2) |
+| 8 | Viewport Asisten AI Diperbesar & Full Height | ✅ Done (v2) |
+| 9 | Hand Gesture Detection (MediaPipe) — Voice Control Dihapus | ✅ Done (v2) |
+| 10 | Galeri Tamu (Seleksi Maksimal 10 Foto Terpilih) | ✅ Done (v2) |
+| 11 | Editor Frame & Layout (Menggunakan 10 Foto Terpilih) | ✅ Done (v2) |
+| 12 | Scan & Download QR Code (Default 10 Foto Terpilih) | ✅ Done (v2) |
+| 13 | Fitur Unlock Semua Foto via Duitku Gateway API | ✅ Done (v2) |
+| 14 | Admin Kelola Biaya Full Foto (biaya_full_foto per paket) | ✅ Done (v2) |
+| 15 | Stiker Layer (drag-and-drop) | ✅ Done |
+| 16 | Admin Dashboard (statistik, chart, konfirmasi) | ✅ Done |
+| 17 | Admin CRUD Paket & Payment Settings | ✅ Done |
+| 18 | Superadmin Buat Admin & Statistik Lintas Cabang | ✅ Done |
 | 19 | Desktop Wrapper (PyWebView) | ✅ Done |
-| 20 | Auto-detect Branch (URL param / admin session) | ✅ Done |
-| 21 | Hand Gesture Detection (MediaPipe) | ✅ Done |
-| 22 | GIF Generation (gifshot) | ✅ Done |
+| 20 | GIF Generation (gifshot) | ✅ Done |
 
 ---
 
