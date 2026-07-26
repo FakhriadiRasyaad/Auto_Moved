@@ -19,7 +19,7 @@
 Sistem ini dirancang untuk berjalan di **perangkat kios/touchscreen** di lokasi photobooth, dengan dukungan manajemen multi-cabang melalui panel admin dan superadmin.
 
 ### Deployment URL
-> **Production**: `https://axionix-two.vercel.app/`
+> **Production**: `https://axionix.lti.company/`
 
 ---
 

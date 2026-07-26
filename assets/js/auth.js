@@ -3,10 +3,10 @@ import { supabase } from "./supabase.js?v=2";
 document.addEventListener("DOMContentLoaded", () => {
 
   const btnUserFlow = document.getElementById("btn-login-user");
-  const btnAdmin    = document.getElementById("btn-login-admin");
+  const btnAdmin = document.getElementById("btn-login-admin");
 
   function getCredentials() {
-    const email    = document.getElementById("email")?.value.trim() ?? "";
+    const email = document.getElementById("email")?.value.trim() ?? "";
     const password = document.getElementById("password")?.value.trim() ?? "";
     return { email, password };
   }
@@ -65,15 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!authSuccess) {
       // Jika ada error dari Supabase Auth (bukan network error), tampilkan pesan yang jelas
       if (supabaseAuthError) {
-        const errDetail = supabaseAuthError.message || supabaseAuthError.error_description || (typeof supabaseAuthError === "object" ? JSON.stringify(supabaseAuthError) : String(supabaseAuthError));
-        const errMsg = errDetail.toLowerCase();
-
+        const errMsg = supabaseAuthError.message.toLowerCase();
         if (errMsg.includes("email not confirmed")) {
-          alert("Email belum dikonfirmasi! Matikan 'Confirm email' di Supabase Dashboard → Authentication → Providers → Email, atau buat user via Dashboard UI dengan centang Auto Confirm User.");
+          alert("Email belum dikonfirmasi! Minta superadmin untuk menonaktifkan 'Confirm email' di Supabase Dashboard → Authentication → Providers → Email.");
         } else if (errMsg.includes("invalid login credentials") || errMsg.includes("invalid")) {
-          alert("Email atau Password salah! Pastikan akun sudah dibuat via Supabase Dashboard → Authentication → Users.");
+          alert("Email atau Password salah! Pastikan akun sudah terdaftar.");
         } else {
-          alert("Login gagal: " + errDetail);
+          alert("Login gagal: " + supabaseAuthError.message);
         }
         return;
       }
@@ -97,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
           name: "Jakarta",
           code: "JKT"
         }));
-        
+
         // Delay kecil lalu redirect
         await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -123,18 +121,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 4. Simpan session ke localStorage
-    localStorage.setItem("loggedIn",    "true");
-    localStorage.setItem("userEmail",   authData.user.email);
-    localStorage.setItem("userId",      authData.user.id);
-    localStorage.setItem("userRole",    userRole);
-    localStorage.setItem("branchId",    profile.branch_id ?? "");
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("userEmail", authData.user.email);
+    localStorage.setItem("userId", authData.user.id);
+    localStorage.setItem("userRole", userRole);
+    localStorage.setItem("branchId", profile.branch_id ?? "");
     localStorage.setItem("displayName", profile.display_name ?? "");
 
     // 5. Simpan currentAdmin agar kompatibel dengan halaman lain
     localStorage.setItem("currentAdmin", JSON.stringify({
-      id:        authData.user.id,
-      username:  authData.user.email,
-      role:      userRole,
+      id: authData.user.id,
+      username: authData.user.email,
+      role: userRole,
       branch_id: profile.branch_id ?? ""
     }));
 
@@ -158,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     sessionStorage.setItem("selectedBranch", JSON.stringify({
-      id:   profile.branch_id ?? "",
+      id: profile.branch_id ?? "",
       name: branchName,
       code: branchCode
     }));

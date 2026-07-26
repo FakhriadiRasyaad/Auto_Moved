@@ -10,7 +10,7 @@ import webview
 USE_LOCAL_FILES = False
 
 # URL Vercel yang sudah dideploy
-REMOTE_URL = "https://axionix-two.vercel.app/"
+REMOTE_URL = "https://axionix.lti.company/"
 
 # Path ke index.html lokal (relatif terhadap script ini)
 LOCAL_ENTRY = "index.html"

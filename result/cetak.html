@@ -771,7 +771,7 @@
         let origin = window.location.origin;
         let pathname = window.location.pathname;
         if (!origin || origin === "null" || origin.includes("localhost") || origin.includes("127.0.0.1") || origin.startsWith("file:")) {
-          origin = "https://axionix-two.vercel.app";
+          origin = "https://axionix.lti.company";
           pathname = "/result/download.html";
         } else {
           pathname = pathname.replace("cetak.html", "download.html");

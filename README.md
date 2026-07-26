@@ -1,6 +1,6 @@
 # 📸 LTI Photobooth — AutoMoved System (v2.0)
 
-[![Production Site](https://img.shields.io/badge/Production-axionix--two.vercel.app-ff4886?style=for-the-badge&logo=vercel)](https://axionix-two.vercel.app/)
+[![Production Site](https://img.shields.io/badge/Production-axionix.lti.company-ff4886?style=for-the-badge&logo=vercel)](https://axionix.lti.company/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Storage-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
 [![Duitku Gateway](https://img.shields.io/badge/Payment-Duitku%20Gateway-0052CC?style=for-the-badge)](https://www.duitku.com/)
 [![MediaPipe AI](https://img.shields.io/badge/AI-MediaPipe%20Gestures-FF6F00?style=for-the-badge&logo=google)](https://mediapipe.dev/)
