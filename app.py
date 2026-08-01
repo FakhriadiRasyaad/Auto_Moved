@@ -332,41 +332,15 @@ def main():
             hookTriggerPreset();
             autoInitCameraIfNeeded();
 
-            // 1. Cek tombol preset yang aktif
-            var activeChip = document.querySelector('.pose-chip-btn.active, button.active[data-id], .preset-chip.active, [data-preset-active="true"]');
+            // Cek tombol preset yang aktif secara eksplisit
+            var activeChip = document.querySelector('.pose-chip-btn.active, button.active[data-id], .preset-chip.active');
             if (activeChip) {
                 var dataId = activeChip.getAttribute('data-id');
                 if (dataId) {
                     notifyPython(dataId);
-                    return;
-                }
-                var textMatch = activeChip.textContent.match(/\\d+/);
-                if (textMatch) {
-                    notifyPython(textMatch[0]);
-                    return;
                 }
             }
-
-            // 2. Cek overlay text video panduan ("Panduan Preset 1")
-            var overlay = document.querySelector('#videoOverlayText, .video-overlay-text');
-            if (overlay && overlay.textContent) {
-                var m = overlay.textContent.match(/Preset\\s*(\\d+)/i);
-                if (m) {
-                    notifyPython(m[1]);
-                    return;
-                }
-            }
-
-            // 3. Cek AI status badge ("Gestur 1 Jari Diterima!")
-            var badge = document.querySelector('#aiStatusBadge, .ai-status-badge');
-            if (badge && badge.textContent) {
-                var m2 = badge.textContent.match(/(?:Gestur|Preset)\\s*(\\d+)/i);
-                if (m2) {
-                    notifyPython(m2[1]);
-                    return;
-                }
-            }
-        }, 250);
+        }, 300);
     })();
     """
 

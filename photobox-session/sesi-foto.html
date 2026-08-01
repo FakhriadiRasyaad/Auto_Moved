@@ -745,29 +745,60 @@
     }
 
     async function startCamera(deviceId) {
-      if (curStream) { curStream.getTracks().forEach(t => t.stop()); curStream = null; }
+      if (curStream) {
+        try { curStream.getTracks().forEach(t => t.stop()); } catch (e) { }
+        curStream = null;
+      }
       try {
-        curStream = await navigator.mediaDevices.getUserMedia({
-          video: deviceId ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
-            : { width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false
-        });
-        video.srcObject = curStream; await video.play();
+        const constraints = deviceId && deviceId !== "default"
+          ? { video: { deviceId: { exact: deviceId } }, audio: false }
+          : { video: true, audio: false };
+        curStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = curStream;
+        await video.play();
         video.addEventListener("loadedmetadata", () => {
           gestCanvas.width = video.videoWidth; gestCanvas.height = video.videoHeight;
         }, { once: true });
-      } catch (err) { showToast("⚠️ Tidak bisa akses kamera."); }
+        console.log("Kamera berhasil dimulai:", deviceId || "default");
+      } catch (err) {
+        console.warn("startCamera error, mencoba fallback minimal:", err);
+        try {
+          curStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          video.srcObject = curStream;
+          await video.play();
+          console.log("Kamera berhasil dimulai via fallback minimal.");
+        } catch (err2) {
+          console.error("Gagal total buka kamera:", err2);
+          showToast("⚠️ Tidak bisa akses kamera: " + (err2.message || "Error"));
+        }
+      }
     }
 
     async function enumCameras() {
       try {
-        const tmp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        tmp.getTracks().forEach(t => t.stop());
-        const devs = await navigator.mediaDevices.enumerateDevices();
-        const cams = devs.filter(d => d.kind === "videoinput");
-        camSel.innerHTML = cams.map((d, i) => `<option value="${d.deviceId}">${d.label || "Kamera " + (i + 1)}</option>`).join("");
-        if (cams.length > 0) { camSel.value = cams[0].deviceId; await startCamera(cams[0].deviceId); }
-      } catch (err) { showToast("⚠️ Tidak ada kamera terdeteksi."); }
+        let devs = await navigator.mediaDevices.enumerateDevices();
+        let cams = devs.filter(d => d.kind === "videoinput");
+        if (cams.length === 0 || !cams[0].label) {
+          try {
+            const tmp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            tmp.getTracks().forEach(t => t.stop());
+            devs = await navigator.mediaDevices.enumerateDevices();
+            cams = devs.filter(d => d.kind === "videoinput");
+          } catch(e) { }
+        }
+        if (cams.length > 0) {
+          camSel.innerHTML = cams.map((d, i) => `<option value="${d.deviceId}">${d.label || "Kamera " + (i + 1)}</option>`).join("");
+          camSel.value = cams[0].deviceId;
+          await startCamera(cams[0].deviceId);
+        } else {
+          camSel.innerHTML = '<option value="default">Kamera Utama</option>';
+          await startCamera("default");
+        }
+      } catch (err) {
+        console.warn("enumCameras error, mencoba fallback:", err);
+        camSel.innerHTML = '<option value="default">Kamera Utama</option>';
+        await startCamera("default");
+      }
     }
     camSel.addEventListener("change", e => { if (e.target.value) startCamera(e.target.value); });
 
@@ -852,6 +883,9 @@
 
       // If preset is locked, 5s counting, or video is currently playing
       if (lockPreset || isCounting || isPreVideoCounting) {
+        if (results.multiHandLandmarks?.length) {
+          drawHandLandmarks(results);
+        }
         return;
       }
 
