@@ -267,10 +267,6 @@ def main():
     webview_window = window
     api.set_window(webview_window)
 
-    # Setup hardware permissions (camera & mic untuk photobooth)
-    from permissions import setup_permissions
-    setup_permissions(webview_window)
-
     # 🤖 WEB SCRAPER LISTENER (Mendengarkan preset aktif di website -> Kirim ke ESP32)
     SCRAPER_JS = """
     (function() {
@@ -393,13 +389,18 @@ def main():
     t_scraper = threading.Thread(target=scraper_loop, daemon=True)
     t_scraper.start()
 
-    # 6. Start webview (blocking sampai window ditutup)
+    def on_start():
+        from permissions import setup_permissions
+        setup_permissions(webview_window)
 
+    # 6. Start webview (blocking sampai window ditutup)
     try:
         webview.start(
+            on_start,
             http_server=USE_LOCAL_FILES,
             debug=DEBUG_MODE
         )
+
     finally:
         # 7. Cleanup: Pastikan semua resource dilepas saat window ditutup
 
