@@ -9,6 +9,10 @@ import webview
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
+# Otomatis izinkan kamera & mikrofon pada engine Chromium/Edge WebView2
+os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--use-fake-ui-for-media-stream --enable-usermedia-screen-capturing"
+
+
 # ==========================================
 # ⚙️ CONFIGURATION / KONFIGURASI
 # ==========================================
