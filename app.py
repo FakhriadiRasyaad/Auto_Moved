@@ -53,21 +53,23 @@ ESP32_BAUD_RATE = 9600
 ESP32_DEBUG_PRINT = True
 
 # ==========================================
-# KONFIGURASI GESTURE DETECTOR (Python/OpenCV)
+# KONFIGURASI GESTURE DETECTOR / SCRAPPER
 # ==========================================
-# Aktifkan deteksi gesture via Python (OpenCV + MediaPipe) — TIDAK pakai browser
-# Keuntungan: tidak konflik kamera, output langsung di terminal, preview window
-GESTURE_ENABLED = True
+# Nonaktifkan gesture detector OpenCV Python agar TIDAK mengunci kamera.
+# Kamera kini digunakan langsung oleh layer website (Chromium/WebView2).
+# Python akan melakukan "scraping" / mendengarkan status preset yang terdeteksi
+# di website dan mengirim trigger output (1-10) ke ESP32.
+GESTURE_ENABLED = False
 
-# Index kamera untuk gesture detector (0 = kamera utama/built-in)
-# Jika ada 2 kamera dan kamera 0 dipakai browser, coba ganti ke 1
+# Index kamera untuk gesture detector Python (jika GESTURE_ENABLED = True)
 GESTURE_CAMERA_INDEX = 0
 
-# Tampilkan jendela preview kamera kecil dengan landmark tangan
-GESTURE_SHOW_PREVIEW = True
+# Tampilkan jendela preview kamera kecil dengan landmark tangan (jika GESTURE_ENABLED = True)
+GESTURE_SHOW_PREVIEW = False
 
 # Logging level untuk ESP32 handler
 logging.basicConfig(level=logging.INFO, format="[%(name)s] %(message)s")
+
 
 
 # ==========================================
@@ -269,7 +271,106 @@ def main():
     from permissions import setup_permissions
     setup_permissions(webview_window)
 
+    # 🤖 WEB SCRAPER LISTENER (Mendengarkan preset aktif di website -> Kirim ke ESP32)
+    SCRAPER_JS = """
+    (function() {
+        if (window.__esp32ScraperInjected) return;
+        window.__esp32ScraperInjected = true;
+        console.log('[ESP32 Scraper] Injected JS Scraper for preset detection');
+
+        var lastSentPreset = null;
+
+        function notifyPython(presetId) {
+            var pid = parseInt(presetId, 10);
+            if (isNaN(pid) || pid <= 0 || pid > 10) return;
+            if (lastSentPreset === pid) return;
+            lastSentPreset = pid;
+            console.log('[ESP32 Scraper] Preset ' + pid + ' aktif → Kirim ke ESP32');
+            if (window.pywebview && window.pywebview.api && window.pywebview.api.trigger_esp32) {
+                window.pywebview.api.trigger_esp32(pid);
+            }
+        }
+
+        function hookTriggerPreset() {
+            if (window.triggerPreset && !window.__esp32TriggerHooked) {
+                window.__esp32TriggerHooked = true;
+                var orig = window.triggerPreset;
+                window.triggerPreset = function(id, src) {
+                    notifyPython(id);
+                    return orig.apply(this, arguments);
+                };
+                console.log('[ESP32 Scraper] window.triggerPreset hooked!');
+            }
+        }
+
+        hookTriggerPreset();
+
+        setInterval(function() {
+            hookTriggerPreset();
+
+            // 1. Cek tombol preset yang aktif
+            var activeChip = document.querySelector('.pose-chip-btn.active, button.active[data-id], .preset-chip.active, [data-preset-active="true"]');
+            if (activeChip) {
+                var dataId = activeChip.getAttribute('data-id');
+                if (dataId) {
+                    notifyPython(dataId);
+                    return;
+                }
+                var textMatch = activeChip.textContent.match(/\\d+/);
+                if (textMatch) {
+                    notifyPython(textMatch[0]);
+                    return;
+                }
+            }
+
+            // 2. Cek overlay text video panduan ("Panduan Preset 1")
+            var overlay = document.querySelector('#videoOverlayText, .video-overlay-text');
+            if (overlay && overlay.textContent) {
+                var m = overlay.textContent.match(/Preset\\s*(\\d+)/i);
+                if (m) {
+                    notifyPython(m[1]);
+                    return;
+                }
+            }
+
+            // 3. Cek AI status badge ("Gestur 1 Jari Diterima!")
+            var badge = document.querySelector('#aiStatusBadge, .ai-status-badge');
+            if (badge && badge.textContent) {
+                var m2 = badge.textContent.match(/(?:Gestur|Preset)\\s*(\\d+)/i);
+                if (m2) {
+                    notifyPython(m2[1]);
+                    return;
+                }
+            }
+        }, 250);
+    })();
+    """
+
+    def inject_scraper():
+        try:
+            window.evaluate_js(SCRAPER_JS)
+        except Exception as e:
+            pass
+
+    window.events.loaded += inject_scraper
+
+    # Thread periodik untuk memastikan scraper tetap aktif jika ada navigasi halaman SPA
+    import threading
+    import time
+    def scraper_loop():
+        time.sleep(3)
+        while True:
+            try:
+                inject_scraper()
+            except Exception:
+                break
+            time.sleep(2)
+
+    t_scraper = threading.Thread(target=scraper_loop, daemon=True)
+    t_scraper.start()
+
     # 6. Start webview (blocking sampai window ditutup)
+
     try:
         webview.start(
             http_server=USE_LOCAL_FILES,
