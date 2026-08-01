@@ -16,7 +16,7 @@ if sys.stdout.encoding != 'utf-8':
 USE_LOCAL_FILES = False
 
 # URL Vercel yang sudah dideploy
-REMOTE_URL = "https://axionix.lti.company/"
+REMOTE_URL = "http://127.0.0.1:5500/"
 
 # Path ke index.html lokal (relatif terhadap script ini)
 LOCAL_ENTRY = "index.html"
@@ -303,10 +303,34 @@ def main():
             }
         }
 
+        var lastCamRetry = 0;
+        function autoInitCameraIfNeeded() {
+            var now = Date.now();
+            if (now - lastCamRetry < 3000) return;
+            var camSel = document.querySelector('#camSel, select.camera-select, select[id*="cam"]');
+            if (camSel && (camSel.options.length <= 1 || camSel.value === '')) {
+                lastCamRetry = now;
+                console.log('[ESP32 Scraper] Retrying camera initialization...');
+                if (typeof enumCameras === 'function') {
+                    enumCameras();
+                } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
+                        console.log('[ESP32 Scraper] Camera access granted!');
+                        stream.getTracks().forEach(function(t) { t.stop(); });
+                        if (typeof enumCameras === 'function') enumCameras();
+                    }).catch(function(err) {
+                        console.warn('[ESP32 Scraper] Camera request err:', err);
+                    });
+                }
+            }
+        }
+
         hookTriggerPreset();
+        autoInitCameraIfNeeded();
 
         setInterval(function() {
             hookTriggerPreset();
+            autoInitCameraIfNeeded();
 
             // 1. Cek tombol preset yang aktif
             var activeChip = document.querySelector('.pose-chip-btn.active, button.active[data-id], .preset-chip.active, [data-preset-active="true"]');
