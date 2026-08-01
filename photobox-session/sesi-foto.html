@@ -250,9 +250,9 @@
           <!-- Video Guidance Container (Expanded height to match camera layout) -->
           <div
             style="position: relative; width: 100%; flex: 1; min-height: 380px; background: #1A1524; border-radius: 22px; overflow: hidden; border: 2px solid #FFD8E7; display: flex; align-items: center; justify-content: center;">
-            <video id="presetVideoPlayer" playsinline
+            <video id="presetVideoPlayer" playsinline loop
               style="width: 100%; height: 100%; object-fit: cover; display: block;" poster="../img/Style/01.svg">
-              <source src="../img/Sesi_Foto/0721.mp4" type="video/mp4">
+              <source src="../Video_Photo/1.mp4" type="video/mp4">
             </video>
             <div id="videoOverlayText"
               style="position: absolute; bottom: 12px; left: 14px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #fff; padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800;">
@@ -490,6 +490,51 @@
     let mpReadyAt = 0;
     const MP_WARMUP_MS = 3000;
 
+    // ── Deteksi idle finger state ──────────────────────────────────────────────
+    let lastFingerSeenAt = Date.now(); // last time any finger was detected
+    let fingerIdleTimer   = null;      // repeating timer when no finger seen
+    let isPlayingDeteksi  = false;     // true while Deteksi.mp4 is active
+    const FINGER_IDLE_MS  = 3000;     // 3s no finger → play Deteksi
+
+    function playDeteksiVideo() {
+      if (lockPreset || isCounting || isPreVideoCounting) return;
+      isPlayingDeteksi = true;
+      if (presetVideoPlayer) {
+        presetVideoPlayer.ontimeupdate = null;
+        presetVideoPlayer.onended = null;
+        try { presetVideoPlayer.pause(); } catch(e) {}
+        presetVideoPlayer.loop   = false;
+        presetVideoPlayer.muted  = false;
+        presetVideoPlayer.volume = 1.0;
+        presetVideoPlayer.src    = "../Video_Photo/Deteksi.mp4";
+        presetVideoPlayer.currentTime = 0;
+        if (videoOverlayText) videoOverlayText.textContent = "🤖 Tunjukkan Jari Anda!";
+        presetVideoPlayer.play().catch(() => {});
+        // setelah video selesai, biarkan diam – timer akan memutar lagi jika masih idle
+        presetVideoPlayer.onended = () => { isPlayingDeteksi = false; };
+      }
+    }
+
+    function stopDeteksiCycle() {
+      if (fingerIdleTimer) { clearInterval(fingerIdleTimer); fingerIdleTimer = null; }
+      isPlayingDeteksi = false;
+      // Bersihkan handler onended bawaan Deteksi agar tidak bentrok
+      if (presetVideoPlayer) presetVideoPlayer.onended = null;
+    }
+
+    function startFingerIdleCycle() {
+      if (fingerIdleTimer) return; // sudah berjalan
+      // Putar langsung pertama kali
+      playDeteksiVideo();
+      // Kemudian ulangi setiap 3 detik jika masih idle
+      fingerIdleTimer = setInterval(() => {
+        if (!lockPreset && !isCounting && !isPreVideoCounting && !isPlayingDeteksi) {
+          playDeteksiVideo();
+        }
+      }, FINGER_IDLE_MS);
+    }
+    // ──────────────────────────────────────────────────────────────────────────
+
     function renderChips() {
       $("chipsEl").innerHTML = PRESETS.map(p =>
         `<button type="button" class="pose-chip-btn ${p.id === 1 ? 'active' : ''}" data-id="${p.id}" onclick="triggerPreset(${p.id})">${p.label}</button>`
@@ -541,25 +586,31 @@
       const icon = src === "gesture" ? "✋" : "👆";
       showToast(`${icon} Preset ${id}: ${p.label}`, 3500);
 
-      // Play corresponding preset video guidance layout WITH AUDIO ENABLED
+      // Hentikan siklus Deteksi dulu sebelum preset aktif
+      stopDeteksiCycle();
+      lastFingerSeenAt = Date.now(); // reset idle timer
+
+      // Play corresponding preset video guidance layout WITH AUDIO ENABLED (no loop)
       if (presetVideoPlayer) {
         presetVideoPlayer.ontimeupdate = null;
         presetVideoPlayer.onended = null;
         try { presetVideoPlayer.pause(); } catch (e) { }
 
         if (videoOverlayText) videoOverlayText.textContent = `Panduan Preset ${id}`;
-        presetVideoPlayer.muted = false;
+        presetVideoPlayer.muted  = false;
         presetVideoPlayer.volume = 1.0;
-        presetVideoPlayer.src = `../img/Sesi_Foto/video${id}.mp4`;
+        presetVideoPlayer.loop   = false; // play once – stop after video ends
+        presetVideoPlayer.src    = `../Video_Photo/${id}.mp4`;
         try { presetVideoPlayer.currentTime = 0; } catch (e) { }
 
         const playPromise = presetVideoPlayer.play();
         if (playPromise !== undefined) {
           playPromise.catch(err => {
-            console.warn(`Video guide for preset ${id} not found, playing fallback tutorial:`, err);
-            presetVideoPlayer.src = `../img/Sesi_Foto/0721.mp4`;
+            console.warn(`Video_Photo/${id}.mp4 not found, playing fallback (1.mp4):`, err);
+            presetVideoPlayer.src    = `../Video_Photo/1.mp4`;
+            presetVideoPlayer.loop   = false;
             try { presetVideoPlayer.currentTime = 0; } catch (e) { }
-            presetVideoPlayer.muted = false;
+            presetVideoPlayer.muted  = false;
             presetVideoPlayer.volume = 1.0;
             presetVideoPlayer.play().catch(() => { });
           });
@@ -811,9 +862,17 @@
           aiStatusBadge.style.color = "#FF4886";
         }
         lastFingerCount = -1;
-        gestStableTime = 0;
+        gestStableTime  = 0;
+        // Mulai siklus Deteksi jika sudah 3 detik tanpa jari
+        if ((now - lastFingerSeenAt) >= FINGER_IDLE_MS && !fingerIdleTimer) {
+          startFingerIdleCycle();
+        }
         return;
       }
+
+      // Ada jari terdeteksi → stop siklus Deteksi, reset idle timer
+      stopDeteksiCycle();
+      lastFingerSeenAt = now;
 
       drawHandLandmarks(results);
       let total = 0;
@@ -823,9 +882,9 @@
       if (total > 0) {
         if (total !== lastFingerCount) {
           lastFingerCount = total;
-          gestStableTime = now;
+          gestStableTime  = now;
         } else {
-          const stable = now - gestStableTime;
+          const stable   = now - gestStableTime;
           const warmedUp = mpReadyAt > 0 && (now - mpReadyAt) >= MP_WARMUP_MS;
 
           // 1 SECOND HOLD CONFIRMS FINGER GESTURE & STARTS 5S PRE-VIDEO COUNTDOWN!
@@ -838,7 +897,7 @@
         }
       } else {
         lastFingerCount = -1;
-        gestStableTime = 0;
+        gestStableTime  = 0;
         if (aiStatusBadge) {
           aiStatusBadge.innerHTML = `🤖 <b>Asisten AI Online</b> — ✋ 0 jari terdeteksi`;
           aiStatusBadge.style.background = "#FFF0F5";
@@ -1076,9 +1135,35 @@
       closeModal(); showToast("✅ Preset disimpan!", 3000);
     };
 
+    function updatePresetVideo(presetId) {
+      if (presetVideoPlayer) {
+        presetVideoPlayer.src = `../Video_Photo/${presetId}.mp4`;
+        presetVideoPlayer.muted = true;
+        presetVideoPlayer.loop = true;
+        presetVideoPlayer.currentTime = 0;
+        presetVideoPlayer.play().catch(() => {});
+        if (videoOverlayText) videoOverlayText.textContent = `Panduan Preset ${presetId}`;
+      }
+    }
+
     renderChips(); enumCameras(); startTimer(); updateGallery(); updateFilterBadge();
     const initFs = buildFilter(FILTER_CFG); if (initFs !== "none") video.style.filter = initFs;
     loadFace(); initMediaPipe();
+
+    // ── Inisialisasi: saat MP siap, langsung putar Deteksi karena belum ada jari ──
+    if (presetVideoPlayer) {
+      // Tampilkan frame pertama Deteksi.mp4 sebagai poster (muted, tidak autoplay)
+      presetVideoPlayer.src    = "../Video_Photo/Deteksi.mp4";
+      presetVideoPlayer.muted  = true;
+      presetVideoPlayer.loop   = false;
+      presetVideoPlayer.currentTime = 0;
+      presetVideoPlayer.load();
+      if (videoOverlayText) videoOverlayText.textContent = "🤖 Tunjukkan Jari Anda!";
+    }
+    // Setelah warm-up MP (3 detik), mulai siklus idle Deteksi
+    setTimeout(() => {
+      if (!lockPreset && !isCounting) startFingerIdleCycle();
+    }, MP_WARMUP_MS);
 
     if (NAMA) {
       setTimeout(() => {
