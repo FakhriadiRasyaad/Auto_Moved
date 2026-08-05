@@ -290,8 +290,7 @@ def main():
         width=WINDOW_WIDTH,
         height=WINDOW_HEIGHT,
         fullscreen=FULLSCREEN,
-        js_api=api,
-        icon=icon_path if os.path.exists(icon_path) else None
+        js_api=api
     )
     webview_window = window
     api.set_window(webview_window)
