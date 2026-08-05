@@ -1,6 +1,25 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+
+# ── DLL & PYTHON RUNTIME PATH RESOLUTION FOR CLEAN WINDOWS DEVICES ──
+if getattr(sys, 'frozen', False):
+    exe_dir = os.path.dirname(sys.executable)
+    bundle_dir = getattr(sys, '_MEIPASS', exe_dir)
+    internal_dir = os.path.join(exe_dir, '_internal')
+
+    for d in [exe_dir, bundle_dir, internal_dir]:
+        if os.path.exists(d):
+            os.environ['PATH'] = d + os.path.pathsep + os.environ.get('PATH', '')
+            if hasattr(os, 'add_dll_directory'):
+                try:
+                    os.add_dll_directory(d)
+                except Exception:
+                    pass
+
+    os.environ['PYTHONHOME'] = bundle_dir
+    os.environ['PYTHONPATH'] = bundle_dir
+
 import subprocess
 import logging
 import webview
@@ -20,7 +39,7 @@ os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--use-fake-ui-for-media-s
 USE_LOCAL_FILES = False
 
 # URL Vercel yang sudah dideploy
-REMOTE_URL = "http://127.0.0.1:5500/"
+REMOTE_URL = "https://axionix.lti.company/"
 
 # Path ke index.html lokal (relatif terhadap script ini)
 LOCAL_ENTRY = "index.html"
@@ -30,7 +49,7 @@ START_DRIVE_SERVER = False
 DRIVE_SERVER_PATH = "server-drive.js"
 
 # Pengaturan Window
-WINDOW_TITLE = "LTI Photobooth"
+WINDOW_TITLE = "Axionix Photo"
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 800
 FULLSCREEN = False  # Set ke True untuk mode kiosk/layar penuh tanpa border
