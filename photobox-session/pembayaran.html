@@ -466,7 +466,7 @@
       const out = []; let i = 0;
       while (i < str.length) {
         const tag = str.slice(i, i + 2);
-        const len = Number(str.slice(i + 4, i + 4)); // Wait length extraction
+        const len = Number(str.slice(i + 2, i + 4));
         const val = str.slice(i + 4, i + 4 + len);
         if (Number.isNaN(len) || val.length !== len) throw new Error("Format TLV QRIS dasar tidak valid.");
         out.push({ tag, value: val });

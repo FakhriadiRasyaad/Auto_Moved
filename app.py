@@ -55,7 +55,7 @@ WINDOW_HEIGHT = 800
 FULLSCREEN = False  # Set ke True untuk mode kiosk/layar penuh tanpa border
 
 # Aktifkan DevTools (bisa klik kanan -> Inspect Element / Ctrl+Shift+I)
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 # ==========================================
@@ -279,13 +279,19 @@ def main():
         api.set_esp32(esp32)
 
     # WebView settings
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    icon_path = os.path.join(base_dir, 'app_icon.ico')
+    if not os.path.exists(icon_path):
+        icon_path = os.path.join(base_dir, 'img', 'Logo_photobooth_LTI.png')
+
     window = webview.create_window(
         title=WINDOW_TITLE,
         url=target,
         width=WINDOW_WIDTH,
         height=WINDOW_HEIGHT,
         fullscreen=FULLSCREEN,
-        js_api=api
+        js_api=api,
+        icon=icon_path if os.path.exists(icon_path) else None
     )
     webview_window = window
     api.set_window(webview_window)
@@ -384,6 +390,15 @@ def main():
     def on_start():
         from permissions import setup_permissions
         setup_permissions(webview_window)
+
+        try:
+            from PyQt5.QtWidgets import QApplication
+            from PyQt5.QtGui import QIcon
+            app = QApplication.instance()
+            if app and os.path.exists(icon_path):
+                app.setWindowIcon(QIcon(icon_path))
+        except Exception:
+            pass
 
     # 6. Start webview (blocking sampai window ditutup)
     try:

@@ -29,8 +29,15 @@ def setup_permissions(window):
                         logger.info(f"[QtWebEngine] ✅ Auto-granted permission for feature: {feature}")
 
                     page.featurePermissionRequested.connect(grant_permission)
+
+                    # Prevent app closure on target="_blank" or window.open links (e.g., Duitku payment portal)
+                    def handle_create_window(win_type):
+                        logger.info(f"[QtWebEngine] Redirecting new window/popup request ({win_type}) to main window.")
+                        return page
+
+                    page.createWindow = handle_create_window
                     handler_bound = True
-                    logger.info("[QtWebEngine] ✅ Permission handler bound successfully.")
+                    logger.info("[QtWebEngine] ✅ Permission & createWindow handler bound successfully.")
                     return
                 except Exception as ex_qt:
                     logger.warning(f"[QtWebEngine] Permission setup note: {ex_qt}")
