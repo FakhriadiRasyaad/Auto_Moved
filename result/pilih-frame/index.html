@@ -12,7 +12,9 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js"></script>
 
   <!-- Axionix Design System -->
@@ -240,6 +242,90 @@
       flex-direction: column;
       gap: 10px;
       margin-top: 10px;
+    }
+
+    /* ── RESPONSIVE MEDIA QUERIES ── */
+    @media (max-width: 1200px) {
+      .editor-page {
+        grid-template-columns: 300px 1fr 280px;
+        gap: 12px;
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      body {
+        overflow-y: auto !important;
+      }
+
+      .global-header {
+        height: auto;
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .steps {
+        overflow-x: auto;
+        max-width: 100%;
+        padding-bottom: 4px;
+      }
+
+      .editor-page {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height: auto;
+        min-height: calc(100vh - 80px);
+        overflow-y: auto;
+        gap: 16px;
+        padding: 12px;
+      }
+
+      .editor-page .col {
+        height: auto;
+        min-height: 380px;
+      }
+
+      /* On mobile/tablet, order the Preview Canvas on top! */
+      .editor-page .col:nth-child(2) {
+        order: 1;
+      }
+
+      .editor-page .col:nth-child(1) {
+        order: 2;
+      }
+
+      .editor-page .col:nth-child(3) {
+        order: 3;
+      }
+
+      .canvas-wrapper {
+        min-height: 280px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .global-header .logo-text {
+        font-size: 16px;
+      }
+
+      .step-item-wrap span:last-child {
+        font-size: 10px;
+      }
+
+      .col-header {
+        padding: 0 14px;
+        font-size: 12px;
+      }
+
+      .col-body {
+        padding: 12px;
+      }
+
+      .canvas-wrapper {
+        min-height: 220px;
+        padding: 8px;
+      }
     }
 
     /* ── BUTTONS ── */
@@ -521,7 +607,7 @@
       border-radius: 10px;
       object-fit: cover;
       margin-bottom: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
 
     .filter-item span {
@@ -703,7 +789,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       transition: background 0.2s;
     }
 
@@ -905,7 +991,8 @@
   <div id="loadingOverlay" style="display: flex;">
     <div style="font-size: 3rem; animation: pulse 1.5s infinite alternate;">📸</div>
     <p style="font-size: 15px; color: #3A2B42; font-weight: 900;">Memuat foto dari server...</p>
-    <p id="loadingMsg" style="font-size: 12px; color: #7A6988; max-width: 80%; text-align: center; font-weight: 700;"></p>
+    <p id="loadingMsg" style="font-size: 12px; color: #7A6988; max-width: 80%; text-align: center; font-weight: 700;">
+    </p>
   </div>
 
   <!-- Global Header Bar -->
@@ -916,7 +1003,7 @@
       </div>
       <span class="logo-text">PHOTOBOOTH ✨</span>
     </div>
-    
+
     <div class="steps">
       <div class="step-item-wrap">
         <div class="step" onclick="history.back()">1</div>
@@ -942,7 +1029,7 @@
 
   <!-- Editor Main 3 Columns Container -->
   <div class="editor-page">
-    
+
     <!-- COLUMN 1: PREVIEW CARD -->
     <div class="col preview-col">
       <div class="col-header">📷 PREVIEW ✨</div>
@@ -950,8 +1037,10 @@
         <div class="canvas-wrapper">
           <canvas id="previewCanvas"></canvas>
           <div id="stikerLayer"></div>
-          <img src="../../img/Style/11.svg" alt="Sparkle" style="position: absolute; top: 10px; right: 12px; width: 18px; opacity: 0.8;" />
-          <img src="../../img/Style/09.svg" alt="Heart" style="position: absolute; bottom: 12px; left: 12px; width: 20px; opacity: 0.8;" />
+          <img src="../../img/Style/11.svg" alt="Sparkle"
+            style="position: absolute; top: 10px; right: 12px; width: 18px; opacity: 0.8;" />
+          <img src="../../img/Style/09.svg" alt="Heart"
+            style="position: absolute; bottom: 12px; left: 12px; width: 20px; opacity: 0.8;" />
         </div>
         <div class="preview-actions">
           <button class="btn-cetak" id="btnCetak" onclick="lanjut()">🖨️ Cetak / Continue ✨</button>
@@ -994,14 +1083,16 @@
         <div class="tab-panel" id="tabStiker">
           <p class="section-title">TAP UNTUK TAMBAH</p>
           <div class="stiker-grid" id="stikerList">
-            <p style="font-size:11px; color:#7A6988; grid-column:1/-1; text-align:center; font-weight:700;">Loading stickers...</p>
+            <p style="font-size:11px; color:#7A6988; grid-column:1/-1; text-align:center; font-weight:700;">Loading
+              stickers...</p>
           </div>
           <p class="section-title" style="margin-top:10px;">STIKER AKTIF</p>
           <div id="activeStikers">
             <p style="font-size:11px; color:#7A6988; font-weight:700;">Belum ada stiker.</p>
           </div>
           <button onclick="clearAllStiker()"
-            style="margin-top:6px; width:100%; background:#FFF0F5; color:#FF4886; border:1.5px solid #FFD8E7; border-radius:14px; padding:8px; font-size:12px; font-weight:800; cursor:pointer; transition:all 0.2s ease;">🗑️ Hapus Semua</button>
+            style="margin-top:6px; width:100%; background:#FFF0F5; color:#FF4886; border:1.5px solid #FFD8E7; border-radius:14px; padding:8px; font-size:12px; font-weight:800; cursor:pointer; transition:all 0.2s ease;">🗑️
+            Hapus Semua</button>
         </div>
       </div>
     </div>
@@ -1010,13 +1101,15 @@
     <div class="col slot-col">
       <div class="col-header">🎯 SUSUN FOTO KE SLOT</div>
       <div class="col-body">
-        <p class="slot-info">⬆ Drag foto dari bawah ke slot layout...</p>
+        <p class="slot-info">⬆ Drag/Klik foto dari bawah ke slot layout...</p>
         <div class="slot-grid" id="slotGrid">
-          <p style="font-size:11px; color:#7A6988; text-align:center; padding:16px 0; font-weight:700;">← Pilih layout terlebih dahulu</p>
+          <p style="font-size:11px; color:#7A6988; text-align:center; padding:16px 0; font-weight:700;">← Pilih layout
+            terlebih dahulu</p>
         </div>
         <p class="bank-title">FOTO TERSEDIA:</p>
         <div class="foto-bank" id="fotoBank">
-          <p style="font-size:11px; color:#7A6988; text-align:center; padding:10px 0; font-weight:700;">Memuat foto...</p>
+          <p style="font-size:11px; color:#7A6988; text-align:center; padding:10px 0; font-weight:700;">Memuat foto...
+          </p>
         </div>
       </div>
     </div>
@@ -1087,7 +1180,7 @@
             }
           }
           if (!all.length) throw new Error("Tidak ada foto di folder sesi ini.");
-          
+
           const selRaw = sessionStorage.getItem("guestSelectedPhotos");
           if (selRaw) {
             try {

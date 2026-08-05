@@ -24,6 +24,27 @@
       window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search);
     }
   </script>
+
+  <style>
+    @media (max-width: 576px) {
+      body.customer-page {
+        padding: 16px !important;
+      }
+
+      .thankyou-container {
+        padding: 24px 18px !important;
+        border-radius: 24px !important;
+      }
+
+      .thankyou-icon {
+        font-size: 54px !important;
+      }
+
+      .thankyou-heading {
+        font-size: 24px !important;
+      }
+    }
+  </style>
 </head>
 
 <body class="customer-page">

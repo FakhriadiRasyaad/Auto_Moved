@@ -11,6 +11,12 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
     rel="stylesheet" />
 
+  <!-- Library QR Code -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/png" href="../img/Logo_photobooth_LTI.png" />
+
   <!-- Axionix Design System -->
   <link rel="stylesheet" href="../assets/css/design-system.css" />
   <link rel="stylesheet" href="../assets/css/components.css" />
@@ -37,9 +43,15 @@
 
     <p class="font-bold text-lg text-primary">Sesi foto kamu telah selesai! ✨</p>
 
-    <p class="thankyou-subtext text-sm">
-      Silakan menuju ke layar kasir / area cetak di depan untuk memilih frame dan mencetak foto terbaik kamu.
+    <p class="thankyou-subtext text-sm" style="margin-bottom: 12px;">
+      Silakan menuju ke layar kasir / area cetak di depan untuk memilih frame dan mencetak foto terbaik kamu atau silahkan scan qr code dibawah ini untuk memilih frame dan foto.
     </p>
+
+    <!-- QR Code Box -->
+    <div style="background: #FFF0F5; border: 2px dashed #FFD8E7; border-radius: 20px; padding: 16px; margin: 12px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(255, 72, 134, 0.08);">
+      <canvas id="qrCanvas" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #FFFFFF; padding: 8px;"></canvas>
+      <span style="font-size: 11px; font-weight: 800; color: #FF4886; letter-spacing: 0.3px;">Scan QR Code di atas untuk akses dari HP 📱</span>
+    </div>
 
     <!-- Progress bar countdown -->
     <div style="width: 100%; margin-top: var(--space-4);">
@@ -51,6 +63,20 @@
   </div>
 
   <script>
+    // Generate QR Code
+    if (typeof QRCode !== "undefined") {
+      QRCode.toCanvas(document.getElementById("qrCanvas"), "https://axionix.lti.company/result/guest-login/", {
+        width: 150,
+        margin: 1,
+        color: {
+          dark: "#3A2B42",
+          light: "#FFFFFF"
+        }
+      }, function (error) {
+        if (error) console.error("QR Code Error:", error);
+      });
+    }
+
     let timeLeft = 15;
     const progressFill = document.getElementById("progressFill");
 

@@ -25,6 +25,139 @@
     .hidden {
       display: none !important;
     }
+
+    .guest-login-card {
+      max-width: 920px;
+      width: 100%;
+      min-height: auto;
+      position: relative;
+      z-index: 10;
+      background: #FFFFFF;
+      border: 3px solid #FFD8E7;
+      border-radius: 36px;
+      padding: 36px 40px;
+      box-shadow: 0 20px 50px rgba(255, 110, 165, 0.16);
+      box-sizing: border-box;
+    }
+
+    .login-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .form-inner-card {
+      background: #FFFFFF;
+      border: 2px solid #FFD8E7;
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(255, 110, 165, 0.08);
+      box-sizing: border-box;
+    }
+
+    /* Mobile-specific text toggle */
+    .mobile-subtext,
+    .mobile-btn-text,
+    .mobile-privacy-text {
+      display: none;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .guest-login-card {
+        padding: 24px 24px;
+        border-radius: 28px;
+      }
+
+      .login-grid {
+        grid-template-columns: 1fr 260px;
+        gap: 20px;
+      }
+
+      .background-decoration {
+        opacity: 0.4;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .login-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .right-mockup-col,
+      .background-decoration,
+      .floating-items {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      body.korean-register-page {
+        padding: 12px 10px !important;
+      }
+
+      .guest-login-card {
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      .form-inner-card {
+        padding: 22px 16px !important;
+        border-radius: 24px !important;
+        border: 2.5px solid #FFD8E7 !important;
+        background: #FFFFFF !important;
+        box-shadow: 0 12px 36px rgba(255, 110, 165, 0.16) !important;
+      }
+
+      .form-header-box {
+        gap: 0 !important;
+        margin-bottom: 16px !important;
+      }
+
+      .form-header-icon {
+        display: none !important;
+      }
+
+      .form-header-title {
+        font-size: 19px !important;
+        text-align: center;
+        width: 100%;
+      }
+
+      .form-header-sub {
+        font-size: 12px !important;
+        text-align: center;
+        margin-top: 4px !important;
+        width: 100%;
+      }
+
+      .desktop-subtext,
+      .desktop-btn-text,
+      .desktop-privacy-text {
+        display: none !important;
+      }
+
+      .mobile-subtext,
+      .mobile-btn-text,
+      .mobile-privacy-text {
+        display: inline !important;
+      }
+
+      #btnLogin {
+        height: 48px !important;
+        font-size: 14px !important;
+        padding: 0 12px !important;
+      }
+
+      .brand-header {
+        justify-content: center !important;
+        margin-bottom: 14px !important;
+      }
+    }
   </style>
   <script>
     if (window.location.pathname.endsWith('/index.html')) {
@@ -82,8 +215,7 @@
   </div>
 
   <!-- Main Korean Pastel Card Container -->
-  <div class="customer-container"
-    style="max-width: 920px; width: 100%; min-height: auto; position: relative; z-index: 10; background: #FFFFFF; border: 3px solid #FFD8E7; border-radius: 36px; padding: 36px 40px; box-shadow: 0 20px 50px rgba(255, 110, 165, 0.16);">
+  <div class="customer-container guest-login-card">
 
     <!-- Top Header Brand Logo -->
     <div class="customer-logo brand-header mb-4">
@@ -97,23 +229,23 @@
     </div>
 
     <!-- 2 Column Split Grid Layout (Left Form vs Right Visual Graphic Mockup) -->
-    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 36px; align-items: center;">
+    <div class="login-grid">
 
       <!-- Left Column: Form Card -->
-      <div
-        style="background: #FFFFFF; border: 2px solid #FFD8E7; border-radius: 28px; padding: 28px; box-shadow: 0 10px 30px rgba(255, 110, 165, 0.08);">
+      <div class="form-inner-card">
 
         <!-- Form Header Box -->
-        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
-          <div
+        <div class="form-header-box" style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+          <div class="form-header-icon"
             style="width: 50px; height: 50px; background: #FFF0F5; border: 2px solid #FFD8E7; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(255, 110, 165, 0.12); flex-shrink: 0;">
             📷
           </div>
-          <div>
-            <h1 style="font-size: 20px; font-weight: 900; color: #3A2B42; margin: 0; line-height: 1.2;">Ambil Foto Kamu!
-              📷</h1>
-            <p style="font-size: 11px; font-weight: 600; color: #7A6988; margin-top: 4px; line-height: 1.3;">Masukkan
-              Nama &amp; Nomor HP yang terdaftar saat foto di photobooth!</p>
+          <div style="flex: 1;">
+            <h1 class="form-header-title" style="font-size: 20px; font-weight: 900; color: #3A2B42; margin: 0; line-height: 1.2;">Ambil Foto Kamu! 📷</h1>
+            <p class="form-header-sub" style="font-size: 11px; font-weight: 600; color: #7A6988; margin-top: 4px; line-height: 1.3;">
+              <span class="desktop-subtext">Masukkan Nama &amp; Nomor HP yang terdaftar saat foto di photobooth!</span>
+              <span class="mobile-subtext">Masukkan Nama &amp; No. HP terdaftar!</span>
+            </p>
           </div>
         </div>
 
@@ -154,7 +286,8 @@
           <!-- Submit Button -->
           <button id="btnLogin" type="submit" class="customer-btn-primary korean-btn-gradient"
             style="width: 100%; height: 50px; border-radius: 25px; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(255, 111, 162, 0.35); margin-top: 4px;">
-            <span>✨ Lihat &amp; Cetak Foto Saya</span>
+            <span class="desktop-btn-text">✨ Lihat &amp; Cetak Foto Saya</span>
+            <span class="mobile-btn-text">✨ Lihat Foto Saya</span>
           </button>
 
         </form>
@@ -167,7 +300,8 @@
         <!-- Privacy Footer Note -->
         <div
           style="font-size: 11px; font-weight: 700; color: #9B8AA9; text-align: center; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>🔒 Data kamu dijaga dan hanya untuk keperluan cetak foto</span>
+          <span class="desktop-privacy-text">🔒 Data kamu dijaga dan hanya untuk keperluan cetak foto</span>
+          <span class="mobile-privacy-text">🔒 Data kamu aman untuk cetak foto</span>
         </div>
 
         <!-- Navigation Link -->
@@ -181,7 +315,7 @@
       </div>
 
       <!-- Right Column: Visual Graphics & Characters -->
-      <div
+      <div class="right-mockup-col"
         style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
 
         <!-- Photo Strip Sample Graphic Mockup -->
