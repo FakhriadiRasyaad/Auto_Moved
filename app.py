@@ -120,6 +120,7 @@ class Api:
     def __init__(self):
         self._window = None
         self._esp32 = None
+        self._payment_window = None
 
     def set_window(self, window):
         self._window = window
@@ -127,6 +128,61 @@ class Api:
     def set_esp32(self, esp32_handler):
         """Inject ESP32Handler instance ke dalam Api."""
         self._esp32 = esp32_handler
+
+    def open_payment_popup(self, url: str) -> dict:
+        """
+        Buka jendela pop-up pembayaran khusus (Duitku / Payment Gateway).
+        """
+        try:
+            if self._payment_window:
+                try:
+                    self._payment_window.destroy()
+                except Exception:
+                    pass
+                self._payment_window = None
+
+            print(f"[PAYMENT POPUP] Membuka jendela pop-up pembayaran: {url}", flush=True)
+            win = webview.create_window(
+                title="Pembayaran - Axionix Photo",
+                url=url,
+                width=720,
+                height=740,
+                resizable=True,
+                on_top=True
+            )
+            self._payment_window = win
+
+            # Pass Chrome 122 User-Agent and storage settings to payment popup window
+            def bind_popup_perm():
+                try:
+                    from permissions import setup_permissions
+                    setup_permissions(win)
+                except Exception as ex:
+                    logging.warning(f"[PAYMENT POPUP] Setup permissions note: {ex}")
+
+            try:
+                win.events.shown += bind_popup_perm
+            except Exception:
+                pass
+            bind_popup_perm()
+
+            return {"success": True}
+        except Exception as e:
+            logging.error(f"[PAYMENT POPUP] Gagal membuka window: {e}")
+            return {"success": False, "error": str(e)}
+
+    def close_payment_popup(self) -> dict:
+        """
+        Tutup jendela pop-up pembayaran secara otomatis saat status lunas.
+        """
+        try:
+            if self._payment_window:
+                print("[PAYMENT POPUP] Menutup jendela pop-up pembayaran...", flush=True)
+                self._payment_window.destroy()
+                self._payment_window = None
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     def close_app(self):
         print("Closing application...")
