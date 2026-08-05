@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 gesture_detector.py
 Deteksi gesture jari menggunakan OpenCV + MediaPipe Hands.
@@ -82,16 +82,20 @@ class GestureDetector:
             return None
 
         for idx in ([self.camera_index] + [i for i in range(4) if i != self.camera_index]):
-            cap = cv2.VideoCapture(idx)
-            if cap.isOpened():
-                ret, _ = cap.read()
-                if ret:
-                    print(f"[GESTURE] Kamera ditemukan di index {idx}", flush=True)
-                    self.camera_index = idx
-                    return cap
-                cap.release()
+            try:
+                cap = cv2.VideoCapture(idx)
+                if cap.isOpened():
+                    ret, _ = cap.read()
+                    if ret:
+                        print(f"[GESTURE] Kamera OpenCV ditemukan di index {idx}", flush=True)
+                        self.camera_index = idx
+                        return cap
+                    cap.release()
+            except Exception:
+                pass
 
-        print("[GESTURE] ERROR: Tidak ada kamera yang bisa dibuka!", flush=True)
+        print("[GESTURE] Kamera OpenCV tidak dapat dibuka langsung (sedang dipakai Browser).", flush=True)
+        print("[GESTURE] → Deteksi gesture & garis-garis di tangan otomatis aktif di Web Overlay Browser.", flush=True)
         return None
 
     def _run(self):

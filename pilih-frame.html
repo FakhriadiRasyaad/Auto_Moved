@@ -861,13 +861,23 @@
         window._sessionFolderPath = sfp;
         window._sessionGuestNama = sessionStorage.getItem("sessionGuestNama") || "user";
         window._sessionBranchId = sessionStorage.getItem("sessionBranchId") || "";
-      } else if (gd && br) {
-        try { window._guestData = JSON.parse(gd); window._branchData = JSON.parse(br); window._isAdminFlow = false; }
-        catch (e) { window.location.href = "guest-login.html"; }
+      } else if (gd) {
+        try {
+          window._guestData = JSON.parse(gd);
+          const guestObj = window._guestData?.guest;
+          let branchObj = br ? JSON.parse(br) : null;
+          if (!branchObj && guestObj?.branch_id) {
+            branchObj = { id: guestObj.branch_id };
+            sessionStorage.setItem("selectedBranch", JSON.stringify(branchObj));
+          }
+          window._branchData = branchObj;
+          window._isAdminFlow = false;
+        }
+        catch (e) { window.location.href = "result/guest-login/"; }
       } else {
         const cu = localStorage.getItem("currentUser"), ca = localStorage.getItem("currentAdmin");
         if (cu && ca) window.location.href = "../pilih-foto.html";
-        else window.location.href = "guest-login.html";
+        else window.location.href = "result/guest-login/";
       }
     })();
   </script>
@@ -1009,7 +1019,7 @@
 
     const IS_ADMIN_FLOW = !!window._isAdminFlow;
     const guestInfo = IS_ADMIN_FLOW ? { nama: window._sessionGuestNama || "user" } : (window._guestData?.guest ?? { nama: "guest" });
-    const branchId = IS_ADMIN_FLOW ? window._sessionBranchId : (window._branchData?.id ?? "");
+    const branchId = IS_ADMIN_FLOW ? window._sessionBranchId : (window._branchData?.id || window._guestData?.guest?.branch_id || "");
     const ALLOWED = ['asli', 'noedit'];
 
     let fotos = [], fotosMeta = [], dragSrc = null;
@@ -1067,12 +1077,23 @@
 
       lm.textContent = "Mencari folder sesi...";
       try {
-        const { data: folders, error: listErr } = await supabase.storage.from("photos").list(branchId, { limit: 100, sortBy: { column: "name", order: "desc" } });
-        if (listErr) throw listErr; if (!folders?.length) throw new Error("Tidak ada folder ditemukan.");
-        const prefix = guestInfo.nama + '_';
-        const gf = folders.filter(f => f.name.startsWith(prefix) && !f.metadata);
+        const activeBranchId = branchId || "b149999f-33ec-4342-95bb-4f4961956c0b";
+        let { data: folders, error: listErr } = await supabase.storage.from("photos").list(activeBranchId, { limit: 100, sortBy: { column: "name", order: "desc" } });
+        if (!folders || !folders.length) {
+          const { data: rootFolders } = await supabase.storage.from("photos").list("", { limit: 100, sortBy: { column: "name", order: "desc" } });
+          if (rootFolders) folders = rootFolders;
+        }
+        if (!folders?.length) throw new Error("Tidak ada folder ditemukan.");
+        const prefix = (guestInfo.nama || "").toLowerCase().trim() + '_';
+        let gf = folders.filter(f => !f.metadata && f.name.toLowerCase().startsWith(prefix));
+        if (!gf.length) {
+          gf = folders.filter(f => !f.metadata && guestInfo.nama && f.name.toLowerCase().includes(guestInfo.nama.toLowerCase().trim()));
+        }
+        if (!gf.length) {
+          gf = folders.filter(f => !f.metadata);
+        }
         if (!gf.length) throw new Error("Belum ada foto untuk sesi ini.");
-        const latest = gf[0]; sessionFolderPath = `${branchId}/${latest.name}`; lm.textContent = `Folder: ${latest.name}`;
+        const latest = gf[0]; sessionFolderPath = `${activeBranchId}/${latest.name}`; lm.textContent = `Folder: ${latest.name}`;
         const { data: sub } = await supabase.storage.from("photos").list(sessionFolderPath, { limit: 20 });
         if (!sub) throw new Error("Folder sesi kosong.");
         let all = [];
@@ -1539,7 +1560,7 @@
           gifPath: uploadedGifPath,
         }));
         msg.style.color = "#FF4886"; msg.textContent = "✅ Upload selesai!";
-        setTimeout(() => { window.location.href = "cetak.html?v=" + Date.now(); }, 800);
+        setTimeout(() => { window.location.href = "result/cetak/?v=" + Date.now(); }, 800);
       } catch (e) { hideOverlay(); msg.style.color = "red"; msg.textContent = "❌ " + e.message; btn.disabled = false; }
     };
   </script>

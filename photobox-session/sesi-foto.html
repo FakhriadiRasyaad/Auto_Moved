@@ -50,6 +50,14 @@
       box-shadow: 0 6px 16px rgba(255, 111, 162, 0.35) !important;
     }
 
+    .pose-chip-btn.detecting-active {
+      background: #FFE5F1 !important;
+      border-color: #FF6FA2 !important;
+      color: #FF4886 !important;
+      transform: scale(1.08);
+      box-shadow: 0 0 12px rgba(255, 111, 162, 0.4) !important;
+    }
+
     .countdown-overlay {
       position: absolute;
       inset: 0;
@@ -151,11 +159,17 @@
         </div>
 
         <select id="camSel" class="customer-input pill-input"
-          style="height: 38px; padding: 0 14px; font-size: 12px; max-width: 150px; background: #FFFFFF;">
+          style="height: 38px; padding: 0 14px; font-size: 12px; max-width: 150px; background: #FFFFFF;" title="Pilih Kamera">
           <option value="">-- Kamera --</option>
         </select>
 
-        <div class="korean-tab-btn active" id="cntPill" style="height: 38px; padding: 0 16px; font-size: 13px;">0 foto</div>
+        <button type="button" class="korean-tab-btn" onclick="refreshCamera(event)" title="Klik: Reset Sensor Kamera | Shift+Klik: Reload Halaman"
+          style="height: 38px; padding: 0 14px; font-size: 12px; gap: 6px; background: #FFFFFF; border: 1.5px solid #FF6FAE; color: #FF4886; font-weight: 700; border-radius: 20px; cursor: pointer; display: flex; align-items: center;">
+          🔄 Refresh
+        </button>
+
+        <div class="korean-tab-btn active" id="cntPill" style="height: 38px; padding: 0 16px; font-size: 13px;">0 foto
+        </div>
 
         <button class="korean-tab-btn" onclick="openModal()" title="Pengaturan Foto"
           style="height: 38px; width: 38px; padding: 0; justify-content: center; border-radius: 50%;">
@@ -483,7 +497,7 @@
     const IDLE_MS = 5000;
     let isIdle = false, faceLoaded = false;
     let mpHands = null, lastFingerCount = -1, gestStableTime = 0;
-    const GESTURE_STABLE_MS = 1000; // 1 second hold confirms finger gesture
+    const GESTURE_STABLE_MS = 700; // 0.7 second hold confirms finger gesture for faster response
     let isPreVideoCounting = false; // 5-second countdown timer before video starts
     let preVideoTimer = null;
     let gestCooldownUntil = 0; // 3-second post-video cooldown
@@ -492,9 +506,9 @@
 
     // ── Deteksi idle finger state ──────────────────────────────────────────────
     let lastFingerSeenAt = Date.now(); // last time any finger was detected
-    let fingerIdleTimer   = null;      // repeating timer when no finger seen
-    let isPlayingDeteksi  = false;     // true while Deteksi.mp4 is active
-    const FINGER_IDLE_MS  = 3000;     // 3s no finger → play Deteksi
+    let fingerIdleTimer = null;      // repeating timer when no finger seen
+    let isPlayingDeteksi = false;     // true while Deteksi.mp4 is active
+    const FINGER_IDLE_MS = 3000;     // 3s no finger → play Deteksi
 
     function playDeteksiVideo() {
       if (lockPreset || isCounting || isPreVideoCounting) return;
@@ -502,14 +516,14 @@
       if (presetVideoPlayer) {
         presetVideoPlayer.ontimeupdate = null;
         presetVideoPlayer.onended = null;
-        try { presetVideoPlayer.pause(); } catch(e) {}
-        presetVideoPlayer.loop   = false;
-        presetVideoPlayer.muted  = false;
+        try { presetVideoPlayer.pause(); } catch (e) { }
+        presetVideoPlayer.loop = false;
+        presetVideoPlayer.muted = false;
         presetVideoPlayer.volume = 1.0;
-        presetVideoPlayer.src    = "../Video_Photo/Deteksi.mp4";
+        presetVideoPlayer.src = "../Video_Photo/Deteksi.mp4";
         presetVideoPlayer.currentTime = 0;
         if (videoOverlayText) videoOverlayText.textContent = "🤖 Tunjukkan Jari Anda!";
-        presetVideoPlayer.play().catch(() => {});
+        presetVideoPlayer.play().catch(() => { });
         // setelah video selesai, biarkan diam – timer akan memutar lagi jika masih idle
         presetVideoPlayer.onended = () => { isPlayingDeteksi = false; };
       }
@@ -547,6 +561,11 @@
       isPreVideoCounting = true;
       lockPreset = true;
       btnSnap.disabled = true;
+
+      // Kirim sinyal trigger ke ESP32 secara instan saat gestur jari dikonfirmasi!
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.trigger_esp32) {
+        window.pywebview.api.trigger_esp32(presetId).catch(() => {});
+      }
 
       let sec = 5;
       if (aiStatusBadge) {
@@ -586,6 +605,11 @@
       const icon = src === "gesture" ? "✋" : "👆";
       showToast(`${icon} Preset ${id}: ${p.label}`, 3500);
 
+      // Kirim trigger preset langsung ke ESP32 via Python Serial API jika tersedia
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.trigger_esp32) {
+        window.pywebview.api.trigger_esp32(id).catch(() => {});
+      }
+
       // Hentikan siklus Deteksi dulu sebelum preset aktif
       stopDeteksiCycle();
       lastFingerSeenAt = Date.now(); // reset idle timer
@@ -597,20 +621,20 @@
         try { presetVideoPlayer.pause(); } catch (e) { }
 
         if (videoOverlayText) videoOverlayText.textContent = `Panduan Preset ${id}`;
-        presetVideoPlayer.muted  = false;
+        presetVideoPlayer.muted = false;
         presetVideoPlayer.volume = 1.0;
-        presetVideoPlayer.loop   = false; // play once – stop after video ends
-        presetVideoPlayer.src    = `../Video_Photo/${id}.mp4`;
+        presetVideoPlayer.loop = false; // play once – stop after video ends
+        presetVideoPlayer.src = `../Video_Photo/${id}.mp4`;
         try { presetVideoPlayer.currentTime = 0; } catch (e) { }
 
         const playPromise = presetVideoPlayer.play();
         if (playPromise !== undefined) {
           playPromise.catch(err => {
             console.warn(`Video_Photo/${id}.mp4 not found, playing fallback (1.mp4):`, err);
-            presetVideoPlayer.src    = `../Video_Photo/1.mp4`;
-            presetVideoPlayer.loop   = false;
+            presetVideoPlayer.src = `../Video_Photo/1.mp4`;
+            presetVideoPlayer.loop = false;
             try { presetVideoPlayer.currentTime = 0; } catch (e) { }
-            presetVideoPlayer.muted  = false;
+            presetVideoPlayer.muted = false;
             presetVideoPlayer.volume = 1.0;
             presetVideoPlayer.play().catch(() => { });
           });
@@ -774,6 +798,21 @@
       }
     }
 
+    window.refreshCamera = async function (e) {
+      if (e && (e.shiftKey || e.ctrlKey)) {
+        showToast("🔄 Reloading halaman web...", 1500);
+        setTimeout(() => window.location.reload(), 300);
+        return;
+      }
+      showToast("🔄 Re-scanning & Reset Kamera...", 2500);
+      if (curStream) {
+        try { curStream.getTracks().forEach(t => t.stop()); } catch (err) { }
+        curStream = null;
+      }
+      await new Promise(r => setTimeout(r, 300));
+      await enumCameras();
+    };
+
     async function enumCameras() {
       try {
         let devs = await navigator.mediaDevices.enumerateDevices();
@@ -784,12 +823,20 @@
             tmp.getTracks().forEach(t => t.stop());
             devs = await navigator.mediaDevices.enumerateDevices();
             cams = devs.filter(d => d.kind === "videoinput");
-          } catch(e) { }
+          } catch (e) { }
         }
+
+        const savedCamId = localStorage.getItem("selectedCameraId");
+
         if (cams.length > 0) {
           camSel.innerHTML = cams.map((d, i) => `<option value="${d.deviceId}">${d.label || "Kamera " + (i + 1)}</option>`).join("");
-          camSel.value = cams[0].deviceId;
-          await startCamera(cams[0].deviceId);
+          
+          let targetId = cams[0].deviceId;
+          if (savedCamId && cams.some(c => c.deviceId === savedCamId)) {
+            targetId = savedCamId;
+          }
+          camSel.value = targetId;
+          await startCamera(targetId);
         } else {
           camSel.innerHTML = '<option value="default">Kamera Utama</option>';
           await startCamera("default");
@@ -800,7 +847,23 @@
         await startCamera("default");
       }
     }
-    camSel.addEventListener("change", e => { if (e.target.value) startCamera(e.target.value); });
+
+    camSel.addEventListener("change", async e => {
+      const selectedId = e.target.value;
+      if (!selectedId) return;
+
+      localStorage.setItem("selectedCameraId", selectedId);
+      showToast("📷 Memindahkan koneksi ke kamera terpilih...", 2000);
+
+      if (curStream) {
+        try { curStream.getTracks().forEach(t => t.stop()); } catch (err) { }
+        curStream = null;
+      }
+
+      // Jeda 300ms penting di pywebview/WebView2 agar hardware kamera sebelumnya dilepas sempurna oleh Chromium
+      await new Promise(r => setTimeout(r, 300));
+      await startCamera(selectedId);
+    });
 
     async function loadFace() {
       await new Promise(res => {
@@ -846,21 +909,46 @@
       setTimeout(() => clearInterval(wait), 12000);
     }
 
+    let isMpProcessing = false;
     function setupHands() {
       try {
         mpHands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
-        mpHands.setOptions({ maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.65, minTrackingConfidence: 0.55 });
+        mpHands.setOptions({ maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.60, minTrackingConfidence: 0.50 });
         mpHands.onResults(onHandResults);
-        setInterval(() => { if (video.readyState >= 2 && mpHands) mpHands.send({ image: video }).catch(() => { }); }, 120);
+
+        // Frame loop async yang aman tanpa menyebabkan penumpukan/lag antrean frame
+        async function mpLoop() {
+          if (video.readyState >= 2 && mpHands && !isMpProcessing) {
+            isMpProcessing = true;
+            try {
+              await mpHands.send({ image: video });
+            } catch (e) {
+              console.warn("MediaPipe frame send error:", e);
+            } finally {
+              isMpProcessing = false;
+            }
+          }
+          requestAnimationFrame(mpLoop);
+        }
+        requestAnimationFrame(mpLoop);
         setTimeout(() => { mpReadyAt = Date.now(); }, 1000);
       } catch (e) { console.warn("MediaPipe gagal:", e); }
     }
 
-    function countFingers(lm, handLabel) {
+    // Kalkulasi hitung jari yang jauh lebih akurat dan independen terhadap rotasi tangan/mirroring
+    function countFingers(lm) {
       let count = 0;
-      const thumbOpen = handLabel === "Right" ? lm[4].x < lm[3].x : lm[4].x > lm[3].x;
-      if (thumbOpen) count++;
-      [8, 12, 16, 20].forEach((t, i) => { if (lm[t].y < lm[[6, 10, 14, 18][i]].y) count++; });
+      // Ibu jari: Perbandingan jarak 3D Euclidean antara Ujung Ibu Jari (lm 4) vs Pangkal Kelingking (lm 17)
+      const distTip = Math.hypot(lm[4].x - lm[17].x, lm[4].y - lm[17].y, (lm[4].z || 0) - (lm[17].z || 0));
+      const distJoint = Math.hypot(lm[3].x - lm[17].x, lm[3].y - lm[17].y, (lm[3].z || 0) - (lm[17].z || 0));
+      if (distTip > distJoint * 1.12) count++;
+
+      // 4 Jari (Telunjuk, Tengah, Manis, Kelingking)
+      const tips = [8, 12, 16, 20];
+      const pips = [6, 10, 14, 18];
+      for (let i = 0; i < 4; i++) {
+        if (lm[tips[i]].y < lm[pips[i]].y) count++;
+      }
       return count;
     }
 
@@ -876,6 +964,7 @@
           aiStatusBadge.style.background = "#FFF0F5";
           aiStatusBadge.style.color = "#FF4886";
         }
+        document.querySelectorAll(".pose-chip-btn").forEach(c => c.classList.remove("detecting-active"));
         lastFingerCount = -1;
         gestStableTime = 0;
         return;
@@ -886,6 +975,7 @@
         if (results.multiHandLandmarks?.length) {
           drawHandLandmarks(results);
         }
+        document.querySelectorAll(".pose-chip-btn").forEach(c => c.classList.remove("detecting-active"));
         return;
       }
 
@@ -895,8 +985,9 @@
           aiStatusBadge.style.background = "#FFF0F5";
           aiStatusBadge.style.color = "#FF4886";
         }
+        document.querySelectorAll(".pose-chip-btn").forEach(c => c.classList.remove("detecting-active"));
         lastFingerCount = -1;
-        gestStableTime  = 0;
+        gestStableTime = 0;
         // Mulai siklus Deteksi jika sudah 3 detik tanpa jari
         if ((now - lastFingerSeenAt) >= FINGER_IDLE_MS && !fingerIdleTimer) {
           startFingerIdleCycle();
@@ -910,28 +1001,47 @@
 
       drawHandLandmarks(results);
       let total = 0;
-      results.multiHandLandmarks.forEach((lm, i) => { total += countFingers(lm, results.multiHandedness[i]?.label || "Right"); });
+      results.multiHandLandmarks.forEach((lm) => { total += countFingers(lm); });
       total = Math.max(0, Math.min(10, total));
 
       if (total > 0) {
         if (total !== lastFingerCount) {
           lastFingerCount = total;
-          gestStableTime  = now;
-        } else {
-          const stable   = now - gestStableTime;
-          const warmedUp = mpReadyAt > 0 && (now - mpReadyAt) >= MP_WARMUP_MS;
+          gestStableTime = now;
+        }
 
-          // 1 SECOND HOLD CONFIRMS FINGER GESTURE & STARTS 5S PRE-VIDEO COUNTDOWN!
-          if (stable >= GESTURE_STABLE_MS && !lockPreset && !isCounting && !isPreVideoCounting && warmedUp) {
-            gestStableTime = now + 20000;
-            if (total <= PRESETS.length) {
-              start5sPreVideoCountdown(total);
-            }
+        const elapsed = now - gestStableTime;
+        const progressPct = Math.min(100, Math.round((elapsed / GESTURE_STABLE_MS) * 100));
+        const warmedUp = mpReadyAt > 0 && (now - mpReadyAt) >= MP_WARMUP_MS;
+
+        // Umpan Balik Visual INSTAN di UI (aiStatusBadge & Pose Chips) setiap frame saat jari terdeteksi!
+        if (aiStatusBadge) {
+          aiStatusBadge.innerHTML = `✋ <b>${total} Jari Terdeteksi!</b><br><span style="font-size:11px; color:#0066CC;">Mendeteksi Preset ${total}... (${progressPct}%)</span>`;
+          aiStatusBadge.style.background = "#EBF5FF";
+          aiStatusBadge.style.color = "#0088FF";
+        }
+
+        // Highlight chip preset secara real-time saat mendeteksi
+        document.querySelectorAll(".pose-chip-btn").forEach(c => {
+          if (parseInt(c.dataset.id) === total) {
+            c.classList.add("detecting-active");
+          } else {
+            c.classList.remove("detecting-active");
+          }
+        });
+
+        // 700ms HOLD CONFIRMS FINGER GESTURE & STARTS COUNTDOWN!
+        if (elapsed >= GESTURE_STABLE_MS && !lockPreset && !isCounting && !isPreVideoCounting && warmedUp) {
+          gestStableTime = now + 20000;
+          document.querySelectorAll(".pose-chip-btn").forEach(c => c.classList.remove("detecting-active"));
+          if (total <= PRESETS.length) {
+            start5sPreVideoCountdown(total);
           }
         }
       } else {
         lastFingerCount = -1;
-        gestStableTime  = 0;
+        gestStableTime = 0;
+        document.querySelectorAll(".pose-chip-btn").forEach(c => c.classList.remove("detecting-active"));
         if (aiStatusBadge) {
           aiStatusBadge.innerHTML = `🤖 <b>Asisten AI Online</b> — ✋ 0 jari terdeteksi`;
           aiStatusBadge.style.background = "#FFF0F5";
@@ -1175,7 +1285,7 @@
         presetVideoPlayer.muted = true;
         presetVideoPlayer.loop = true;
         presetVideoPlayer.currentTime = 0;
-        presetVideoPlayer.play().catch(() => {});
+        presetVideoPlayer.play().catch(() => { });
         if (videoOverlayText) videoOverlayText.textContent = `Panduan Preset ${presetId}`;
       }
     }
@@ -1187,9 +1297,9 @@
     // ── Inisialisasi: saat MP siap, langsung putar Deteksi karena belum ada jari ──
     if (presetVideoPlayer) {
       // Tampilkan frame pertama Deteksi.mp4 sebagai poster (muted, tidak autoplay)
-      presetVideoPlayer.src    = "../Video_Photo/Deteksi.mp4";
-      presetVideoPlayer.muted  = true;
-      presetVideoPlayer.loop   = false;
+      presetVideoPlayer.src = "../Video_Photo/Deteksi.mp4";
+      presetVideoPlayer.muted = true;
+      presetVideoPlayer.loop = false;
       presetVideoPlayer.currentTime = 0;
       presetVideoPlayer.load();
       if (videoOverlayText) videoOverlayText.textContent = "🤖 Tunjukkan Jari Anda!";

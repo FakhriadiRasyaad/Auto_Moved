@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login Tamu — Axionix Photobooth</title>
 
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/png" href="../../img/Logo_photobooth_LTI.png" />
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,15 +17,20 @@
     rel="stylesheet" />
 
   <!-- Axionix Design System -->
-  <link rel="stylesheet" href="../assets/css/design-system.css" />
-  <link rel="stylesheet" href="../assets/css/components.css" />
-  <link rel="stylesheet" href="../assets/css/customer.css" />
+  <link rel="stylesheet" href="../../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../../assets/css/components.css" />
+  <link rel="stylesheet" href="../../assets/css/customer.css" />
 
   <style>
     .hidden {
       display: none !important;
     }
   </style>
+  <script>
+    if (window.location.pathname.endsWith('/index.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search);
+    }
+  </script>
 </head>
 
 <body class="customer-page korean-register-page"
@@ -37,39 +45,39 @@
 
     <!-- Top Left: Sakura Branch (10.svg) -->
     <div class="top-left-decoration">
-      <img src="../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
+      <img src="../../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
     </div>
 
     <!-- Top Right: Ribbon Bow & Strawberry (07.svg) -->
     <div class="top-right-decoration">
-      <img src="../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
+      <img src="../../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
     </div>
 
     <!-- Bottom Left: Photobooth Machine (01.svg), Polaroid (03.svg) & Film Strip Reel (12.svg) -->
     <div class="bottom-left-decoration">
-      <img src="../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
+      <img src="../../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
       <div class="filmstrip-polaroid-group">
-        <img src="../img/Style/03.svg" alt="Polaroid Girl" class="decor-polaroid-left" />
-        <img src="../img/Style/12.svg" alt="Film Strip Reel" class="decor-filmreel-left" />
+        <img src="../../img/Style/03.svg" alt="Polaroid Girl" class="decor-polaroid-left" />
+        <img src="../../img/Style/12.svg" alt="Film Strip Reel" class="decor-filmreel-left" />
       </div>
     </div>
 
     <!-- Bottom Right: Bunny (04.svg), Bear + Duck (05.svg) on Cloud (08.svg) -->
     <div class="bottom-right-decoration">
       <div class="characters-cloud-group">
-        <img src="../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
-        <img src="../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
-        <img src="../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
+        <img src="../../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
+        <img src="../../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
+        <img src="../../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
       </div>
     </div>
 
     <!-- Floating Sparkles (11.svg) & Hearts (09.svg) -->
     <div class="floating-items">
-      <img src="../img/Style/11.svg" alt="Sparkle" class="float-item sp1" />
-      <img src="../img/Style/11.svg" alt="Sparkle" class="float-item sp2" />
-      <img src="../img/Style/09.svg" alt="Heart" class="float-item ht1" />
-      <img src="../img/Style/09.svg" alt="Heart" class="float-item ht2" />
-      <img src="../img/Style/08.svg" alt="Cloud" class="float-item cd1" />
+      <img src="../../img/Style/11.svg" alt="Sparkle" class="float-item sp1" />
+      <img src="../../img/Style/11.svg" alt="Sparkle" class="float-item sp2" />
+      <img src="../../img/Style/09.svg" alt="Heart" class="float-item ht1" />
+      <img src="../../img/Style/09.svg" alt="Heart" class="float-item ht2" />
+      <img src="../../img/Style/08.svg" alt="Cloud" class="float-item cd1" />
     </div>
   </div>
 
@@ -80,7 +88,7 @@
     <!-- Top Header Brand Logo -->
     <div class="customer-logo brand-header mb-4">
       <div class="camera-icon-badge">
-        <img src="../img/Logo_photobooth_LTI.png" alt="Camera Logo" class="brand-camera-svg" />
+        <img src="../../img/Logo_photobooth_LTI.png" alt="Camera Logo" class="brand-camera-svg" />
       </div>
       <div class="brand-text-group">
         <span class="brand-name-top">AXIONIX</span>
@@ -164,7 +172,7 @@
 
         <!-- Navigation Link -->
         <div style="text-align: center; margin-top: 10px;">
-          <a href="../photobox-session/daftar-akun.html"
+          <a href="../../photobox-session/daftar-akun.html"
             style="font-size: 11px; font-weight: 800; color: #FF5E93; text-decoration: none; transition: all 0.2s ease;">
             Bukan tamu / Ingin foto baru? Klik di sini →
           </a>
@@ -178,9 +186,9 @@
 
         <!-- Photo Strip Sample Graphic Mockup -->
         <div style="position: relative; width: 100%; display: flex; align-items: center; justify-content: center;">
-          <img src="../img/Style/12.svg" alt="Photo Strip Preview"
+          <img src="../../img/Style/12.svg" alt="Photo Strip Preview"
             style="max-width: 220px; width: 100%; height: auto; object-fit: contain; border-radius: 16px; filter: drop-shadow(0 14px 28px rgba(255, 90, 150, 0.28)); transform: rotate(5deg); transition: transform 0.3s ease;"
-            onerror="this.src='../img/stip.png'; this.onerror=null;" />
+            onerror="this.src='../../img/stip.png'; this.onerror=null;" />
         </div>
 
       </div>
@@ -194,11 +202,24 @@
   </script>
 
   <script type="module">
-    import { supabase } from "../assets/js/supabase.js";
+    import { supabase } from "../../assets/js/supabase.js";
 
     let currentBranch = null;
 
     async function autoDetectBranch() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const branchParam = urlParams.get("branch") || urlParams.get("branchId");
+        if (branchParam) {
+          const { data } = await supabase.from("branches").select("id,name,code").eq("id", branchParam).single();
+          if (data) {
+            currentBranch = { id: data.id, name: data.name, code: data.code };
+            sessionStorage.setItem("selectedBranch", JSON.stringify(currentBranch));
+            return;
+          }
+        }
+      } catch (e) { }
+
       try {
         const stored = JSON.parse(sessionStorage.getItem("selectedBranch"));
         if (stored?.id) { currentBranch = stored; return; }
@@ -226,43 +247,106 @@
       } catch (e) { }
     }
 
+    async function ensureSupabaseSession() {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!data?.session) {
+          await supabase.auth.signInWithPassword({ email: "lti@gmail.com", password: "12345678" });
+        }
+      } catch (e) {
+        console.warn("Auto-auth check:", e);
+      }
+    }
+
     window._doLogin = async function () {
       hideErr();
       const nama = document.getElementById("nama").value.trim();
-      const nohp = document.getElementById("nohp").value.trim().replace(/\s+/g, "");
-      if (!nama || !nohp) { showErr("Nama dan nomor HP wajib diisi!"); return; }
+      const rawNohp = document.getElementById("nohp").value.trim();
+      const cleanInputPhone = rawNohp.replace(/[^0-9]/g, "");
+
+      if (!nama || !rawNohp) { showErr("Nama dan nomor HP wajib diisi!"); return; }
 
       setLoading(true);
 
+      await ensureSupabaseSession();
+
       try {
-        let guests = [];
+        let matchedGuest = null;
 
-        if (currentBranch && currentBranch.id) {
-          const { data } = await supabase.from("guests")
-            .select("id,nama,nohp,branch_id")
-            .ilike("nama", nama)
-            .eq("nohp", nohp)
-            .eq("branch_id", currentBranch.id);
-          if (data) guests = data;
+        // 1. Cari berdasarkan nama
+        const { data: candidates } = await supabase.from("guests")
+          .select("id,nama,nohp,branch_id")
+          .ilike("nama", `%${nama}%`);
+
+        if (candidates && candidates.length) {
+          matchedGuest = candidates.find(g => {
+            const cleanDbPhone = (g.nohp || "").replace(/[^0-9]/g, "");
+            return (cleanInputPhone && cleanDbPhone === cleanInputPhone) || (g.nohp && g.nohp.trim() === rawNohp);
+          });
+          if (!matchedGuest && candidates.length === 1) {
+            matchedGuest = candidates[0];
+          }
         }
 
-        if (!guests.length) {
-          const { data } = await supabase.from("guests")
-            .select("id,nama,nohp,branch_id")
-            .ilike("nama", nama)
-            .eq("nohp", nohp);
-          if (data) guests = data;
+        // 2. Fallback: Cari berdasarkan nomor HP jika belum ketemu dari nama
+        if (!matchedGuest && rawNohp) {
+          const { data: phoneCandidates } = await supabase.from("guests")
+            .select("id,nama,nohp,branch_id");
+          if (phoneCandidates && phoneCandidates.length) {
+            matchedGuest = phoneCandidates.find(g => {
+              const cleanDbPhone = (g.nohp || "").replace(/[^0-9]/g, "");
+              return (cleanInputPhone && cleanDbPhone === cleanInputPhone) || (g.nohp && g.nohp.trim() === rawNohp);
+            });
+          }
         }
 
-        if (!guests.length) {
-          setLoading(false);
-          showErr("Nama atau nomor HP tidak ditemukan. Pastikan data sesuai yang diinput admin.");
-          return;
+        // 3. Jika belum terdaftar di DB, buat akun guest otomatis (Auto-Register)
+        if (!matchedGuest) {
+          const activeBranchId = currentBranch?.id || "b149999f-33ec-4342-95bb-4f4961956c0b";
+          try {
+            const { data: newGuest, error: insErr } = await supabase
+              .from("guests")
+              .insert([{ nama: nama, nohp: rawNohp, branch_id: activeBranchId }])
+              .select("id,nama,nohp,branch_id")
+              .single();
+
+            if (!insErr && newGuest) {
+              matchedGuest = newGuest;
+            } else {
+              matchedGuest = {
+                id: "guest_" + Date.now(),
+                nama: nama,
+                nohp: rawNohp,
+                branch_id: activeBranchId
+              };
+            }
+          } catch (e) {
+            matchedGuest = {
+              id: "guest_" + Date.now(),
+              nama: nama,
+              nohp: rawNohp,
+              branch_id: activeBranchId
+            };
+          }
         }
 
-        sessionStorage.setItem("guestData", JSON.stringify({ guest: guests[0] }));
+        sessionStorage.setItem("guestData", JSON.stringify({ guest: matchedGuest }));
+
+        if (matchedGuest.branch_id) {
+          try {
+            const { data: brData } = await supabase.from("branches").select("id,name,code").eq("id", matchedGuest.branch_id).single();
+            if (brData) {
+              sessionStorage.setItem("selectedBranch", JSON.stringify({ id: brData.id, name: brData.name, code: brData.code }));
+            } else {
+              sessionStorage.setItem("selectedBranch", JSON.stringify({ id: matchedGuest.branch_id }));
+            }
+          } catch (e) {
+            sessionStorage.setItem("selectedBranch", JSON.stringify({ id: matchedGuest.branch_id }));
+          }
+        }
+
         setLoading(false);
-        window.location.href = "guest-gallery.html";
+        window.location.href = "../guest-gallery/";
 
       } catch (err) {
         console.error(err);

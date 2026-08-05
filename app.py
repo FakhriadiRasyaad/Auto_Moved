@@ -45,12 +45,13 @@ DEBUG_MODE = True
 # Aktifkan integrasi ESP32 (kirim angka preset via Serial)
 ESP32_ENABLED = True
 
-# Port Serial ESP32 (cek di Device Manager -> COM & LPT Ports)
-# Contoh Windows: "COM3", "COM4" | Linux: "/dev/ttyUSB0"
-ESP32_PORT = "COM3"
+# Port Serial ESP32:
+# Gunakan "auto" untuk deteksi port otomatis adaptif (memindai chip CP210x, CH340, FTDI, dll.)
+# Atau tentukan port spesifik jika ingin memaksa, misal: "COM3", "COM4", "/dev/ttyUSB0"
+ESP32_PORT = "auto"
 
-# Baud rate — harus sama dengan yang di-set di sketch Arduino/ESP32
-ESP32_BAUD_RATE = 9600
+# Baud rate — harus sama dengan yang di-set di sketch Arduino/ESP32 (115200 baud)
+ESP32_BAUD_RATE = 115200
 
 # Mode debug: cetak output preset ke terminal walau ESP32 tidak terhubung
 # Berguna untuk verifikasi deteksi gesture sebelum hardware tersedia
@@ -147,7 +148,7 @@ class Api:
 
         result = self._esp32.send_preset(preset_num)
         if result["ok"]:
-            print(f"          ✅ Serial OK → {ESP32_PORT}")
+            print(f"          ✅ Serial OK → {self._esp32.port}")
         else:
             print(f"          ❌ Serial GAGAL: {result['message']}")
         return result
@@ -231,19 +232,18 @@ def main():
         esp32 = ESP32Handler(port=ESP32_PORT, baud_rate=ESP32_BAUD_RATE)
         ok = esp32.connect()
         if ok:
-            print(f"[ESP32] ✅ Terhubung ke ESP32 di {ESP32_PORT}")
+            print(f"[ESP32] ✅ Terhubung ke ESP32 di {esp32.port}")
         else:
-            print(f"[ESP32] ⚠️  Tidak terhubung ke {ESP32_PORT} — berjalan dalam DEBUG MODE")
+            print(f"[ESP32] ⚠️  Belum terhubung ke ESP32 pada startup — akan coba hubungkan otomatis saat trigger")
             available = ESP32Handler.list_ports()
             if available:
-                print(f"[ESP32] Port tersedia: {[p['port'] + ' (' + p['description'] + ')' for p in available]}")
+                print(f"[ESP32] Port terdeteksi di sistem: {[p['port'] + ' (' + p['description'] + ')' for p in available]}")
             else:
-                print(f"[ESP32] Tidak ada COM port terdeteksi. Pastikan driver USB-Serial ter-install.")
-            esp32 = None  # Reset agar API tahu tidak ada hardware
+                print(f"[ESP32] Tidak ada COM port terdeteksi. Pastikan kabel USB & driver USB-Serial ter-install.")
 
     # 4. Inisialisasi Gesture Detector Python (OpenCV + MediaPipe)
     gesture_detector = None
-    if GESTURE_ENABLED:
+    if GESTURE_ENABLED and esp32:
         from gesture_detector import GestureDetector
         gesture_detector = GestureDetector(
             esp32_handler  = esp32,
@@ -256,7 +256,7 @@ def main():
 
     # 5. Inisialisasi API dan buat window
     api = Api()
-    if esp32:
+    if ESP32_ENABLED:
         api.set_esp32(esp32)
 
     # WebView settings
@@ -279,12 +279,15 @@ def main():
         console.log('[ESP32 Scraper] Injected JS Scraper for preset detection');
 
         var lastSentPreset = null;
+        var lastSentTime = 0;
 
-        function notifyPython(presetId) {
+        function notifyPython(presetId, force) {
             var pid = parseInt(presetId, 10);
             if (isNaN(pid) || pid <= 0 || pid > 10) return;
-            if (lastSentPreset === pid) return;
+            var now = Date.now();
+            if (!force && lastSentPreset === pid && (now - lastSentTime) < 800) return;
             lastSentPreset = pid;
+            lastSentTime = now;
             console.log('[ESP32 Scraper] Preset ' + pid + ' aktif → Kirim ke ESP32');
             if (window.pywebview && window.pywebview.api && window.pywebview.api.trigger_esp32) {
                 window.pywebview.api.trigger_esp32(pid);
@@ -296,7 +299,7 @@ def main():
                 window.__esp32TriggerHooked = true;
                 var orig = window.triggerPreset;
                 window.triggerPreset = function(id, src) {
-                    notifyPython(id);
+                    notifyPython(id, true);
                     return orig.apply(this, arguments);
                 };
                 console.log('[ESP32 Scraper] window.triggerPreset hooked!');
@@ -331,21 +334,13 @@ def main():
         setInterval(function() {
             hookTriggerPreset();
             autoInitCameraIfNeeded();
-
-            // Cek tombol preset yang aktif secara eksplisit
-            var activeChip = document.querySelector('.pose-chip-btn.active, button.active[data-id], .preset-chip.active');
-            if (activeChip) {
-                var dataId = activeChip.getAttribute('data-id');
-                if (dataId) {
-                    notifyPython(dataId);
-                }
-            }
-        }, 300);
+        }, 500);
     })();
     """
 
     def inject_scraper():
         try:
+            # Inject Scraper pendukung (hanya mendengarkan event/DOM di website -> ESP32)
             window.evaluate_js(SCRAPER_JS)
         except Exception as e:
             pass

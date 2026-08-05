@@ -6,15 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terima Kasih — Axionix Photobooth</title>
 
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/png" href="../../img/Logo_photobooth_LTI.png" />
+
   <!-- Google Fonts -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap"
     rel="stylesheet" />
 
   <!-- Axionix Design System -->
-  <link rel="stylesheet" href="../assets/css/design-system.css" />
-  <link rel="stylesheet" href="../assets/css/components.css" />
-  <link rel="stylesheet" href="../assets/css/customer.css" />
+  <link rel="stylesheet" href="../../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../../assets/css/components.css" />
+  <link rel="stylesheet" href="../../assets/css/customer.css" />
+
+  <script>
+    if (window.location.pathname.endsWith('/index.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search);
+    }
+  </script>
 </head>
 
 <body class="customer-page">
@@ -27,7 +36,7 @@
 
   <div class="thankyou-container customer-card max-w-md w-full">
     <div class="customer-logo mb-2">
-      <img src="../img/Logo_photobooth_LTI.png" alt="Logo Photobooth" />
+      <img src="../../img/Logo_photobooth_LTI.png" alt="Logo Photobooth" />
       <span class="customer-logo-text text-gradient-primary">AXIONIX PHOTOBOOTH</span>
     </div>
 
@@ -63,7 +72,7 @@
 
       if (timeLeft <= 0) {
         clearInterval(timer);
-        window.location.href = "guest-login.html";
+        window.location.href = "../guest-login/";
       }
     }, 1000);
 

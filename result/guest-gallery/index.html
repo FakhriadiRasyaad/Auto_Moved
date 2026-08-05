@@ -6,15 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Galeri Foto Tamu — Axionix Photobooth</title>
 
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/png" href="../../img/Logo_photobooth_LTI.png" />
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Axionix Design System -->
-  <link rel="stylesheet" href="../assets/css/design-system.css" />
-  <link rel="stylesheet" href="../assets/css/components.css" />
-  <link rel="stylesheet" href="../assets/css/customer.css" />
+  <link rel="stylesheet" href="../../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../../assets/css/components.css" />
+  <link rel="stylesheet" href="../../assets/css/customer.css" />
+
+  <script>
+    if (window.location.pathname.endsWith('/index.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search);
+    }
+  </script>
 </head>
 
 <body class="customer-page korean-register-page" style="padding: 20px; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -28,39 +37,39 @@
     
     <!-- Top Left: Sakura Branch (10.svg) -->
     <div class="top-left-decoration">
-      <img src="../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
+      <img src="../../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
     </div>
 
     <!-- Top Right: Ribbon Bow & Strawberry (07.svg) -->
     <div class="top-right-decoration">
-      <img src="../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
+      <img src="../../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
     </div>
 
     <!-- Bottom Left: Photobooth Machine (01.svg), Polaroid (03.svg) & Film Strip Reel (12.svg) -->
     <div class="bottom-left-decoration">
-      <img src="../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
+      <img src="../../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
       <div class="filmstrip-polaroid-group">
-        <img src="../img/Style/03.svg" alt="Polaroid Girl" class="decor-polaroid-left" />
-        <img src="../img/Style/12.svg" alt="Film Strip Reel" class="decor-filmreel-left" />
+        <img src="../../img/Style/03.svg" alt="Polaroid Girl" class="decor-polaroid-left" />
+        <img src="../../img/Style/12.svg" alt="Film Strip Reel" class="decor-filmreel-left" />
       </div>
     </div>
 
     <!-- Bottom Right: Bunny (04.svg), Bear + Duck (05.svg) on Cloud (08.svg) -->
     <div class="bottom-right-decoration">
       <div class="characters-cloud-group">
-        <img src="../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
-        <img src="../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
-        <img src="../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
+        <img src="../../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
+        <img src="../../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
+        <img src="../../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
       </div>
     </div>
 
     <!-- Floating Sparkles (11.svg) & Hearts (09.svg) -->
     <div class="floating-items">
-      <img src="../img/Style/11.svg" alt="Sparkle" class="float-item sp1" />
-      <img src="../img/Style/11.svg" alt="Sparkle" class="float-item sp2" />
-      <img src="../img/Style/09.svg" alt="Heart" class="float-item ht1" />
-      <img src="../img/Style/09.svg" alt="Heart" class="float-item ht2" />
-      <img src="../img/Style/08.svg" alt="Cloud" class="float-item cd1" />
+      <img src="../../img/Style/11.svg" alt="Sparkle" class="float-item sp1" />
+      <img src="../../img/Style/11.svg" alt="Sparkle" class="float-item sp2" />
+      <img src="../../img/Style/09.svg" alt="Heart" class="float-item ht1" />
+      <img src="../../img/Style/09.svg" alt="Heart" class="float-item ht2" />
+      <img src="../../img/Style/08.svg" alt="Cloud" class="float-item cd1" />
     </div>
   </div>
 
@@ -72,7 +81,7 @@
       <!-- Brand Logo -->
       <div class="customer-logo brand-header">
         <div class="camera-icon-badge">
-          <img src="../img/Logo_photobooth_LTI.png" alt="Camera Logo" class="brand-camera-svg" />
+          <img src="../../img/Logo_photobooth_LTI.png" alt="Camera Logo" class="brand-camera-svg" />
         </div>
         <div class="brand-text-group">
           <span class="brand-name-top">AXIONIX</span>
@@ -112,7 +121,7 @@
     <div style="background: #FFFFFF; border: 3px solid #FFD8E7; border-radius: 32px; padding: 28px 32px; box-shadow: 0 16px 40px rgba(255, 110, 165, 0.14); position: relative;">
       
       <!-- Cute Bunny Illustration on Top-Right Corner of Card -->
-      <img src="../img/Style/04.svg" alt="Cute Bunny" style="position: absolute; top: -30px; right: 20px; width: 75px; height: auto; z-index: 15; pointer-events: none; filter: drop-shadow(0 6px 12px rgba(255, 110, 165, 0.2));" />
+      <img src="../../img/Style/04.svg" alt="Cute Bunny" style="position: absolute; top: -30px; right: 20px; width: 75px; height: auto; z-index: 15; pointer-events: none; filter: drop-shadow(0 6px 12px rgba(255, 110, 165, 0.2));" />
 
       <!-- Header Title & Greeting -->
       <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
@@ -141,101 +150,110 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 12px;">
       
       <!-- Left Exit/Switch Guest Button -->
-      <button onclick="window.location.href='guest-login.html'"
+      <button onclick="window.location.href='../guest-login/'"
         style="background: #FFFFFF; border: 2px solid #FFD8E7; border-radius: 24px; color: #3A2B42; font-weight: 800; padding: 12px 24px; height: 48px; font-size: 13px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(255, 110, 165, 0.08);"
         onmouseover="this.style.background='#FFF0F5'; this.style.borderColor='#FF6FA2';"
         onmouseout="this.style.background='#FFFFFF'; this.style.borderColor='#FFD8E7';">
         <span>← Keluar / Ganti Tamu</span>
       </button>
 
-      <!-- Right Next to Frame Button -->
-      <button id="btnNext" onclick="goNext()" disabled class="customer-btn-primary korean-btn-gradient"
-        style="height: 50px; padding: 0 32px; border-radius: 25px; font-size: 15px; font-weight: 900; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(255, 111, 162, 0.35);">
-        <span>Lanjut ke Pilih Frame (0 Foto) →</span>
+      <!-- Right Continue Button -->
+      <button id="btnContinue" onclick="proceedToFrame()" class="customer-btn-primary korean-btn-gradient"
+        style="height: 48px; border-radius: 24px; font-size: 14px; font-weight: 900; padding: 0 28px; display: flex; align-items: center; gap: 8px; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(255, 111, 162, 0.35);">
+        <span>Lanjut Pilih Frame →</span>
       </button>
 
     </div>
 
   </div>
 
-  <!-- Lightbox Preview Modal (NO DOWNLOAD BUTTON!) -->
-  <div class="modal-overlay" id="lightbox" style="display:none;" onclick="lbClose()">
-    <div style="position:relative; max-width:90vw; max-height:90vh; background: #FFFFFF; border: 3px solid #FFD8E7; border-radius: 28px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
-      <button class="modal-close" style="position:absolute; top: 12px; right: 16px; background: #FFF0F5; border: 1.5px solid #FFD8E7; color: #FF4886; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: bold; cursor: pointer;" onclick="lbClose()">✕</button>
-      <img id="lbImg" src="" alt="Photo Full" style="max-width: 100%; max-height: 70vh; border-radius: 20px; object-fit: contain; display: block; margin: 0 auto 12px auto; border: 2px solid #FFD8E7;">
-
-      <div style="display: flex; justify-content: center; align-items: center;">
-        <span style="font-size: 13px; font-weight: 800; color: #3A2B42;" id="lbCaption"></span>
+  <!-- Lightbox Modal Preview -->
+  <div id="lbModal" onclick="lbClose()" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 999; align-items: center; justify-content: center; padding: 20px;">
+    <div onclick="event.stopPropagation()" style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center;">
+      <img id="lbImg" src="" alt="Preview" style="max-width: 100%; max-height: 80vh; border-radius: 16px; object-fit: contain; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+      <div style="margin-top: 14px; display: flex; gap: 12px; align-items: center;">
+        <button id="lbSelectBtn" onclick="lbToggleSelect()" style="background: #FF6FA2; color: #FFF; border: none; border-radius: 20px; padding: 8px 20px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 14px rgba(255,111,162,0.4);">
+          Pilih Foto Ini
+        </button>
+        <button onclick="lbClose()" style="background: rgba(255,255,255,0.2); color: #FFF; border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 8px 18px; font-weight: 800; font-size: 13px; cursor: pointer;">
+          Tutup
+        </button>
       </div>
     </div>
   </div>
 
   <script>
-    let curLbIdx = 0;
-    let selectedPhotoIndices = new Set();
-    const MAX_SELECT = 10;
+    const selectedPhotoIndices = new Set();
+    let currentLbIndex = null;
 
-    function lbOpen(i, e) {
+    function togglePhotoSelect(idx, e) {
       if (e) e.stopPropagation();
-      if (window.allUrls && window.allUrls[i]) {
-        curLbIdx = i;
-        document.getElementById("lbImg").src = window.allUrls[i];
-        document.getElementById("lbCaption").textContent = `${window.allPhotos[i].kind.toUpperCase()} · ${window.allPhotos[i].name}`;
-        document.getElementById("lightbox").style.display = "flex";
-      }
-    }
-    function lbClose() {
-      document.getElementById("lightbox").style.display = "none";
-    }
-
-    function togglePhotoSelect(i, e) {
-      if (e) e.stopPropagation();
-      if (selectedPhotoIndices.has(i)) {
-        selectedPhotoIndices.delete(i);
+      if (selectedPhotoIndices.has(idx)) {
+        selectedPhotoIndices.delete(idx);
       } else {
-        if (selectedPhotoIndices.size >= MAX_SELECT) {
-          alert("⚠️ Maksimal 10 foto terpilih yang dapat digunakan!");
+        if (selectedPhotoIndices.size >= 10) {
+          alert("Maksimal 10 foto yang dapat dipilih!");
           return;
         }
-        selectedPhotoIndices.add(i);
+        selectedPhotoIndices.add(idx);
       }
       updateSelectUI();
     }
 
     function updateSelectUI() {
+      const count = selectedPhotoIndices.size;
       const badge = document.getElementById("selectCountBadge");
-      if (badge) badge.textContent = `📌 ${selectedPhotoIndices.size} / ${MAX_SELECT} Terpilih`;
-
-      const btnNext = document.getElementById("btnNext");
-      if (btnNext) {
-        btnNext.disabled = selectedPhotoIndices.size === 0;
-        btnNext.innerHTML = selectedPhotoIndices.size === 0
-          ? `<span>Lanjut ke Pilih Frame (Pilih Min 1 Foto) →</span>`
-          : `<span>Lanjut ke Pilih Frame (${selectedPhotoIndices.size} Foto) →</span>`;
-      }
+      if (badge) badge.textContent = `${count} / 10 Terpilih`;
 
       if (window.allPhotos) {
-        window.allPhotos.forEach((_, idx) => {
-          const card = document.getElementById(`photoCard-${idx}`);
-          const chk = document.getElementById(`photoChk-${idx}`);
-          const isSelected = selectedPhotoIndices.has(idx);
+        for (let i = 0; i < window.allPhotos.length; i++) {
+          const card = document.getElementById(`photoCard-${i}`);
+          const chk = document.getElementById(`photoChk-${i}`);
+          const isSel = selectedPhotoIndices.has(i);
           if (card) {
-            card.style.borderColor = isSelected ? '#FF4886' : '#FFD8E7';
-            card.style.borderWidth = isSelected ? '2.5px' : '1.5px';
-            card.style.boxShadow = isSelected ? '0 8px 20px rgba(255, 72, 134, 0.28)' : '0 6px 16px rgba(255, 110, 165, 0.12)';
+            card.style.border = isSel ? '2.5px solid #FF4886' : '1.5px solid #FFD8E7';
+            card.style.boxShadow = isSel ? '0 8px 20px rgba(255, 72, 134, 0.28)' : '0 6px 16px rgba(255, 110, 165, 0.12)';
           }
           if (chk) {
-            chk.style.background = isSelected ? '#FF4886' : 'rgba(255, 255, 255, 0.9)';
-            chk.style.borderColor = isSelected ? '#FF4886' : '#FFD8E7';
-            chk.innerHTML = isSelected ? '✓' : '';
+            chk.style.background = isSel ? '#FF4886' : 'rgba(255,255,255,0.92)';
+            chk.style.borderColor = isSel ? '#FF4886' : '#FFD8E7';
+            chk.innerHTML = isSel ? '✓' : '';
           }
-        });
+        }
       }
     }
 
-    function goNext() {
+    function lbOpen(idx, e) {
+      if (e) e.stopPropagation();
+      currentLbIndex = idx;
+      document.getElementById("lbImg").src = window.allUrls[idx];
+      document.getElementById("lbModal").style.display = "flex";
+      updateLbBtn();
+    }
+
+    function lbClose() {
+      document.getElementById("lbModal").style.display = "none";
+      currentLbIndex = null;
+    }
+
+    function lbToggleSelect() {
+      if (currentLbIndex !== null) {
+        togglePhotoSelect(currentLbIndex);
+        updateLbBtn();
+      }
+    }
+
+    function updateLbBtn() {
+      const btn = document.getElementById("lbSelectBtn");
+      if (!btn || currentLbIndex === null) return;
+      const isSel = selectedPhotoIndices.has(currentLbIndex);
+      btn.textContent = isSel ? "✓ Terpilih (Batal)" : "+ Pilih Foto Ini";
+      btn.style.background = isSel ? "#4CAF50" : "#FF6FA2";
+    }
+
+    function proceedToFrame() {
       if (selectedPhotoIndices.size === 0) {
-        alert("Pilih minimal 1 foto terlebih dahulu!");
+        alert("Pilih minimal 1 foto untuk dilanjutkan ke frame!");
         return;
       }
       const selectedIndices = Array.from(selectedPhotoIndices);
@@ -247,12 +265,12 @@
       sessionStorage.setItem("guestSelectedUrls", JSON.stringify(selectedUrls));
       sessionStorage.setItem("guestAllPhotos", JSON.stringify(window.allPhotos));
 
-      window.location.href = "pilih-frame.html";
+      window.location.href = "../pilih-frame/";
     }
   </script>
 
   <script type="module">
-    import { supabase } from "../assets/js/supabase.js";
+    import { supabase } from "../../assets/js/supabase.js";
 
     const VALID_SUBFOLDERS = ['asli', 'edit', 'noedit'];
     const SUBFOLDER_ICON = { asli: '📷', edit: '✨', noedit: '📁' };
@@ -269,17 +287,25 @@
 
     if (!guest) {
       alert("Sesi login tamu tidak ditemukan. Mengalihkan ke login...");
-      window.location.href = "guest-login.html";
+      window.location.href = "../guest-login/";
     } else {
       document.getElementById("greetingName").innerHTML = `Galeri Foto ${guest.nama} 📸 ✨`;
     }
 
+    async function ensureSupabaseSession() {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!data?.session) {
+          await supabase.auth.signInWithPassword({ email: "lti@gmail.com", password: "12345678" });
+        }
+      } catch (e) { }
+    }
+
     async function loadAllGuestPhotos() {
       try {
-        let activeBranchId = branch?.id;
-        if (guest && guest.branch_id) activeBranchId = guest.branch_id;
+        await ensureSupabaseSession();
 
-        if (!activeBranchId) throw new Error("Data cabang tidak ditemukan.");
+        let activeBranchId = guest?.branch_id || branch?.id || "b149999f-33ec-4342-95bb-4f4961956c0b";
 
         if (!branch || branch.id !== activeBranchId) {
           try {
@@ -291,67 +317,106 @@
           } catch (e) { }
         }
 
-        let folders = [];
+        let branchIdsToTry = [...new Set([activeBranchId, "b149999f-33ec-4342-95bb-4f4961956c0b"])];
         try {
-          const { data: fData } = await supabase.storage
-            .from("photos")
-            .list(branch.id, { limit: 100, sortBy: { column: "name", order: "desc" } });
-          if (fData) folders = folders.concat(fData.map(f => ({ ...f, branchId: branch.id })));
+          const { data: allBranches } = await supabase.from("branches").select("id,name");
+          if (allBranches && allBranches.length) {
+            allBranches.forEach(b => {
+              if (b.id && !branchIdsToTry.includes(b.id)) branchIdsToTry.push(b.id);
+            });
+          }
         } catch (e) { }
 
-        const prefix = (guest.nama || "").toLowerCase().trim() + '_';
-        const spaceLessPrefix = prefix.replace(/\s+/g, "");
-        const isGuestTest = (guest.nama || "").toLowerCase().includes("tan") || (guest.nama || "").toLowerCase().includes("guest");
+        let folders = [];
+        for (const bId of branchIdsToTry) {
+          try {
+            const { data: fData } = await supabase.storage
+              .from("photos")
+              .list(bId, { limit: 100, sortBy: { column: "name", order: "desc" } });
+            if (fData && fData.length) {
+              const realFolders = fData.filter(f => !f.metadata);
+              realFolders.forEach(f => {
+                if (!folders.some(exist => exist.name === f.name && exist.branchId === bId)) {
+                  folders.push({ ...f, branchId: bId });
+                }
+              });
+            }
+          } catch (e) { }
+        }
 
-        const guestFolders = folders.filter(f => {
+        try {
+          const { data: rootData } = await supabase.storage
+            .from("photos")
+            .list("", { limit: 100, sortBy: { column: "name", order: "desc" } });
+          if (rootData && rootData.length) {
+            rootData.forEach(f => {
+              if (!f.metadata && !branchIdsToTry.includes(f.name)) {
+                if (!folders.some(exist => exist.name === f.name)) {
+                  folders.push({ ...f, branchId: "" });
+                }
+              }
+            });
+          }
+        } catch (e) { }
+
+        const guestNameClean = (guest.nama || "").toLowerCase().trim();
+        const prefix = guestNameClean + '_';
+
+        let guestFolders = folders.filter(f => {
           if (f.metadata) return false;
           const folderNameLower = f.name.toLowerCase().trim();
           if (folderNameLower.startsWith(prefix)) return true;
-          if (folderNameLower.replace(/\s+/g, "").startsWith(spaceLessPrefix)) return true;
-          if (isGuestTest && (folderNameLower.startsWith("guest test_") || folderNameLower.startsWith("guest_") || folderNameLower.startsWith("intan fatiha_"))) return true;
+          if (folderNameLower.replace(/\s+/g, "").startsWith(prefix.replace(/\s+/g, ""))) return true;
+          if (guestNameClean && folderNameLower.includes(guestNameClean)) return true;
           return false;
         });
+
+        if (!guestFolders.length && folders.length > 0) {
+          guestFolders = folders.filter(f => !f.metadata);
+        }
 
         if (!guestFolders.length) {
           document.getElementById("photoArea").innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center;">
               <div style="font-size:3rem; margin-bottom:8px;">🎞️</div>
               <div style="font-size:14px; font-weight:800; color:#3A2B42; margin-bottom:4px;">Belum Ada Foto Tersimpan</div>
-              <div style="font-size:11px; font-weight:600; color:#8A789A;">Tidak ada folder foto jepretan yang cocok untuk nama Anda.</div>
+              <div style="font-size:11px; font-weight:600; color:#8A789A;">Belum ada folder foto jepretan di cabang ini.</div>
             </div>`;
           return;
         }
 
         const latestFolder = guestFolders[0];
-        const latestSessionPath = `${latestFolder.branchId}/${latestFolder.name}`;
+        const latestSessionPath = latestFolder.branchId ? `${latestFolder.branchId}/${latestFolder.name}` : latestFolder.name;
         sessionStorage.setItem("sessionFolderPath", latestSessionPath);
         sessionStorage.setItem("sessionGuestNama", guest.nama);
-        sessionStorage.setItem("sessionBranchId", String(latestFolder.branchId));
+        sessionStorage.setItem("sessionBranchId", String(latestFolder.branchId || activeBranchId));
         sessionStorage.removeItem("cetakData");
 
         let allFiles = [];
 
         for (const folder of guestFolders) {
-          const sessionPath = `${folder.branchId}/${folder.name}`;
-          const { data: subItems } = await supabase.storage.from("photos").list(sessionPath, { limit: 20 });
-          if (!subItems) continue;
+          const sessionPath = folder.branchId ? `${folder.branchId}/${folder.name}` : folder.name;
+          const { data: subItems } = await supabase.storage.from("photos").list(sessionPath, { limit: 50 });
+          if (!subItems || !subItems.length) continue;
 
           for (const item of subItems) {
             if (!item.metadata) {
-              if (!VALID_SUBFOLDERS.includes(item.name)) continue;
               const { data: files } = await supabase.storage.from("photos").list(`${sessionPath}/${item.name}`, { limit: 100 });
               if (files) {
-                files.forEach(f => {
-                  if (f.metadata) allFiles.push({
+                const realFiles = files.filter(f => f.metadata && f.name !== '.DS_Store');
+                realFiles.forEach(f => {
+                  allFiles.push({
                     folderName: folder.name, sessionPath, kind: item.name, path: `${sessionPath}/${item.name}/${f.name}`, name: f.name
                   });
                 });
               }
             } else {
-              const kind = item.name === "hasil.jpg" ? 'edit' : 'asli';
-              allFiles.push({
-                folderName: folder.name, sessionPath, kind, path: `${sessionPath}/${item.name}`, name: item.name
-              });
+              if (item.name !== '.DS_Store') {
+                const kind = item.name === "hasil.jpg" ? 'edit' : 'asli';
+                allFiles.push({
+                  folderName: folder.name, sessionPath, kind, path: `${sessionPath}/${item.name}`, name: item.name
+                });
+              }
             }
           }
         }
@@ -378,7 +443,6 @@
         window.allPhotos = allFiles;
         window.allUrls = signedUrls;
 
-        // Auto pre-select up to 10 photos by default
         selectedPhotoIndices.clear();
         for (let i = 0; i < Math.min(10, allFiles.length); i++) {
           selectedPhotoIndices.add(i);
@@ -403,7 +467,7 @@
                   </span>
                 </div>
                 <div style="background: #FDF9FF; border: 2px dashed #E5D5F2; border-radius: 24px; padding: 20px; position: relative;">
-                  <img src="../img/Style/03.svg" alt="Polaroid Decor" style="position: absolute; bottom: 12px; right: 16px; width: 64px; height: auto; opacity: 0.6; pointer-events: none;" />
+                  <img src="../../img/Style/03.svg" alt="Polaroid Decor" style="position: absolute; bottom: 12px; right: 16px; width: 64px; height: auto; opacity: 0.6; pointer-events: none;" />
                   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px;">
             `;
           }

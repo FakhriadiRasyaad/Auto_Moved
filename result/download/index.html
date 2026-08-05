@@ -6,15 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Download Foto — Photobooth</title>
 
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/png" href="../../img/Logo_photobooth_LTI.png" />
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Axionix Design System -->
-  <link rel="stylesheet" href="../assets/css/design-system.css" />
-  <link rel="stylesheet" href="../assets/css/components.css" />
-  <link rel="stylesheet" href="../assets/css/customer.css" />
+  <link rel="stylesheet" href="../../assets/css/design-system.css" />
+  <link rel="stylesheet" href="../../assets/css/components.css" />
+  <link rel="stylesheet" href="../../assets/css/customer.css" />
+
+  <script>
+    if (window.location.pathname.endsWith('/index.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search);
+    }
+  </script>
 
   <style>
     * {
@@ -282,19 +291,19 @@
   <!-- Background SVG Decorations -->
   <div class="background-decoration">
     <div class="top-left-decoration">
-      <img src="../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
+      <img src="../../img/Style/10.svg" alt="Sakura Branch" class="decor-sakura-branch" />
     </div>
     <div class="top-right-decoration">
-      <img src="../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
+      <img src="../../img/Style/07.svg" alt="Ribbon & Strawberry" class="decor-ribbon-bow" />
     </div>
     <div class="bottom-left-decoration">
-      <img src="../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
+      <img src="../../img/Style/01.svg" alt="Photobooth Machine" class="decor-photobooth-left" />
     </div>
     <div class="bottom-right-decoration">
       <div class="characters-cloud-group">
-        <img src="../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
-        <img src="../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
-        <img src="../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
+        <img src="../../img/Style/08.svg" alt="Cloud Base" class="decor-cloud-base" />
+        <img src="../../img/Style/05.svg" alt="Bear + Duck" class="decor-bear-chick" />
+        <img src="../../img/Style/04.svg" alt="Bunny with Camera" class="decor-bunny-right" />
       </div>
     </div>
   </div>
@@ -304,7 +313,7 @@
     <!-- Header Logo -->
     <div class="customer-logo">
       <div class="customer-logo-badge">
-        <img src="../img/Logo_photobooth_LTI.png" alt="Logo" onerror="this.src='../assets/img/logo.png'">
+        <img src="../../img/Logo_photobooth_LTI.png" alt="Logo" onerror="this.src='../../assets/img/logo.png'">
       </div>
       <span class="customer-logo-text">PHOTOBOOTH ✨</span>
     </div>
@@ -324,7 +333,7 @@
           <span>⏳ Memuat foto cetak...</span>
         </div>
         <img id="mainPhoto" alt="Foto Cetak" style="display:none;">
-        <img src="../img/Style/11.svg" alt="Sparkle" style="position: absolute; top: 12px; right: 12px; width: 18px; opacity: 0.8;" />
+        <img src="../../img/Style/11.svg" alt="Sparkle" style="position: absolute; top: 12px; right: 12px; width: 18px; opacity: 0.8;" />
       </div>
 
       <button class="btn-download-primary" id="btnDownloadMain" style="display:none;">
@@ -421,7 +430,7 @@
   </div>
 
   <script type="module">
-    import { supabase } from "../assets/js/supabase.js";
+    import { supabase } from "../../assets/js/supabase.js";
 
     const urlParams = new URLSearchParams(window.location.search);
     const sessionPath = urlParams.get("session");
@@ -564,8 +573,18 @@
       loadPhotos();
     }
 
+    async function ensureSupabaseSession() {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!data?.session) {
+          await supabase.auth.signInWithPassword({ email: "lti@gmail.com", password: "12345678" });
+        }
+      } catch (e) { }
+    }
+
     async function loadPhotos() {
       try {
+        await ensureSupabaseSession();
         try {
           let branchId = sessionPath.split("/")[0];
           if (!branchId || branchId.length < 10) branchId = "b149999f-33ec-4342-95bb-4f4961956c0b";
@@ -712,7 +731,7 @@
       document.getElementById("starsWrap").style.display = "none";
       document.getElementById("ratingThankYou").style.display = "block";
       setTimeout(() => {
-        window.location.href = "terima-kasih.html";
+        window.location.href = "../terima-kasih/";
       }, 1500);
     };
   </script>

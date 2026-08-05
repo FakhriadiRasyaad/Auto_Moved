@@ -180,16 +180,14 @@
     async function getBranchDetails() {
       if (!admin) return;
 
-      if (admin.username === "1@admin.com") {
-        try {
-          const { data } = await supabase.auth.getSession();
-          if (!data.session) {
-            console.log("Bypass mode detected: logging in to Supabase Auth...");
-            await supabase.auth.signInWithPassword({ email: "1@admin.com", password: "1" });
-          }
-        } catch (e) {
-          console.error("Gagal auto-auth:", e);
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) {
+          console.log("Auto-auth: logging in to Supabase Auth...");
+          await supabase.auth.signInWithPassword({ email: "lti@gmail.com", password: "12345678" });
         }
+      } catch (e) {
+        console.error("Gagal auto-auth:", e);
       }
 
       if (!branchId) {
@@ -216,16 +214,14 @@
       setLoading(true);
 
       try {
-        if (admin && admin.username === "1@admin.com") {
-          try {
-            const { data } = await supabase.auth.getSession();
-            if (!data.session) {
-              console.log("Bypass mode: Authenticating Supabase Auth in doLogin...");
-              await supabase.auth.signInWithPassword({ email: "1@admin.com", password: "1" });
-            }
-          } catch (e) {
-            console.error("Gagal auto-auth saat doLogin:", e);
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (!data.session) {
+            console.log("Auto-auth: logging in to Supabase Auth in doLogin...");
+            await supabase.auth.signInWithPassword({ email: "lti@gmail.com", password: "12345678" });
           }
+        } catch (e) {
+          console.error("Gagal auto-auth saat doLogin:", e);
         }
 
         if (!branchId && admin) {

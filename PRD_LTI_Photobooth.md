@@ -452,14 +452,14 @@ flowchart LR
 
 ### 6.5 🖼️ Guest Result (`/result/`)
 
-| Halaman | Fungsi |
-|---------|--------|
-| `guest-login.html` | Login tamu untuk akses galeri foto mereka |
-| `guest-gallery.html` | Galeri foto hasil sesi tamu |
-| `pilih-frame.html` | Editor frame versi tamu (post-session) |
-| `cetak.html` | Cetak hasil foto |
-| `download.html` | Download foto + QR Code |
-| `terima-kasih.html` | Halaman akhir terima kasih |
+| Halaman / Route | Fungsi |
+|-----------------|--------|
+| `guest-login/` | Login tamu untuk akses galeri foto mereka |
+| `guest-gallery/` | Galeri foto hasil sesi tamu |
+| `pilih-frame/` | Editor frame versi tamu (post-session) |
+| `cetak/` | Cetak hasil foto |
+| `download/` | Download foto + QR Code |
+| `terima-kasih/` | Halaman akhir terima kasih |
 
 ---
 
@@ -608,12 +608,12 @@ Auto_Moved-main/
 │   └── statistik.html                  # Statistik lintas cabang
 │
 ├── result/                             # 🖼️ Guest Result
-│   ├── guest-login.html                # Login tamu untuk akses galeri
-│   ├── guest-gallery.html              # Galeri foto tamu
-│   ├── pilih-frame.html                # Editor frame (guest version)
-│   ├── cetak.html                      # Halaman cetak
-│   ├── download.html                   # Download + QR Code
-│   └── terima-kasih.html               # Terima kasih
+│   ├── guest-login/index.html          # Login tamu untuk akses galeri
+│   ├── guest-gallery/index.html        # Galeri foto tamu
+│   ├── pilih-frame/index.html          # Editor frame (guest version)
+│   ├── cetak/index.html                # Halaman cetak
+│   ├── download/index.html             # Download + QR Code
+│   └── terima-kasih/index.html         # Terima kasih
 │
 ├── assets/
 │   ├── css/                            # Stylesheet admin & superadmin
