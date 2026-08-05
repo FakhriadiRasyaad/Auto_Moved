@@ -51,23 +51,10 @@ def setup_permissions(window):
                     page.featurePermissionRequested.connect(grant_permission)
 
                     # Intercept target="_blank" and window.open links (e.g. Duitku payment portal)
-                    # and open them in system default browser (Edge/Chrome) so Next.js loads without errors,
-                    # while keeping the Photobooth Kiosk window on pembayaran.html with live status polling.
-                    import webbrowser
+                    # and redirect them back into the main window so everything stays inside the app.
                     def handle_create_window(win_type):
-                        try:
-                            dummy_page = QWebEnginePage(native)
-                            def on_url_changed(qurl):
-                                url_str = qurl.toString()
-                                if url_str and url_str != "about:blank":
-                                    logger.info(f"[QtWebEngine] Opening external link in system browser: {url_str}")
-                                    webbrowser.open(url_str)
-                                    dummy_page.deleteLater()
-                            dummy_page.urlChanged.connect(on_url_changed)
-                            return dummy_page
-                        except Exception as ex_cw:
-                            logger.warning(f"[QtWebEngine] Error in createWindow: {ex_cw}")
-                            return None
+                        logger.info(f"[QtWebEngine] Redirecting popup/new window ({win_type}) back into main window.")
+                        return page
 
                     page.createWindow = handle_create_window
                     handler_bound = True
