@@ -434,12 +434,12 @@ def main():
         try:
             webview.start(
                 on_start,
-                gui='winforms',
+                gui='qt',
                 http_server=USE_LOCAL_FILES,
                 debug=DEBUG_MODE
             )
-        except Exception as ex_wf:
-            logging.warning(f"WinForms backend start fallback: {ex_wf}")
+        except Exception as ex_qt:
+            logging.warning(f"Qt backend start fallback: {ex_qt}")
             webview.start(
                 on_start,
                 http_server=USE_LOCAL_FILES,
