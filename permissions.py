@@ -22,8 +22,28 @@ def setup_permissions(window):
             # 1. PyQt5 / QtWebEngine Backend
             if hasattr(native, 'page'):
                 try:
-                    from PyQt5.QtWebEngineWidgets import QWebEnginePage
+                    from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineSettings
                     page = native.page()
+
+                    # Set modern Chrome User-Agent so Next.js / Duitku payment portal loads without client-side exceptions
+                    try:
+                        profile = page.profile()
+                        profile.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+                    except Exception:
+                        pass
+
+                    try:
+                        st = page.settings()
+                        st.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+                        st.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+                        st.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
+                        st.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
+                        st.setAttribute(QWebEngineSettings.AllowRunningInsecureContent, True)
+                        st.setAttribute(QWebEngineSettings.WebGLEnabled, True)
+                        st.setAttribute(QWebEngineSettings.AutoLoadImages, True)
+                    except Exception:
+                        pass
+
                     def grant_permission(security_origin, feature):
                         page.setFeaturePermission(security_origin, feature, QWebEnginePage.PermissionGrantedByUser)
                         logger.info(f"[QtWebEngine] ✅ Auto-granted permission for feature: {feature}")

@@ -298,6 +298,28 @@ def main():
     # 🤖 WEB SCRAPER LISTENER (Mendengarkan preset aktif di website -> Kirim ke ESP32)
     SCRAPER_JS = """
     (function() {
+        if (!String.prototype.replaceAll) {
+            String.prototype.replaceAll = function(str, newStr) {
+                if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') return this.replace(str, newStr);
+                return this.replace(new RegExp(String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newStr);
+            };
+        }
+        if (!Promise.allSettled) {
+            Promise.allSettled = function(promises) {
+                return Promise.all(Array.from(promises).map(function(p) {
+                    return Promise.resolve(p).then(
+                        function(value) { return { status: 'fulfilled', value: value }; },
+                        function(reason) { return { status: 'rejected', reason: reason }; }
+                    );
+                }));
+            };
+        }
+        if (!Object.hasOwn) {
+            Object.hasOwn = function(obj, prop) {
+                return Object.prototype.hasOwnProperty.call(obj, prop);
+            };
+        }
+
         if (window.__esp32ScraperInjected) return;
         window.__esp32ScraperInjected = true;
         console.log('[ESP32 Scraper] Injected JS Scraper for preset detection');
