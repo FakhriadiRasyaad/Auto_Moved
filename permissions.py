@@ -5,80 +5,68 @@ logger = logging.getLogger("Permissions")
 
 def setup_permissions(window):
     """
-    Menyetujui izin Kamera dan Mikrofon secara otomatis pada engine Windows Edge WebView2.
-    Aman dari Threading Exception karena menggunakan WinForms UI Thread.
+    Menyetujui izin Kamera dan Mikrofon secara otomatis pada engine Chromium (QtWebEngine & WinForms).
     """
     handler_bound = False
 
-    def bind_permissions_on_ui(sender=None, args=None):
+    def bind_permissions():
         nonlocal handler_bound
         if handler_bound:
             return
+
         try:
-            import System
             native = getattr(window, 'native', None)
             if not native:
                 return
 
+            # 1. PyQt5 / QtWebEngine Backend
+            if hasattr(native, 'page'):
+                try:
+                    from PyQt5.QtWebEngineWidgets import QWebEnginePage
+                    page = native.page()
+                    def grant_permission(security_origin, feature):
+                        page.setFeaturePermission(security_origin, feature, QWebEnginePage.PermissionGrantedByUser)
+                        logger.info(f"[QtWebEngine] ✅ Auto-granted permission for feature: {feature}")
+
+                    page.featurePermissionRequested.connect(grant_permission)
+                    handler_bound = True
+                    logger.info("[QtWebEngine] ✅ Permission handler bound successfully.")
+                    return
+                except Exception as ex_qt:
+                    logger.warning(f"[QtWebEngine] Permission setup note: {ex_qt}")
+
+            # 2. WinForms Edge WebView2 Backend
             webview_control = getattr(native, 'webview', None)
-            if not webview_control:
-                return
-
-            def permission_requested_handler(s, e):
+            if webview_control:
                 try:
-                    # 1 = CoreWebView2PermissionState.Allow
-                    e.State = System.Enum.ToObject(e.State.GetType(), 1)
-                    e.Handled = True
-                    kind_id = int(e.PermissionKind)
-                    kind_name = "Camera" if kind_id == 2 else ("Microphone" if kind_id == 1 else f"Kind_{kind_id}")
-                    logger.info(f"[WebView2] ✅ Auto-granted permission for: {kind_name}")
-                except Exception as ex:
-                    logger.warning(f"[WebView2] Error in permission handler: {ex}")
-
-            core = getattr(webview_control, 'CoreWebView2', None)
-            if core is not None:
-                core.PermissionRequested += permission_requested_handler
-                handler_bound = True
-                logger.info("[WebView2] ✅ Permission handler bound successfully to CoreWebView2.")
-            else:
-                def on_init_completed(s, e):
-                    nonlocal handler_bound
-                    if getattr(e, 'IsSuccess', False) and not handler_bound:
+                    import System
+                    def permission_requested_handler(s, e):
                         try:
-                            webview_control.CoreWebView2.PermissionRequested += permission_requested_handler
-                            handler_bound = True
-                            logger.info("[WebView2] ✅ Permission handler bound after CoreWebView2 init.")
-                        except Exception as ex2:
-                            logger.warning(f"[WebView2] Error binding after init: {ex2}")
+                            e.State = System.Enum.ToObject(e.State.GetType(), 1)
+                            e.Handled = True
+                            logger.info("[WebView2] ✅ Auto-granted permission.")
+                        except Exception as ex_wf:
+                            logger.warning(f"[WebView2] Error in permission handler: {ex_wf}")
 
-                if hasattr(webview_control, 'CoreWebView2InitializationCompleted'):
-                    webview_control.CoreWebView2InitializationCompleted += on_init_completed
-                    logger.info("[WebView2] ⏳ Waiting for CoreWebView2 initialization...")
+                    core = getattr(webview_control, 'CoreWebView2', None)
+                    if core is not None:
+                        core.PermissionRequested += permission_requested_handler
+                        handler_bound = True
+                        logger.info("[WebView2] ✅ Permission handler bound successfully to CoreWebView2.")
+                except ImportError:
+                    pass
+                except Exception as err_wf:
+                    logger.warning(f"[WebView2] Permission setup note: {err_wf}")
+
         except Exception as err:
-            logger.warning(f"[WebView2] Permission setup note: {err}")
+            logger.warning(f"[Permissions] Setup note: {err}")
 
-    def safe_attach():
-        try:
-            import System
-            native = getattr(window, 'native', None)
-            if not native:
-                return
+    try:
+        window.events.shown += bind_permissions
+    except Exception:
+        pass
+    bind_permissions()
 
-            if hasattr(native, 'IsHandleCreated') and native.IsHandleCreated:
-                try:
-                    native.BeginInvoke(System.Action(bind_permissions_on_ui))
-                except Exception:
-                    pass
-
-            if hasattr(native, 'Shown'):
-                try:
-                    native.Shown += System.EventHandler(bind_permissions_on_ui)
-                except Exception:
-                    pass
-        except Exception as e:
-            logger.warning(f"[WebView2] safe_attach note: {e}")
-
-    window.events.shown += safe_attach
 
 
 

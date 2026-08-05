@@ -387,11 +387,20 @@ def main():
 
     # 6. Start webview (blocking sampai window ditutup)
     try:
-        webview.start(
-            on_start,
-            http_server=USE_LOCAL_FILES,
-            debug=DEBUG_MODE
-        )
+        try:
+            webview.start(
+                on_start,
+                gui='qt',
+                http_server=USE_LOCAL_FILES,
+                debug=DEBUG_MODE
+            )
+        except Exception as ex_qt:
+            logging.warning(f"Qt backend start fallback: {ex_qt}")
+            webview.start(
+                on_start,
+                http_server=USE_LOCAL_FILES,
+                debug=DEBUG_MODE
+            )
 
     finally:
         # 7. Cleanup: Pastikan semua resource dilepas saat window ditutup
