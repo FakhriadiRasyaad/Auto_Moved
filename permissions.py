@@ -89,11 +89,35 @@ def setup_permissions(window):
                         except Exception as ex_wf:
                             logger.warning(f"[WebView2] Error in permission handler: {ex_wf}")
 
+                    def new_window_handler(s, e):
+                        try:
+                            e.NewWindow = core
+                            e.Handled = True
+                            logger.info("[WebView2] ✅ Redirected new window request to main window.")
+                        except Exception as ex_nw:
+                            logger.warning(f"[WebView2] Error in NewWindowRequested handler: {ex_nw}")
+
                     core = getattr(webview_control, 'CoreWebView2', None)
                     if core is not None:
                         core.PermissionRequested += permission_requested_handler
+                        core.NewWindowRequested += new_window_handler
                         handler_bound = True
-                        logger.info("[WebView2] ✅ Permission handler bound successfully to CoreWebView2.")
+                        logger.info("[WebView2] ✅ Permission & NewWindowRequested handlers bound successfully to CoreWebView2.")
+                    else:
+                        def on_init_completed(s, e):
+                            nonlocal handler_bound
+                            if getattr(e, 'IsSuccess', False) and not handler_bound:
+                                try:
+                                    c = webview_control.CoreWebView2
+                                    c.PermissionRequested += permission_requested_handler
+                                    c.NewWindowRequested += new_window_handler
+                                    handler_bound = True
+                                    logger.info("[WebView2] ✅ Handlers bound after CoreWebView2 init.")
+                                except Exception as ex2:
+                                    logger.warning(f"[WebView2] Error binding after init: {ex2}")
+
+                        if hasattr(webview_control, 'CoreWebView2InitializationCompleted'):
+                            webview_control.CoreWebView2InitializationCompleted += on_init_completed
                 except ImportError:
                     pass
                 except Exception as err_wf:

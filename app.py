@@ -3,22 +3,30 @@ import os
 import sys
 
 # ── DLL & PYTHON RUNTIME PATH RESOLUTION FOR CLEAN WINDOWS DEVICES ──
+import ctypes
 if getattr(sys, 'frozen', False):
     exe_dir = os.path.dirname(sys.executable)
     bundle_dir = getattr(sys, '_MEIPASS', exe_dir)
     internal_dir = os.path.join(exe_dir, '_internal')
+    pyruntime_dir = os.path.join(internal_dir, 'pythonnet', 'runtime')
+    clr_dir = os.path.join(internal_dir, 'clr_loader', 'ffi', 'dlls', 'amd64')
 
-    for d in [exe_dir, bundle_dir, internal_dir]:
+    os.chdir(exe_dir)
+    for d in [exe_dir, bundle_dir, internal_dir, pyruntime_dir, clr_dir]:
         if os.path.exists(d):
             os.environ['PATH'] = d + os.path.pathsep + os.environ.get('PATH', '')
+            try:
+                ctypes.windll.kernel32.SetDllDirectoryW(d)
+            except Exception:
+                pass
             if hasattr(os, 'add_dll_directory'):
                 try:
                     os.add_dll_directory(d)
                 except Exception:
                     pass
 
-    os.environ['PYTHONHOME'] = bundle_dir
-    os.environ['PYTHONPATH'] = bundle_dir
+    os.environ['PYTHONHOME'] = internal_dir if os.path.exists(internal_dir) else bundle_dir
+    os.environ['PYTHONPATH'] = internal_dir if os.path.exists(internal_dir) else bundle_dir
 
 import subprocess
 import logging
@@ -426,12 +434,12 @@ def main():
         try:
             webview.start(
                 on_start,
-                gui='qt',
+                gui='winforms',
                 http_server=USE_LOCAL_FILES,
                 debug=DEBUG_MODE
             )
-        except Exception as ex_qt:
-            logging.warning(f"Qt backend start fallback: {ex_qt}")
+        except Exception as ex_wf:
+            logging.warning(f"WinForms backend start fallback: {ex_wf}")
             webview.start(
                 on_start,
                 http_server=USE_LOCAL_FILES,
