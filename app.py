@@ -418,7 +418,7 @@ def main():
 
     def on_start():
         from permissions import setup_permissions
-        setup_permissions(webview_window)
+        setup_permissions(window)
 
         try:
             from PyQt5.QtWidgets import QApplication
