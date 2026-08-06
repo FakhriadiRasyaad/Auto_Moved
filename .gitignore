@@ -3,6 +3,8 @@ build/
 dist/
 *.spec
 *.zip
+*.exe
+scratch/
 
 # Python cache files
 __pycache__/

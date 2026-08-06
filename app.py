@@ -2,32 +2,20 @@
 import os
 import sys
 
-# ── DLL & PYTHON RUNTIME PATH RESOLUTION FOR CLEAN WINDOWS DEVICES ──
-import ctypes
+# ── EKSPLISIT LOCATION FOR PYTHONNET / CLR IN FROZEN PYINSTALLER EXECUTABLE ──
 if getattr(sys, 'frozen', False):
     exe_dir = os.path.dirname(sys.executable)
-    bundle_dir = getattr(sys, '_MEIPASS', exe_dir)
     internal_dir = os.path.join(exe_dir, '_internal')
-    pyruntime_dir = os.path.join(internal_dir, 'pythonnet', 'runtime')
-    clr_dir = os.path.join(internal_dir, 'clr_loader', 'ffi', 'dlls', 'amd64')
+    bundle_dir = getattr(sys, '_MEIPASS', exe_dir)
 
-    os.chdir(exe_dir)
-    for d in [exe_dir, bundle_dir, internal_dir, pyruntime_dir, clr_dir]:
-        if os.path.exists(d):
-            os.environ['PATH'] = d + os.path.pathsep + os.environ.get('PATH', '')
-            try:
-                ctypes.windll.kernel32.SetDllDirectoryW(d)
-            except Exception:
-                pass
-            if hasattr(os, 'add_dll_directory'):
-                try:
-                    os.add_dll_directory(d)
-                except Exception:
-                    pass
-
-    os.environ['PYTHONHOME'] = internal_dir if os.path.exists(internal_dir) else bundle_dir
-    os.environ['PYTHONPATH'] = internal_dir if os.path.exists(internal_dir) else bundle_dir
-
+    for candidate in [
+        os.path.join(internal_dir, 'python311.dll'),
+        os.path.join(bundle_dir, 'python311.dll'),
+        os.path.join(exe_dir, 'python311.dll')
+    ]:
+        if os.path.exists(candidate):
+            os.environ['PYTHONNET_PYDLL'] = candidate
+            break
 import subprocess
 import logging
 import webview
@@ -531,9 +519,7 @@ def main():
     # 6. Start webview (blocking sampai window ditutup)
     try:
         try:
-            # Utamakan backend Edge Chromium (Edge WebView2) pada Windows
-            # karena memiliki dukungan codec H.264 / MP4 native bawaan Windows.
-            # QtWebEngine bawaan PyQt5 wheel tidak menyertakan codec MP4 proprietary.
+            # Gunakan Edge WebView2 (edgechromium) untuk pemutaran video MP4 / H.264 native
             webview.start(
                 on_start,
                 gui='edgechromium',
@@ -548,7 +534,6 @@ def main():
                 http_server=USE_LOCAL_FILES,
                 debug=DEBUG_MODE
             )
-
     finally:
         # 7. Cleanup: Pastikan semua resource dilepas saat window ditutup
 
