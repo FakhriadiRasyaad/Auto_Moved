@@ -530,12 +530,24 @@ def main():
 
     # 6. Start webview (blocking sampai window ditutup)
     try:
-        webview.start(
-            on_start,
-            gui='qt',
-            http_server=USE_LOCAL_FILES,
-            debug=DEBUG_MODE
-        )
+        try:
+            # Utamakan backend Edge Chromium (Edge WebView2) pada Windows
+            # karena memiliki dukungan codec H.264 / MP4 native bawaan Windows.
+            # QtWebEngine bawaan PyQt5 wheel tidak menyertakan codec MP4 proprietary.
+            webview.start(
+                on_start,
+                gui='edgechromium',
+                http_server=USE_LOCAL_FILES,
+                debug=DEBUG_MODE
+            )
+        except Exception as ex_edge:
+            logging.warning(f"EdgeChromium backend fallback to Qt: {ex_edge}")
+            webview.start(
+                on_start,
+                gui='qt',
+                http_server=USE_LOCAL_FILES,
+                debug=DEBUG_MODE
+            )
 
     finally:
         # 7. Cleanup: Pastikan semua resource dilepas saat window ditutup
