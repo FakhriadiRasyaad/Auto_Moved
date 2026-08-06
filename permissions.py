@@ -23,43 +23,76 @@ def setup_permissions(window):
             if hasattr(native, 'page'):
                 try:
                     from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineSettings
+
+                    # ── Subclass yang benar-benar override createWindow ──────────
+                    # Catatan penting: page.createWindow = func TIDAK bekerja di PyQt5
+                    # karena createWindow adalah C++ virtual method.
+                    # Satu-satunya cara yang benar adalah subclass QWebEnginePage.
+                    class _NoExternalBrowserPage(QWebEnginePage):
+                        """
+                        Custom page yang mencegat window.open() & target='_blank'
+                        agar tidak membuka browser eksternal.
+                        Semua navigasi baru diarahkan ke halaman yang sama (current page).
+                        """
+                        def createWindow(self, win_type):
+                            logger.info(
+                                f"[QtWebEngine] ✅ Intercepted window.open()/target=_blank "
+                                f"(type={win_type}) — ditahan di dalam app."
+                            )
+                            return self  # redirect ke page yang sama, bukan browser luar
+
                     page = native.page()
 
-                    # Set modern Chrome User-Agent so Next.js / Duitku payment portal loads without client-side exceptions
+                    # Pasang custom page (preserving profile)
                     try:
                         profile = page.profile()
-                        profile.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-                    except Exception:
-                        pass
+                        custom_page = _NoExternalBrowserPage(profile, native)
 
-                    try:
-                        st = page.settings()
-                        st.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
-                        st.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
-                        st.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
-                        st.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
-                        st.setAttribute(QWebEngineSettings.AllowRunningInsecureContent, True)
-                        st.setAttribute(QWebEngineSettings.WebGLEnabled, True)
-                        st.setAttribute(QWebEngineSettings.AutoLoadImages, True)
-                    except Exception:
-                        pass
+                        # Terapkan user-agent modern agar Duitku / Next.js tidak error
+                        try:
+                            custom_page.profile().setHttpUserAgent(
+                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                "Chrome/122.0.0.0 Safari/537.36"
+                            )
+                        except Exception:
+                            pass
 
-                    def grant_permission(security_origin, feature):
-                        page.setFeaturePermission(security_origin, feature, QWebEnginePage.PermissionGrantedByUser)
-                        logger.info(f"[QtWebEngine] ✅ Auto-granted permission for feature: {feature}")
+                        # Settings
+                        try:
+                            st = custom_page.settings()
+                            st.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+                            st.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+                            st.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
+                            st.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
+                            st.setAttribute(QWebEngineSettings.AllowRunningInsecureContent, True)
+                            st.setAttribute(QWebEngineSettings.WebGLEnabled, True)
+                            st.setAttribute(QWebEngineSettings.AutoLoadImages, True)
+                            if hasattr(QWebEngineSettings, 'PlaybackRequiresUserGesture'):
+                                st.setAttribute(QWebEngineSettings.PlaybackRequiresUserGesture, False)
+                        except Exception:
+                            pass
 
-                    page.featurePermissionRequested.connect(grant_permission)
+                        # Auto-grant kamera / mikrofon
+                        def grant_permission(security_origin, feature):
+                            custom_page.setFeaturePermission(
+                                security_origin, feature,
+                                QWebEnginePage.PermissionGrantedByUser
+                            )
+                            logger.info(f"[QtWebEngine] ✅ Auto-granted: {feature}")
 
-                    # Intercept target="_blank" and window.open links (e.g. Duitku payment portal)
-                    # and redirect them back into the main window so everything stays inside the app.
-                    def handle_create_window(win_type):
-                        logger.info(f"[QtWebEngine] Redirecting popup/new window ({win_type}) back into main window.")
-                        return page
+                        custom_page.featurePermissionRequested.connect(grant_permission)
 
-                    page.createWindow = handle_create_window
-                    handler_bound = True
-                    logger.info("[QtWebEngine] ✅ Permission & external window handler bound successfully.")
-                    return
+                        # Pasang custom page ke webview
+                        native.setPage(custom_page)
+
+                        handler_bound = True
+                        logger.info("[QtWebEngine] ✅ Custom page (no-external-browser) terpasang.")
+                        return
+
+                    except Exception as ex_page:
+                        logger.warning(f"[QtWebEngine] Gagal pasang custom page: {ex_page}")
+
                 except Exception as ex_qt:
                     logger.warning(f"[QtWebEngine] Permission setup note: {ex_qt}")
 
@@ -78,8 +111,14 @@ def setup_permissions(window):
 
                     def new_window_handler(s, e):
                         try:
-                            e.NewWindow = core
                             e.Handled = True
+                            if hasattr(e, 'Uri') and e.Uri:
+                                core.Navigate(e.Uri)
+                            else:
+                                try:
+                                    e.NewWindow = core
+                                except Exception:
+                                    pass
                             logger.info("[WebView2] ✅ Redirected new window request to main window.")
                         except Exception as ex_nw:
                             logger.warning(f"[WebView2] Error in NewWindowRequested handler: {ex_nw}")
@@ -118,7 +157,3 @@ def setup_permissions(window):
     except Exception:
         pass
     bind_permissions()
-
-
-
-

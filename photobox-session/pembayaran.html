@@ -310,9 +310,8 @@
         if (data?.status === "paid") {
           clearInterval(pollingTimer);
           clearInterval(countdownTimer);
-          if (window.pywebview && window.pywebview.api && window.pywebview.api.close_payment_popup) {
-            try { window.pywebview.api.close_payment_popup(); } catch(e){}
-          }
+          // Tutup jendela pembayaran pywebview lalu lanjut
+          await tutupJendelaPembayaran();
           lanjutSetelahBayar();
         }
       }, 3000);
@@ -375,7 +374,7 @@
           phone:         localUser.nohp  || cleanPhone || "081234567890",
           email:         validCustomerEmail,
           description:   `Photobooth - ${namaPaket}`,
-          return_url:    window.location.origin + "/photobox-session/pembayaran.html"
+          return_url:    window.location.origin + '/photobox-session/pembayaran.html'
         }
       });
 
@@ -400,40 +399,72 @@
       ud.duitku_reference = duitkuData.reference;
       localStorage.setItem("currentUser", JSON.stringify(ud));
 
-      window.currentPaymentUrl = duitkuData.paymentUrl;
-      if (window.pywebview && window.pywebview.api && window.pywebview.api.open_payment_popup) {
-        try { window.pywebview.api.open_payment_popup(duitkuData.paymentUrl); } catch(e){}
-      } else {
-        window.open(duitkuData.paymentUrl, "DuitkuPayment", "width=720,height=740");
-      }
+      const ref = duitkuData.reference;
+      const paymentUrl = duitkuData.paymentUrl;
 
+      // Tampilkan tombol untuk membuka jendela pembayaran pywebview (di dalam aplikasi)
       document.getElementById("gatewayContainer").innerHTML = `
-        <div style="margin-top: 20px; padding: 24px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
-          <h3 style="margin-bottom: 8px; font-size: 18px; color: var(--color-primary, #4F46E5);">💳 Jendela Pembayaran Terbuka</h3>
-          <p style="font-size: 14px; color: var(--text-secondary, #9CA3AF); margin-bottom: 16px;">
-            Silakan selesaikan transaksi (QRIS, Bank Transfer, E-Wallet, VA) pada jendela pop-up pembayaran yang muncul.
+        <div style="display:flex; flex-direction:column; align-items:center; gap: 12px; padding: 12px 0;">
+          <div style="
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed22, #ec489922);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin-bottom: 4px;
+          ">💳</div>
+          <p style="font-size:14px; color:var(--text-primary); font-weight:600; margin:0;">Siap memproses pembayaran</p>
+          <p style="font-size:12px; color:var(--text-secondary); margin:0; text-align:center; line-height:1.5;">
+            Klik tombol di bawah untuk membuka<br/>form pembayaran di dalam aplikasi
           </p>
-          <button onclick="bukaUlangPaymentPopup()" class="customer-btn-primary" style="display: inline-flex; font-size: 14px; font-weight: 700; cursor: pointer; padding: 12px 24px;">
-            🔄 Buka Kembali Jendela Pembayaran
+          <button
+            id="btnBayarSekarang"
+            onclick="bukaJendelaPembayaran('${paymentUrl}')"
+            class="customer-btn-primary"
+            style="font-size:15px; font-weight:700; padding:14px 32px; margin-top:4px; display:inline-flex; align-items:center; gap:8px;"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            Bayar Sekarang
           </button>
-          <p style="margin-top: 14px; font-size: 11px; color: var(--text-tertiary, #6B7280);">
-            Ref Transaksi: <code style="color: var(--color-primary, #4F46E5);">${duitkuData.reference}</code>
+          <p style="margin-top:4px; font-size:11px; color:var(--text-tertiary); text-align:center;">
+            Mendukung: Bank Transfer, QRIS, ShopeePay, OVO, Dana, VA
+          </p>
+          <p style="font-size:11px; color:var(--text-tertiary);">
+            Ref: <code style="color:var(--color-primary);">${ref}</code>
           </p>
         </div>
       `;
-      msg.textContent = "⏳ Menunggu verifikasi pembayaran...";
+      msg.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;">⏳ Menunggu verifikasi pembayaran...</span>`;
       startPolling(sessionId);
     }
 
-    function bukaUlangPaymentPopup() {
-      if (window.currentPaymentUrl) {
-        if (window.pywebview && window.pywebview.api && window.pywebview.api.open_payment_popup) {
-          try { window.pywebview.api.open_payment_popup(window.currentPaymentUrl); } catch(e){}
-        } else {
-          window.open(window.currentPaymentUrl, "DuitkuPayment", "width=720,height=740");
-        }
+    // Navigasi ke halaman pembayaran Duitku di dalam aplikasi
+    window.bukaJendelaPembayaran = async function(url) {
+      const btn = document.getElementById("btnBayarSekarang");
+      if (btn) { btn.disabled = true; btn.textContent = "Memproses..."; }
+
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.open_payment_window) {
+        // Di dalam app pywebview: navigasi window utama ke Duitku
+        await window.pywebview.api.open_payment_window(url);
+      } else {
+        // Fallback testing di browser: navigasi di tab yang sama (bukan buka tab baru)
+        window.location.href = url;
+      }
+
+      if (btn) { btn.disabled = false; btn.textContent = "Bayar Sekarang"; }
+    };
+
+    // Tutup jendela pembayaran (dipanggil saat polling sukses)
+    async function tutupJendelaPembayaran() {
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.close_payment_window) {
+        await window.pywebview.api.close_payment_window();
       }
     }
+
+    // Deteksi pesan postMessage dari jendela Duitku (jika dikirim)
+    window.addEventListener("message", function(event) {
+      if (event.data === "duitku_success" || (event.data && event.data.status === "success")) {
+        tutupJendelaPembayaran().then(() => lanjutSetelahBayar());
+      }
+    });
 
     function startCountdown(seconds) {
       const el = document.getElementById("countdown");

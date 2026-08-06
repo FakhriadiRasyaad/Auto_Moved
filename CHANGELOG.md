@@ -1,6 +1,25 @@
-# 📝 Changelog — AutoMoved Update
+# 📝 Changelog — Axionix Photobooth
 
-## Fitur Baru yang Ditambahkan
+---
+
+## 🆕 Update — 6 Agustus 2026
+
+### 💳 Pembayaran Duitku In-App (Tanpa Buka Browser Eksternal)
+
+**Sebelum:** Klik bayar → browser Chrome/Edge eksternal terbuka, pengguna harus berpindah jendela.  
+**Sesudah:** Klik "Bayar Sekarang" → jendela pembayaran Duitku muncul **di dalam aplikasi** (pywebview window), tanpa keluar dari software sama sekali.
+
+**Perubahan teknis:**
+- `app.py` — Ditambah dua method Python API baru:
+  - `open_payment_window(url)` — membuat pywebview window kedua berisi halaman Duitku
+  - `close_payment_window()` — menutup jendela pembayaran setelah sukses/dibatalkan
+- `photobox-session/pembayaran.html` — Tombol bayar kini memanggil `window.pywebview.api.open_payment_window()`, polling Supabase otomatis menutup jendela dan lanjut ke sesi foto saat status `paid`
+- Dihapus: script `duitku.js` eksternal (sandbox & prod) yang memicu popup browser
+- Fallback: jika diakses via browser biasa, tetap buka `window.open()` agar tidak error saat testing
+
+---
+
+## Fitur Sebelumnya
 
 ---
 

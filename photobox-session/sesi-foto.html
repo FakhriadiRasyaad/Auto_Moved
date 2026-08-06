@@ -523,7 +523,13 @@
         presetVideoPlayer.src = "../Video_Photo/Deteksi.mp4";
         presetVideoPlayer.currentTime = 0;
         if (videoOverlayText) videoOverlayText.textContent = "🤖 Tunjukkan Jari Anda!";
-        presetVideoPlayer.play().catch(() => { });
+        const pPlay = presetVideoPlayer.play();
+        if (pPlay !== undefined) {
+          pPlay.catch(() => {
+            presetVideoPlayer.muted = true;
+            presetVideoPlayer.play().catch(() => { });
+          });
+        }
         // setelah video selesai, biarkan diam – timer akan memutar lagi jika masih idle
         presetVideoPlayer.onended = () => { isPlayingDeteksi = false; };
       }
@@ -630,13 +636,18 @@
         const playPromise = presetVideoPlayer.play();
         if (playPromise !== undefined) {
           playPromise.catch(err => {
-            console.warn(`Video_Photo/${id}.mp4 not found, playing fallback (1.mp4):`, err);
-            presetVideoPlayer.src = `../Video_Photo/1.mp4`;
-            presetVideoPlayer.loop = false;
-            try { presetVideoPlayer.currentTime = 0; } catch (e) { }
-            presetVideoPlayer.muted = false;
-            presetVideoPlayer.volume = 1.0;
-            presetVideoPlayer.play().catch(() => { });
+            console.warn(`Video_Photo/${id}.mp4 playback note (retrying muted if gesture required):`, err);
+            // Coba lagi dengan muted=true jika browser memblokir unmuted autoplay
+            presetVideoPlayer.muted = true;
+            presetVideoPlayer.play().catch(err2 => {
+              if (id !== 1) {
+                console.warn(`Video_Photo/${id}.mp4 tidak dapat diputar, beralih ke 1.mp4:`, err2);
+                presetVideoPlayer.src = `../Video_Photo/1.mp4`;
+                presetVideoPlayer.loop = false;
+                try { presetVideoPlayer.currentTime = 0; } catch (e) { }
+                presetVideoPlayer.play().catch(() => { });
+              }
+            });
           });
         }
       }

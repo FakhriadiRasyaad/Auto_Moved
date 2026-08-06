@@ -36,8 +36,9 @@ import webview
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-# Otomatis izinkan kamera & mikrofon pada engine Chromium/Edge WebView2
-os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--use-fake-ui-for-media-stream --enable-usermedia-screen-capturing"
+# Otomatis izinkan kamera & mikrofon serta autoplay media pada Chromium/QtWebEngine/Edge WebView2
+sys.argv.extend(["--autoplay-policy=no-user-gesture-required", "--no-user-gesture-required"])
+os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--use-fake-ui-for-media-stream --enable-usermedia-screen-capturing --autoplay-policy=no-user-gesture-required"
 
 
 # ==========================================
@@ -119,8 +120,8 @@ class Api:
     """
     def __init__(self):
         self._window = None
-        self._esp32 = None
         self._payment_window = None
+        self._esp32 = None
 
     def set_window(self, window):
         self._window = window
@@ -129,65 +130,36 @@ class Api:
         """Inject ESP32Handler instance ke dalam Api."""
         self._esp32 = esp32_handler
 
-    def open_payment_popup(self, url: str) -> dict:
-        """
-        Buka jendela pop-up pembayaran khusus (Duitku / Payment Gateway).
-        """
-        try:
-            if self._payment_window:
-                try:
-                    self._payment_window.destroy()
-                except Exception:
-                    pass
-                self._payment_window = None
-
-            print(f"[PAYMENT POPUP] Membuka jendela pop-up pembayaran: {url}", flush=True)
-            win = webview.create_window(
-                title="Pembayaran - Axionix Photo",
-                url=url,
-                width=720,
-                height=740,
-                resizable=True,
-                on_top=True
-            )
-            self._payment_window = win
-
-            # Pass Chrome 122 User-Agent and storage settings to payment popup window
-            def bind_popup_perm():
-                try:
-                    from permissions import setup_permissions
-                    setup_permissions(win)
-                except Exception as ex:
-                    logging.warning(f"[PAYMENT POPUP] Setup permissions note: {ex}")
-
-            try:
-                win.events.shown += bind_popup_perm
-            except Exception:
-                pass
-            bind_popup_perm()
-
-            return {"success": True}
-        except Exception as e:
-            logging.error(f"[PAYMENT POPUP] Gagal membuka window: {e}")
-            return {"success": False, "error": str(e)}
-
-    def close_payment_popup(self) -> dict:
-        """
-        Tutup jendela pop-up pembayaran secara otomatis saat status lunas.
-        """
-        try:
-            if self._payment_window:
-                print("[PAYMENT POPUP] Menutup jendela pop-up pembayaran...", flush=True)
-                self._payment_window.destroy()
-                self._payment_window = None
-            return {"success": True}
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-
     def close_app(self):
         print("Closing application...")
         if self._window:
             self._window.destroy()
+
+    def open_payment_window(self, payment_url: str) -> dict:
+        """
+        Navigasi window utama ke URL pembayaran Duitku.
+        Semua proses pembayaran tetap di dalam aplikasi.
+        Setelah selesai, Duitku redirect ke return_url → initPaymentSystem() tangani hasilnya.
+
+        Dipanggil dari JavaScript:
+            await window.pywebview.api.open_payment_window(url);
+        """
+        try:
+            if self._window:
+                self._window.load_url(payment_url)
+                print(f"[PAYMENT] Navigasi ke: {payment_url}")
+            return {"ok": True}
+        except Exception as e:
+            print(f"[PAYMENT] open_payment_window error: {e}")
+            return {"ok": False, "message": str(e)}
+
+    def close_payment_window(self) -> dict:
+        """
+        Tidak lagi relevan (payment kini di main window).
+        Tetap ada untuk backward-compat dengan JS yang sudah memanggil ini.
+        """
+        return {"ok": True}
+
 
     def print_page(self):
         # Memicu dialog print bawaan sistem
@@ -362,12 +334,52 @@ def main():
     # 🤖 WEB SCRAPER LISTENER (Mendengarkan preset aktif di website -> Kirim ke ESP32)
     SCRAPER_JS = """
     (function() {
+        // ══════════════════════════════════════════════════════════════════
+        // POLYFILLS — dijalankan di SEMUA halaman (termasuk Duitku/eksternal)
+        // QtWebEngine lama tidak support ES2021/ES2022 yang dipakai Next.js.
+        // ══════════════════════════════════════════════════════════════════
+
+        // String.prototype.replaceAll (ES2021)
         if (!String.prototype.replaceAll) {
-            String.prototype.replaceAll = function(str, newStr) {
-                if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') return this.replace(str, newStr);
-                return this.replace(new RegExp(String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newStr);
+            String.prototype.replaceAll = function(search, replacement) {
+                if (Object.prototype.toString.call(search).toLowerCase() === '[object regexp]') {
+                    return this.replace(search, replacement);
+                }
+                return this.split(String(search)).join(
+                    typeof replacement === 'function' ? replacement() : String(replacement)
+                );
             };
         }
+
+        // Array.prototype.at (ES2022)
+        if (!Array.prototype.at) {
+            Array.prototype.at = function(index) {
+                var n = Math.trunc(index) || 0;
+                if (n < 0) n += this.length;
+                if (n < 0 || n >= this.length) return undefined;
+                return this[n];
+            };
+        }
+
+        // String.prototype.at (ES2022)
+        if (!String.prototype.at) {
+            String.prototype.at = function(index) {
+                var n = Math.trunc(index) || 0;
+                var len = this.length;
+                if (n < 0) n += len;
+                if (n < 0 || n >= len) return undefined;
+                return this[n];
+            };
+        }
+
+        // Object.hasOwn (ES2022)
+        if (!Object.hasOwn) {
+            Object.hasOwn = function(obj, prop) {
+                return Object.prototype.hasOwnProperty.call(obj, prop);
+            };
+        }
+
+        // Promise.allSettled (ES2020)
         if (!Promise.allSettled) {
             Promise.allSettled = function(promises) {
                 return Promise.all(Array.from(promises).map(function(p) {
@@ -378,15 +390,46 @@ def main():
                 }));
             };
         }
-        if (!Object.hasOwn) {
-            Object.hasOwn = function(obj, prop) {
-                return Object.prototype.hasOwnProperty.call(obj, prop);
+
+        // ══════════════════════════════════════════════════════════════════
+        // Guard: hanya lanjutkan di halaman milik kita
+        // Jika di halaman eksternal (Duitku dsb.), polyfills saja sudah cukup.
+        // ══════════════════════════════════════════════════════════════════
+        var _h = window.location.hostname;
+        var _isOurPage = (
+            _h === '127.0.0.1' ||
+            _h === 'localhost'  ||
+            _h.indexOf('axionix')     >= 0 ||
+            _h.indexOf('lti.company') >= 0
+        );
+        if (!_isOurPage) return; // ← EXIT: polyfills sudah aktif, tidak perlu lanjut
+
+        // PATCH window.open() — alihkan ke in-app navigation
+        // Duitku SDK memanggil window.open(checkoutUrl) → kita tangkap.
+        if (!window.__axionixOpenPatched) {
+            window.__axionixOpenPatched = true;
+            var _origOpen = window.open;
+            window.open = function(url, target, features) {
+                var sUrl = url ? String(url) : '';
+                if (sUrl.startsWith('http://') || sUrl.startsWith('https://')) {
+                    console.log('[Axionix] window.open() → in-app:', sUrl);
+                    window.location.href = sUrl;
+                    return {
+                        closed: false, opener: window,
+                        focus: function() {}, blur: function() {}, close: function() {},
+                        postMessage: function() {},
+                        addEventListener: function() {}, removeEventListener: function() {},
+                        location: { href: sUrl, assign: function(u) { window.location.href = u; } }
+                    };
+                }
+                return _origOpen ? _origOpen.apply(this, arguments) : null;
             };
+            console.log('[Axionix] window.open patched di ' + _h);
         }
 
         if (window.__esp32ScraperInjected) return;
         window.__esp32ScraperInjected = true;
-        console.log('[ESP32 Scraper] Injected JS Scraper for preset detection');
+        console.log('[ESP32 Scraper] Injected for preset detection');
 
         var lastSentPreset = null;
         var lastSentTime = 0;
@@ -488,16 +531,20 @@ def main():
     # 6. Start webview (blocking sampai window ditutup)
     try:
         try:
+            # Utamakan backend Edge Chromium (Edge WebView2) pada Windows
+            # karena memiliki dukungan codec H.264 / MP4 native bawaan Windows.
+            # QtWebEngine bawaan PyQt5 wheel tidak menyertakan codec MP4 proprietary.
             webview.start(
                 on_start,
-                gui='qt',
+                gui='edgechromium',
                 http_server=USE_LOCAL_FILES,
                 debug=DEBUG_MODE
             )
-        except Exception as ex_qt:
-            logging.warning(f"Qt backend start fallback: {ex_qt}")
+        except Exception as ex_edge:
+            logging.warning(f"EdgeChromium backend fallback to Qt: {ex_edge}")
             webview.start(
                 on_start,
+                gui='qt',
                 http_server=USE_LOCAL_FILES,
                 debug=DEBUG_MODE
             )
